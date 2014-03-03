@@ -2,21 +2,16 @@ package Events;
 
 import Misc.DVD;
 
-public class MachineXStage1FinishedDVD extends Event {
+public class MachineXStage1FinishedDVD extends MachineXStage1Event {
 	public MachineXStage1FinishedDVD(int t, int m, DVD d, int p) {
-		super(t);
-		machineNumber = m;
+		super(t, m);
+	
 		finishedDVD = d;
 		procTime = p;
 	}
 
-	private final int machineNumber;
 	private final DVD finishedDVD;
 	private final int procTime;
-	
-	public int getMachineNumber() {
-		return machineNumber;
-	}
 
 	public DVD getFinishedDVD() {
 		return finishedDVD;

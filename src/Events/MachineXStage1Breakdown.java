@@ -1,18 +1,13 @@
 package Events;
 
-public class MachineXStage1Breakdown extends Event {
-	public MachineXStage1Breakdown(int t, int m, int r) {
-		super(t);
-		machineNumber = m;
-		repairTime = r;
+public class MachineXStage1Breakdown extends MachineXStage1Event {
 	
-	}
-
-	private final int machineNumber;
 	private final int repairTime;
 	
-	public int getMachineNumber() {
-		return machineNumber;
+	public MachineXStage1Breakdown(int t, int m, int r) {
+		super(t,m);
+		repairTime = r;
+	
 	}
 
 	public int getRepairTime() {
