@@ -82,6 +82,7 @@ public class Simulation {
 	}
 	
 	public void run() {
+		boolean finished = false;
 		do {
 			Event event = eventQueue.remove();
 			
@@ -101,28 +102,48 @@ public class Simulation {
 				process_MachineXStage1Breakdown_event((MachineXStage1Breakdown) event);
 			}
 			else if (event instanceof SimulationFinished) {
+				finished = true;
 				System.out.println("\t Finishing up the simulation at time " + currentTime);
 				process_SimulationFinished_event(event);
 			}
 			
-		} while(currentTime < runTime);
+		} while(!finished);
 	}
 
 	private void process_MachineXStage1Breakdown_event(
 			MachineXStage1Breakdown event) {
 		stageOneMachines.get(event.getMachineNumber()-1).state = StateStageOne.Broken;
+		stageOneMachines.get(event.getMachineNumber()-1).setLastBreakDownTime(event.getTimeOfOccurence());
+		
 	}
 
 
 	private void process_MachineXStage1FinishedDVD_event(MachineXStage1FinishedDVD event) {
-		// TODO Auto-generated method stub
-		statistics.updateAverage("Average processing time S1M"+  event.getMachineNumber(),
-				event.getProcTime());
-		event.getFinishedDVD().setTimeOfLeavingPipeLine(currentTime);
+		switch(stageOneMachines.get(event.getMachineNumber()-1).state)
+		{
+		case Broken:
+			int processingTimeLeft = event.getTimeOfOccurence()-stageOneMachines.get(event.getMachineNumber()-1).getLastBreakDownTime();
+			break;
+		case Idle:
+			break;
+		case Normal:
+			statistics.updateAverage("Average processing time S1M"+  event.getMachineNumber(),
+					event.getProcTime());
+			event.getFinishedDVD().setTimeOfLeavingPipeLine(currentTime);
+			MachineStageOne m = stageOneMachines.get(event.getMachineNumber()-1);
+			DVD dvd = new DVD(currentTime);
+			int machineProcTime = Math.round(stageOneMachines.get(m.machineNumber-1).generateProcessingTime());
+			int machineFinishedTime = machineProcTime + currentTime;
+			Event machinestage1 = new MachineXStage1FinishedDVD
+					(machineFinishedTime, m.machineNumber,dvd, machineProcTime);
+			eventQueue.add(machinestage1);
+			// TODO: move this to relevant timeslot
+			statistics.updateAverage("Throughput time per DVD", event.getFinishedDVD().throughputTime());
+			break;
+		default:
+			break;
 		
-		
-		// TODO: move this to relevant timeslot
-		statistics.updateAverage("Throughput time per DVD", event.getFinishedDVD().throughputTime());
+		}
 	}
 
 

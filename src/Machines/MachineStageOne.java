@@ -5,6 +5,8 @@ import Stages.StateStageOne;
 public class MachineStageOne extends Machine {
 
 	public StateStageOne state; 
+	
+	private int lastBreakDownTime;
 	public MachineStageOne(int machineNumber) {
 		super(machineNumber);
 		// TODO Auto-generated constructor stub
@@ -25,5 +27,13 @@ public class MachineStageOne extends Machine {
 	public float generateRepairTime()
 	{
 		return machineNumber*2;
+	}
+
+	public int getLastBreakDownTime() {
+		return lastBreakDownTime;
+	}
+
+	public void setLastBreakDownTime(int lastBreakDownTime) {
+		this.lastBreakDownTime = lastBreakDownTime;
 	}
 }

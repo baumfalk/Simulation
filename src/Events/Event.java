@@ -13,6 +13,7 @@ public abstract class Event implements Comparable<Event> {
 	}
 
 	
+	@Override
 	public int compareTo(Event event) {
 		int output = 0;
 		if(this.getTimeOfOccurence() < event.getTimeOfOccurence())
