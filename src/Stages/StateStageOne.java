@@ -3,5 +3,7 @@ package Stages;
 public enum StateStageOne {
 	Normal,
 	Idle,
-	Broken
+	Broken,
+	BrokenAndDVDBeforeRepair,
+	BrokenAndRepairedBeforeDVD
 }

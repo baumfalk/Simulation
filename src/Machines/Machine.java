@@ -18,5 +18,5 @@ public abstract class Machine {
 	
 	
 	
-	public abstract float generateProcessingTime();
+	public abstract int generateProcessingTime();
 }

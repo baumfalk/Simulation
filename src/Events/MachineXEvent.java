@@ -1,9 +1,9 @@
 package Events;
 
-public class MachineXStage1Event extends Event {
+public class MachineXEvent extends Event {
 
 	protected final int machineNumber;
-	public MachineXStage1Event(int t, int m) {
+	public MachineXEvent(int t, int m) {
 		super(t);
 		machineNumber = m;
 	

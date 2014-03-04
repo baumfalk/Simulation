@@ -9,11 +9,12 @@ public class MachineStageOne extends Machine {
 
 	public StateStageOne state; 
 	
-	private int lastBreakDownTime;
-	private int processingTimeLeft;
-	private int totalProcessingTime;
+	public int lastBreakDownTime;
+	public int lastRepairTime;
+	public int processingTimeLeft;
+	public int totalProcessingTime;
 
-	private DVD dvdBeingProcessed;
+	public DVD dvdBeingProcessed;
 	
 	public MachineStageOne(int machineNumber,LinkedList<DVD>rightBuffer) {
 		super(machineNumber,null,rightBuffer);
@@ -22,9 +23,9 @@ public class MachineStageOne extends Machine {
 	}
 
 	@Override
-	public float generateProcessingTime() {
+	public int generateProcessingTime() {
 		// TODO Auto-generated method stub
-		return machineNumber;
+		return machineNumber*10;
 	}
 	
 	public float generateBreakDownTime()
@@ -43,29 +44,5 @@ public class MachineStageOne extends Machine {
 
 	public void setLastBreakDownTime(int lastBreakDownTime) {
 		this.lastBreakDownTime = lastBreakDownTime;
-	}
-
-	public int getProcessingTimeLeft() {
-		return processingTimeLeft;
-	}
-
-	public void setProcessingTimeLeft(int processingTimeLeft) {
-		this.processingTimeLeft = processingTimeLeft;
-	}
-
-	public DVD getDvdBeingProcessed() {
-		return dvdBeingProcessed;
-	}
-
-	public void setDvdBeingProcessed(DVD dvdBeingProcessed) {
-		this.dvdBeingProcessed = dvdBeingProcessed;
-	}
-
-	public int getTotalProcessingTime() {
-		return totalProcessingTime;
-	}
-
-	public void setTotalProcessingTime(int totalProcessingTime) {
-		this.totalProcessingTime = totalProcessingTime;
 	}
 }

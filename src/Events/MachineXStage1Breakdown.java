@@ -1,6 +1,6 @@
 package Events;
 
-public class MachineXStage1Breakdown extends MachineXStage1Event {
+public class MachineXStage1Breakdown extends MachineXEvent {
 	
 	private final int repairTime;
 	
