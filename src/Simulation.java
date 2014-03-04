@@ -1,18 +1,22 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
 
+import Events.ConveyorBeltXFinishedDVD;
 import Events.Event;
 import Events.MachineXStage1Breakdown;
 import Events.MachineXStage1FinishedDVD;
 import Events.MachineXStage1Repaired;
 import Events.MachineXStage2FinishedDVD;
 import Events.SimulationFinished;
+import Machines.ConveyorBelt;
 import Machines.Machine;
 import Machines.MachineStageOne;
 import Machines.MachineStageTwo;
 import Misc.DVD;
 import Misc.Statistics;
+import Stages.StateConveyorBelt;
 import Stages.StateStageOne;
 import Stages.StateStageTwo;
 
@@ -34,7 +38,9 @@ public class Simulation {
 	
 	private ArrayList<MachineStageOne> stageOneMachines;
 	private ArrayList<MachineStageTwo> stageTwoMachines;
-	
+	private ArrayList<ConveyorBelt> conveyorBelts;
+	private int DVDsprocessed;
+	static int hours = 1;
 	public static void main(String [] args) {
 		if (args.length < 3) {
 			System.out.println("Not enough arguments!");
@@ -43,7 +49,7 @@ public class Simulation {
 		int runTime = Integer.parseInt(args[0]);
 		int maxBufferSize = Integer.parseInt(args[1]);
 		int batchSize = Integer.parseInt(args[2]);
-		runTime = 500;
+		runTime =hours*60*60;
 		System.out.println("Starting a simulation with");
 		System.out.println("\t running time: " + runTime);
 		System.out.println("\t maximum buffer size: " + maxBufferSize);
@@ -60,12 +66,10 @@ public class Simulation {
 		this.batchSize = batchSize;
 		simulationFinished = false;
 		eventQueue = new PriorityQueue<Event>();
-		
-		
+		DVDsprocessed=0;
 		createBuffers();
 		createMachines();
 		createStatistics();
-		
 		
 		setup();
 	}
@@ -85,6 +89,7 @@ public class Simulation {
 	private void createMachines() {
 		stageOneMachines = new ArrayList<MachineStageOne>();
 		stageTwoMachines = new ArrayList<MachineStageTwo>();
+		conveyorBelts = new ArrayList<ConveyorBelt>();
 		for (int i = 1; i <= 4;i++) 
 		{
 			// first two connected to buffer one,
@@ -98,17 +103,18 @@ public class Simulation {
 		for (int i = 1; i <= 2;i++) 
 		{
 			stageTwoMachines.add(new MachineStageTwo(i,layerOneBuffers.get(i-1),layerTwoBuffers.get(i-1)));
+			conveyorBelts.add(new ConveyorBelt(i));
 		}
 	}
 	
 	private void createStatistics() {
 		statistics = new Statistics();
-		for (int i = 1; i <= 4;i++) {
+		/*for (int i = 1; i <= 4;i++) {
 			statistics.addStatistic("Average processing time S1M"+i, 0f,"seconds/DVD");
 		}
 		for (int i = 1; i <= 2;i++) {
 			statistics.addStatistic("Average processing time S2M"+i, 0f,"seconds/DVD");
-		}
+		}*/
 		statistics.addStatistic("Throughput time per DVD",0.0f,"seconds");
 		statistics.addStatistic("Output per hour",0.0f,"DVD/hour");
 	}
@@ -120,13 +126,13 @@ public class Simulation {
 		{
 			// production
 			DVD dvd = new DVD(currentTime);
-			int machineProcTime = Math.round(stageOneMachines.get(m.machineNumber-1).generateProcessingTime());
+			int machineProcTime = stageOneMachines.get(m.machineNumber-1).generateProcessingTime();
 			int machineFinishedTime = machineProcTime + currentTime;
 			Event machinestage1 = new MachineXStage1FinishedDVD(machineFinishedTime, m.machineNumber,dvd, machineProcTime);
 			eventQueue.add(machinestage1);
 			
 			//and breakdown
-			int breakdownTime = currentTime+Math.round(stageOneMachines.get(m.machineNumber-1).generateBreakDownTime());
+			int breakdownTime = currentTime+stageOneMachines.get(m.machineNumber-1).generateBreakDownTime();
 			int repairTime =  Math.round(stageOneMachines.get(m.machineNumber-1).generateRepairTime());
 			Event machinestage1breakdown = new MachineXStage1Breakdown(breakdownTime, m.machineNumber, repairTime);
 			eventQueue.add(machinestage1breakdown);
@@ -138,69 +144,105 @@ public class Simulation {
 	
 	public void printState()
 	{
-
+		Event[] eventList = new Event[eventQueue.size()];
+		eventQueue.toArray(eventList) ;
+		Arrays.sort(eventList);
+		System.out.println("EventQueue: ");
+		for(int i =0; i < eventQueue.size();i++) {
+			System.out.println(eventList[i].getClass().getSimpleName() + " at "+  eventList[i].getTimeOfOccurence());
+		}
+		System.out.println();
+		System.out.println("Machines Stage 1");
 		for(int i =0;i<4;i++)
 		{
-			System.out.println("Machine " +(i+1)+" state: " + stageOneMachines.get(0).state);
+			System.out.println("Machine " +(i+1)+" state: " + stageOneMachines.get(i).state);
 		}
+		System.out.println("Buffers between Stage 1 and 2");
 		for(int i =0;i<2;i++)
 		{
 			System.out.println("Buffer " +(i+1)+" size: "+ layerOneBuffers.get(i).size());
 		}
+		System.out.println("Machines Stage 2");
 		for(int i =0;i<2;i++)
 		{
-			System.out.println("Machine " +(i+1)+" state: " + stageTwoMachines.get(0).state);
+			System.out.println("Machine " +(i+1)+" state: " + stageTwoMachines.get(i).state);
 		}
-		
+		System.out.println("Conveyor Belts");
+		for(int i =0;i<2;i++)
+		{
+			System.out.println("CB " +(i+1)+" state: " + conveyorBelts.get(i).state);
+		}
+		System.out.println("Buffers between Conveyor Belt and Stage 3");
+		for(int i =0;i<2;i++)
+		{
+			System.out.println("Buffer " +(i+1)+" size: "+ layerTwoBuffers.get(i).size());
+		}
 	}
 	
 	public void run() {
 		do {
-			Event event = eventQueue.remove();
-			
-			currentTime = event.getTimeOfOccurence();
-			System.out.println("The new time is " + currentTime);
-			System.out.println("The event that will be processed is " + event.getClass().getSimpleName());
-			
+			System.out.println("The current time is " + currentTime);
 			printState();
+			
+			Event event = eventQueue.remove();
+			currentTime = event.getTimeOfOccurence();
+			System.out.println("The event that will be processed is " + event.getClass().getSimpleName());
 			
 			// stage 1
 			if(event instanceof MachineXStage1FinishedDVD) {
-				int machineNumber = ((MachineXStage1FinishedDVD) event).getMachineNumber();
-				System.out.println("\t DVD finished (maybe) for stage 1 and machine " + machineNumber);
 				process_MachineXStage1FinishedDVD_event((MachineXStage1FinishedDVD) event);
 			} 
 			else if(event instanceof MachineXStage1Breakdown) {
-				int machineNumber = ((MachineXStage1Breakdown) event).getMachineNumber();
-				System.out.println("\t ALERT: BREAKDOWN FOR MACHINE " + machineNumber+"!");
 				process_MachineXStage1Breakdown_event((MachineXStage1Breakdown) event);
 			} 
 			else if(event instanceof MachineXStage1Repaired) {
-				int machineNumber = ((MachineXStage1Repaired) event).getMachineNumber();
-				System.out.println("\t Machine " + machineNumber+" repaired!!");
 				process_MachineXStage1Repaired_event((MachineXStage1Repaired) event);
 			}
 			
 			// stage 2
 			else if(event instanceof MachineXStage2FinishedDVD) {
-				int machineNumber = ((MachineXStage2FinishedDVD) event).getMachineNumber();
-				System.out.println("\t DVD finished (maybe) for stage 2 and machine " + machineNumber);
-				process_MachineXStage2Finished_event((MachineXStage2FinishedDVD) event);
-
+				process_MachineXStage2FinishedDVD_event((MachineXStage2FinishedDVD) event);
+			}
+			
+			// conveyor belt
+			else if(event instanceof ConveyorBeltXFinishedDVD) {
+				process_ConveyorBeltXFinishedDVD_event((ConveyorBeltXFinishedDVD) event);
 			}
 			
 			else if (event instanceof SimulationFinished) {
-				System.out.println("\t Finishing up the simulation at time " + currentTime);
 				process_SimulationFinished_event(event);
 			}
+			System.out.println();
 		} while(!simulationFinished);
 	}
 
+	private void process_ConveyorBeltXFinishedDVD_event(ConveyorBeltXFinishedDVD event) {
+		
+		ConveyorBelt cb = conveyorBelts.get(event.conveyorbeltNumber-1);
+		switch (cb.state) {
+		case Idle:
+			break;
+		case Running:
+			//buffer to the right is not full
+			if(layerTwoBuffers.get(event.conveyorbeltNumber-1).size()!=maxBufferSize) {
+				layerTwoBuffers.get(cb.conveyorBeltNumber-1).add(event.dvd);
+				cb.dvdsOnBelt.pop();
+			} else {
+				System.out.println("\t Buffer right to Conveyor Belt "+ cb.conveyorBeltNumber +" is full! Going Idle");
+				cb.state = StateConveyorBelt.Idle;
+			}
+			break;
+		}
+		// buffer to the right is full
+	}
+
+
 	private void process_MachineXStage1FinishedDVD_event(MachineXStage1FinishedDVD event) {
+		System.out.println("\t Looking at Stage 1, machine " + event.getMachineNumber());
 		MachineStageOne m = stageOneMachines.get(event.getMachineNumber()-1);
 		switch(stageOneMachines.get(event.getMachineNumber()-1).state)
 		{
-		case Normal:
+		case Running:
 			int machineProcTime = m.generateProcessingTime();
 			int machineFinishedTime = machineProcTime + currentTime;
 			int machine2Number = (m.machineNumber <= 2) ? 0 : 1;
@@ -208,29 +250,29 @@ public class Simulation {
 			
 			// directly feed the dvd into machine two
 			if(m2.state == StateStageTwo.Idle){
-				System.out.println("\t Reactivating machine at stage 2!");
-				m2.state = StateStageTwo.Normal;
+				System.out.println("\t Reactivating machine " +m2.machineNumber + " at stage 2!");
+				m2.state = StateStageTwo.Running;
 				int machineProcTimeM2 = m2.generateProcessingTime(); 
 				int machineFinishedTimeM2 = machineProcTimeM2 + currentTime;
 				Event event_m2 = new MachineXStage2FinishedDVD(machineFinishedTimeM2, m2.machineNumber, event.getFinishedDVD(), machineProcTimeM2);
 				eventQueue.add(event_m2);
 			}
-			else if(m.rightBuffer.size() == maxBufferSize)
+			
+			if(m.rightBuffer.size() == maxBufferSize)
 			{
 				m.state = StateStageOne.Idle;
 				m.dvdBeingProcessed = event.getFinishedDVD();
 				m.processingTimeLeft = 0;
 				m.totalProcessingTime = event.getProcTime();
 				//TODO: statistics for idle time
-				System.out.println("\t Buffer next to machine " + m.machineNumber +" is full!");
+				System.out.println("\t Buffer next to Stage 1, machine " + m.machineNumber +" is full!");
 			} else {
 				m.rightBuffer.add(event.getFinishedDVD());
 				DVD dvd = new DVD(currentTime);
 				Event machinestage1 = new MachineXStage1FinishedDVD(machineFinishedTime, m.machineNumber,dvd, machineProcTime);
 				eventQueue.add(machinestage1);
-				System.out.println("\t DVD succesfully processed in machine " +event.getMachineNumber());
+				System.out.println("\t DVD successfully processed in Stage 1, machine " +event.getMachineNumber());
 			}
-			
 			break;
 		
 		// no repair has taken place before:
@@ -253,8 +295,8 @@ public class Simulation {
 		// |-------|------|-----|
 		// time between br and r has to be done again
 		case BrokenAndRepairedBeforeDVD:
-			System.out.println("\t Machine " + m.machineNumber + "broke down and was repaired before it could finish it's dvd. Rescheduling.");
-			m.state = StateStageOne.Normal;
+			System.out.println("\t Machine " + m.machineNumber + " broke down and was repaired before it could finish it's dvd. Rescheduling.");
+			m.state = StateStageOne.Running;
 			int timeFalselyRun = m.lastRepairTime - m.lastBreakDownTime;
 			m.lastRepairTime = m.lastBreakDownTime = -1;
 			int newFinishTime = currentTime + timeFalselyRun;
@@ -266,25 +308,40 @@ public class Simulation {
 		}
 	}
 
-	private void process_MachineXStage2Finished_event(MachineXStage2FinishedDVD event) {
+	private void process_MachineXStage2FinishedDVD_event(MachineXStage2FinishedDVD event) {
+		System.out.println("\t Looking at Stage 2, machine " + event.getMachineNumber());
 		MachineStageTwo m = stageTwoMachines.get(event.getMachineNumber()-1);
 		// normal
 		if(!m.breakDVD()) {
 			System.out.println("\t Didn't break the DVD!");
+			ConveyorBelt cb = conveyorBelts.get(m.machineNumber-1);
+			
+			if(cb.state == StateConveyorBelt.Idle)
+			{
+				m.state = StateStageTwo.Idle;//TODO: enhance this
+			} else {
+				DVDsprocessed++;
+				conveyorBelts.get(m.machineNumber-1).dvdsOnBelt.add(event.getFinishedDVD());
+				conveyorBelts.get(m.machineNumber-1).dvdsOnBeltTime.add(currentTime);
+				Event conveyorEvent = new ConveyorBeltXFinishedDVD(currentTime+5, m.machineNumber, event.getFinishedDVD());
+				eventQueue.add(conveyorEvent);
+			}
+			
 			
 		} else {
 			System.out.println("\t Machine " + m.machineNumber + " broke a DVD. :-(");
+		
 		}
 		
 		//schedule new event
 		int machineProcTime = m.generateProcessingTime(); 
 		int machineFinishedTime = machineProcTime + currentTime;
-		if(layerOneBuffers.get(m.machineNumber-1).isEmpty())
+		// buffer to the left empty?
+		if(m.leftBuffer.isEmpty())
 		{
 			m.state = StateStageTwo.Idle;
 			System.out.println("\t Buffer empty, going idle");
-		}
-		else {
+		} else {
 			DVD dvd = layerOneBuffers.get(m.machineNumber-1).pop();
 			Event event_m2 = new MachineXStage2FinishedDVD(machineFinishedTime, m.machineNumber, dvd , machineProcTime);
 			eventQueue.add(event_m2);
@@ -293,18 +350,18 @@ public class Simulation {
 			MachineStageOne m2 = stageOneMachines.get((m.machineNumber-1)*2+1);
 			if(m1.state == StateStageOne.Idle)
 			{
-				m1.state = StateStageOne.Normal;
+				m1.state = StateStageOne.Running;
 				Event event_s1_m1 = new MachineXStage1FinishedDVD(currentTime,m1.machineNumber,m1.dvdBeingProcessed,m1.totalProcessingTime);
 				eventQueue.add(event_s1_m1);
 				System.out.println("\t Reactivating machine at stage 1");
-			} 
+			}
 			if(m2.state == StateStageOne.Idle)
 			{
-				m2.state = StateStageOne.Normal;
+				m2.state = StateStageOne.Running;
 				Event event_s1_m2 = new MachineXStage1FinishedDVD(currentTime,m1.machineNumber,m1.dvdBeingProcessed,m1.totalProcessingTime);
 				eventQueue.add(event_s1_m2);
 				System.out.println("\t Reactivating machine at stage 1");
-			} 
+			}
 		}
 	}
 
@@ -313,16 +370,16 @@ public class Simulation {
 		switch(m.state)
 		{
 		// no repair has taken place before
-					// finished dvd
-					// so repair can reschedule
-					// df-----br------df-----r
-					// |------|-------|------|
-					//
+		// finished dvd
+		// so repair can reschedule
+		// df-----br------df-----r
+		// |------|-------|------|
+		//
 		case BrokenAndDVDBeforeRepair:
 			
 			Event dvdFinishedEvent = new MachineXStage1FinishedDVD(m.processingTimeLeft+currentTime, m.machineNumber, m.dvdBeingProcessed, m.totalProcessingTime);
 			eventQueue.add(dvdFinishedEvent);
-			m.state = StateStageOne.Normal;
+			m.state = StateStageOne.Running;
 			break;
 			
 		// repair has taken place before finished dvd
@@ -336,6 +393,7 @@ public class Simulation {
 			break;
 		// other cases should not happen
 		default:
+			
 			break;
 		}
 		
@@ -354,6 +412,7 @@ public class Simulation {
 	private void process_SimulationFinished_event(Event event) {
 		// print statistics
 		simulationFinished = true;
+		System.out.println(DVDsprocessed/hours);
 		System.out.println(statistics);
 	}
 }

@@ -1,6 +1,6 @@
 package Stages;
 
-public enum StateStageTwo {
+public enum StateConveyorBelt {
 	Running,
 	Idle
 }

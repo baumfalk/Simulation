@@ -15,7 +15,7 @@ public class MachineStageTwo extends Machine {
 
 	@Override
 	public int generateProcessingTime() {
-		return machineNumber;
+		return 24;
 	}
 
 	public boolean breakDVD()

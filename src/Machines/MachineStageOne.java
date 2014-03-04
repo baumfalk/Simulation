@@ -19,23 +19,23 @@ public class MachineStageOne extends Machine {
 	public MachineStageOne(int machineNumber,LinkedList<DVD>rightBuffer) {
 		super(machineNumber,null,rightBuffer);
 		// TODO Auto-generated constructor stub
-		state = StateStageOne.Normal;
+		state = StateStageOne.Running;
 	}
 
 	@Override
 	public int generateProcessingTime() {
 		// TODO Auto-generated method stub
-		return machineNumber*10;
+		return 60;
 	}
 	
-	public float generateBreakDownTime()
+	public int generateBreakDownTime()
 	{
-		return machineNumber*3;
+		return 8*60*60;
 	}
 
-	public float generateRepairTime()
+	public int generateRepairTime()
 	{
-		return machineNumber*2;
+		return 2*60*60;
 	}
 
 	public int getLastBreakDownTime() {
