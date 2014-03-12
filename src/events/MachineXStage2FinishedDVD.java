@@ -139,14 +139,14 @@ public class MachineXStage2FinishedDVD extends MachineXEvent {
 	{
 		MachineStageOne s1m1 = sim.getMachineStage1(m.machineNumber*2-1);
 		MachineStageOne s1m2 = sim.getMachineStage1(m.machineNumber*2);
-		if(s1m1.state == StateStageOne.Idle)
+		if(s1m1.state == StateStageOne.Blocked)
 		{
 			s1m1.state = StateStageOne.Running;
 			Event event_s1_m1 = new MachineXStage1FinishedDVD(sim.getCurrentTime(),s1m1.machineNumber,s1m1.totalProcessingTime);
 			sim.addToEventQueue(event_s1_m1);
 			System.out.println("\t Reactivating machine at stage 1");
 		}
-		if(s1m2.state == StateStageOne.Idle)
+		if(s1m2.state == StateStageOne.Blocked)
 		{
 			s1m2.state = StateStageOne.Running;
 			Event event_s1_m2 = new MachineXStage1FinishedDVD(sim.getCurrentTime(),s1m1.machineNumber,s1m1.totalProcessingTime);

@@ -19,12 +19,12 @@ public class MachineStageTwo extends Machine {
 
 	public void addDVD(DVD dvd) throws BufferOverflowException {
 		this.dvdsInMachine.addToBuffer(dvd);
-		System.out.println("\t Added dvd to stage 1 machine " + machineNumber);
+		System.out.println("\t Added dvd to stage 2 machine " + machineNumber);
 	}
 	
 	public DVD removeDVD() throws BufferUnderflowException
 	{
-		System.out.println("\t removed dvd from stage 1 machine " + machineNumber);
+		System.out.println("\t removed dvd from stage 2 machine " + machineNumber);
 		return this.dvdsInMachine.removeFromBuffer();
 	}
 
