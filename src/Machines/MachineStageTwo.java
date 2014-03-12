@@ -8,6 +8,7 @@ import Stages.StateStageTwo;
 public class MachineStageTwo extends Machine {
 
 	public StateStageTwo state;
+	public DVD dvd;
 	public MachineStageTwo(int machineNumber, LinkedList<DVD>leftBuffer, LinkedList<DVD>rightBuffer) {
 		super(machineNumber,leftBuffer,rightBuffer);
 		state = StateStageTwo.Idle;

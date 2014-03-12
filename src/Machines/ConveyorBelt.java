@@ -9,6 +9,7 @@ public class ConveyorBelt {
 
 	public LinkedList<DVD> dvdsOnBelt;
 	public LinkedList<Integer> dvdsOnBeltTime;
+	public int timePaused;
 	public final int conveyorBeltNumber;
 	public StateConveyorBelt state;
 	

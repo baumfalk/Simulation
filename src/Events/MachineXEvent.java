@@ -1,6 +1,6 @@
 package Events;
 
-public class MachineXEvent extends Event {
+public abstract class MachineXEvent extends Event {
 
 	protected final int machineNumber;
 	public MachineXEvent(int t, int m) {

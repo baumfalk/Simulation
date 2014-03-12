@@ -1,5 +1,7 @@
 package Events;
 
+import Simulation.Simulation;
+
 public abstract class Event implements Comparable<Event> {
 	protected final int timeOfOccurence;
 
@@ -12,6 +14,7 @@ public abstract class Event implements Comparable<Event> {
 		return timeOfOccurence;
 	}
 
+	public abstract void execute(Simulation sim);
 	
 	@Override
 	public int compareTo(Event event) {
