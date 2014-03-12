@@ -2,13 +2,12 @@ package machines;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 
-import exceptions.BufferOverflowException;
-import exceptions.BufferUnderflowException;
 import misc.DVD;
 import states.StateConveyorBelt;
 import buffer.Buffer;
+import exceptions.BufferOverflowException;
+import exceptions.BufferUnderflowException;
 
 public class ConveyorBelt extends Machine{
 

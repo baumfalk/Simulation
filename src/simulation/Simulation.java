@@ -1,7 +1,6 @@
 package simulation;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.PriorityQueue;
 
 import machines.ConveyorBelt;
@@ -15,7 +14,6 @@ import events.MachineXStage1Breakdown;
 import events.MachineXStage1FinishedDVD;
 import events.SimulationFinished;
 import exceptions.BufferOverflowException;
-import exceptions.BufferUnderflowException;
 
 public class Simulation {
 	
@@ -167,6 +165,18 @@ public class Simulation {
 		eventQueue.add(simulationFinished);
 	}
 	
+	public ArrayList<String> getEventListString()
+	{
+		ArrayList<String> listString = new ArrayList<String>();
+		Event[] eventList = new Event[eventQueue.size()];
+		eventQueue.toArray(eventList) ;
+		Arrays.sort(eventList);
+		for(int i =0; i < eventQueue.size();i++) {		
+			listString.add(eventList[i].getClass().getSimpleName() + " at "+  eventList[i].getTimeOfOccurence());
+		}
+		return listString;
+	}
+	
 	private void printState()
 	{
 		Event[] eventList = new Event[eventQueue.size()];
@@ -211,16 +221,26 @@ public class Simulation {
 	
 	public void run() {
 		do {
-			System.out.println("The current time is " + currentTime);
-			//printState();
-			
-			Event event = eventQueue.remove();
-			currentTime = event.getTimeOfOccurence();
-			System.out.println("The event that will be processed is " + event.getClass().getSimpleName());
-			
-			event.execute(this);
-		
-			System.out.println();
+			nextStep();
 		} while(!simulationFinished);
+	}
+
+
+	public void nextStep()
+	{
+		if(simulationFinished) {
+			System.out.println("Simulation is finished!");
+			return;
+		}
+		System.out.println("The current time is " + currentTime);
+		//printState();
+		
+		Event event = eventQueue.remove();
+		currentTime = event.getTimeOfOccurence();
+		System.out.println("The event that will be processed is " + event.getClass().getSimpleName());
+		
+		event.execute(this);
+	
+		System.out.println();
 	}
 }

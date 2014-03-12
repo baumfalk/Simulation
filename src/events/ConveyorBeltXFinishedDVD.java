@@ -1,9 +1,7 @@
 package events;
 
 import machines.ConveyorBelt;
-import misc.DVD;
 import simulation.Simulation;
-import states.StateConveyorBelt;
 
 public class ConveyorBeltXFinishedDVD extends Event {
 
@@ -33,6 +31,10 @@ public class ConveyorBeltXFinishedDVD extends Event {
 				cb.state = StateConveyorBelt.Idle;
 				cb.timePaused = sim.getCurrentTime();
 			}*/
+			break;
+		case Blocked:
+			break;
+		default:
 			break;
 		}
 		// buffer to the right is full

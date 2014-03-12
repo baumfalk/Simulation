@@ -14,7 +14,7 @@ public class SimulationFinished extends Event{
 		// TODO Auto-generated method stub
 		// print statistics
 		sim.simulationFinished = true;
-		System.out.println(sim.DVDsprocessed/sim.hours);
+		System.out.println(sim.DVDsprocessed/Simulation.hours);
 		System.out.println(sim.statistics);
 	}
 
