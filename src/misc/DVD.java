@@ -2,27 +2,16 @@ package misc;
 
 public class DVD {
 	private final int timeOfEnteringPipeLine;
-	private int timeOfLeavingPipeLine;
+	public int timeOfEnteringConveyorBelt;
 	
 	public DVD(int t)
 	{
 		this.timeOfEnteringPipeLine = t;
+		timeOfEnteringConveyorBelt = -1;
 	}
 
 	public int getTimeOfEnteringPipeLine() {
 		return timeOfEnteringPipeLine;
 	}
 
-	public int getTimeOfLeavingPipeLine() {
-		return timeOfLeavingPipeLine;
-	}
-
-	public void setTimeOfLeavingPipeLine(int timeOfLeavingPipeLine) {
-		this.timeOfLeavingPipeLine = timeOfLeavingPipeLine;
-	}
-
-	public int throughputTime() {
-		// TODO Auto-generated method stub
-		return timeOfLeavingPipeLine - timeOfEnteringPipeLine;
-	}
 }

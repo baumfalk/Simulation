@@ -1,9 +1,13 @@
 package machines;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import misc.DVD;
 import states.StateStageOne;
+import buffer.Buffer;
+import exceptions.BufferOverflowException;
+import exceptions.BufferUnderflowException;
 
 public class MachineStageOne extends Machine {
 
@@ -14,12 +18,26 @@ public class MachineStageOne extends Machine {
 	public int processingTimeLeft;
 	public int totalProcessingTime;
 
-	public DVD dvdBeingProcessed;
-	
-	public MachineStageOne(int machineNumber,LinkedList<DVD>rightBuffer) {
-		super(machineNumber,null,rightBuffer);
-		// TODO Auto-generated constructor stub
+	public MachineStageOne(int machineNumber,Buffer rightBuffer) {
+		super(machineNumber,null,new ArrayList<Buffer>(Arrays.asList(rightBuffer)),1);
+		
 		state = StateStageOne.Running;
+	}
+
+	public void addDVD(DVD dvd) throws BufferOverflowException {
+		this.dvdsInMachine.addToBuffer(dvd);
+		System.out.println("\t Added dvd to stage 1 machine " + machineNumber);
+	}
+	
+	public DVD removeDVD() throws BufferUnderflowException
+	{
+		System.out.println("\t removed dvd from stage 1 machine " + machineNumber);
+		return this.dvdsInMachine.removeFromBuffer();
+	}
+	
+	public Buffer rightBuffer()
+	{
+		return this.rightBuffers.get(0);
 	}
 
 	@Override
@@ -38,11 +56,5 @@ public class MachineStageOne extends Machine {
 		return 2*60*60;
 	}
 
-	public int getLastBreakDownTime() {
-		return lastBreakDownTime;
-	}
-
-	public void setLastBreakDownTime(int lastBreakDownTime) {
-		this.lastBreakDownTime = lastBreakDownTime;
-	}
+	
 }

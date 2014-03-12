@@ -4,16 +4,18 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
 
-import events.Event;
-import events.MachineXStage1Breakdown;
-import events.MachineXStage1FinishedDVD;
-import events.SimulationFinished;
 import machines.ConveyorBelt;
-import machines.Machine;
 import machines.MachineStageOne;
 import machines.MachineStageTwo;
 import misc.DVD;
 import misc.Statistics;
+import buffer.Buffer;
+import events.Event;
+import events.MachineXStage1Breakdown;
+import events.MachineXStage1FinishedDVD;
+import events.SimulationFinished;
+import exceptions.BufferOverflowException;
+import exceptions.BufferUnderflowException;
 
 public class Simulation {
 	
@@ -32,13 +34,14 @@ public class Simulation {
 	private PriorityQueue<Event> eventQueue;
 	public Statistics statistics;
 
-	private ArrayList<LinkedList<DVD>> layerOneBuffers;
-	public ArrayList<LinkedList<DVD>> layerTwoBuffers;
-	private ArrayList<LinkedList<DVD>> layerThreeBuffers;
+	private ArrayList<Buffer> layerOneBuffers;
+	public ArrayList<Buffer> layerTwoBuffers;
+	private ArrayList<Buffer> layerThreeBuffers;
 	
 	private ArrayList<MachineStageOne> stageOneMachines;
 	private ArrayList<MachineStageTwo> stageTwoMachines;
 	private ArrayList<ConveyorBelt> conveyorBelts;
+	//TODO:remove this in final
 	public int DVDsprocessed;
 	public static int hours = 1;
 	public static void main(String [] args) {
@@ -75,14 +78,14 @@ public class Simulation {
 	}
 	
 	private void createBuffers()  {
-		layerOneBuffers = new ArrayList<LinkedList<DVD>>();
-		layerTwoBuffers = new ArrayList<LinkedList<DVD>>();
-		layerThreeBuffers = new ArrayList<LinkedList<DVD>>();
+		layerOneBuffers = new ArrayList<Buffer>();
+		layerTwoBuffers = new ArrayList<Buffer>();
+		layerThreeBuffers = new ArrayList<Buffer>();
 		
 		for(int i =0; i<2;i++) {
-			layerOneBuffers.add(new LinkedList<DVD>());
-			layerTwoBuffers.add(new LinkedList<DVD>());
-			layerThreeBuffers.add(new LinkedList<DVD>());
+			layerOneBuffers.add(new Buffer(maxBufferSize));
+			layerTwoBuffers.add(new Buffer(batchSize));
+			layerThreeBuffers.add(new Buffer(batchSize));
 		}
 	}
 
@@ -105,18 +108,6 @@ public class Simulation {
 		eventQueue.add(e);
 	}
 
-
-	public DVD popFromLayerOneBuffer(int machineNumber) {
-		// TODO Auto-generated method stub
-		return layerOneBuffers.get(machineNumber-1).pop();
-	}
-
-
-	public DVD popFromLayerTwoBuffer(int machineNumber) {
-		// TODO Auto-generated method stub
-		return layerOneBuffers.get(machineNumber-1).pop();
-	}
-
 	private void createMachines() {
 		stageOneMachines = new ArrayList<MachineStageOne>();
 		stageTwoMachines = new ArrayList<MachineStageTwo>();
@@ -133,8 +124,8 @@ public class Simulation {
 		
 		for (int i = 1; i <= 2;i++) 
 		{
-			stageTwoMachines.add(new MachineStageTwo(i,layerOneBuffers.get(i-1),layerTwoBuffers.get(i-1)));
-			conveyorBelts.add(new ConveyorBelt(i));
+			stageTwoMachines.add(new MachineStageTwo(i,layerOneBuffers.get(i-1)));
+			conveyorBelts.add(new ConveyorBelt(i, layerTwoBuffers.get(i-1)));
 		}
 	}
 	
@@ -148,13 +139,21 @@ public class Simulation {
 	private void setup()
 	{
 		// setup the first stage
-		for(Machine m : stageOneMachines) 
+		for(MachineStageOne m : stageOneMachines) 
 		{
 			// production
 			DVD dvd = new DVD(currentTime);
+			try {
+				m.addDVD(dvd);
+			} catch (BufferOverflowException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				System.exit(1);
+			}
+		
 			int machineProcTime = stageOneMachines.get(m.machineNumber-1).generateProcessingTime();
 			int machineFinishedTime = machineProcTime + currentTime;
-			Event machinestage1 = new MachineXStage1FinishedDVD(machineFinishedTime, m.machineNumber,dvd, machineProcTime);
+			Event machinestage1 = new MachineXStage1FinishedDVD(machineFinishedTime, m.machineNumber, machineProcTime);
 			eventQueue.add(machinestage1);
 			
 			//and breakdown
@@ -186,7 +185,7 @@ public class Simulation {
 		System.out.println("Buffers between Stage 1 and 2");
 		for(int i =0;i<2;i++)
 		{
-			System.out.println("Buffer " +(i+1)+" size: "+ layerOneBuffers.get(i).size());
+			System.out.println("Buffer " +(i+1)+" size: "+ layerOneBuffers.get(i).currentDVDCount()  + " ("+Math.round(layerTwoBuffers.get(i).currentLoad()*100)+")%");
 		}
 		System.out.println("Machines Stage 2");
 		for(int i =0;i<2;i++)
@@ -198,17 +197,22 @@ public class Simulation {
 		{
 			System.out.println("CB " +(i+1)+" state: " + conveyorBelts.get(i).state);
 		}
-		System.out.println("Buffers between Conveyor Belt and Stage 3");
+		System.out.println("Crates between Conveyor Belt and Stage 3");
 		for(int i =0;i<2;i++)
 		{
-			System.out.println("Buffer " +(i+1)+" size: "+ layerTwoBuffers.get(i).size());
+			System.out.println("Crate " +(i+1)+" size: "+ layerTwoBuffers.get(i).currentDVDCount() + " ("+Math.round(layerTwoBuffers.get(i).currentLoad()*100)+")%");
+		}
+		System.out.println("Crates between Stage 3 and Stage 4");
+		for(int i =0;i<2;i++)
+		{
+			System.out.println("Crate " +(i+1)+" size: "+ layerThreeBuffers.get(i).currentDVDCount()  + " ("+Math.round(layerTwoBuffers.get(i).currentLoad()*100)+")%");
 		}
 	}
 	
 	public void run() {
 		do {
 			System.out.println("The current time is " + currentTime);
-			printState();
+			//printState();
 			
 			Event event = eventQueue.remove();
 			currentTime = event.getTimeOfOccurence();

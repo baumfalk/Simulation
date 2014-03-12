@@ -1,5 +1,7 @@
 package events;
 
+import exceptions.BufferOverflowException;
+import exceptions.BufferUnderflowException;
 import machines.ConveyorBelt;
 import machines.MachineStageOne;
 import machines.MachineStageTwo;
@@ -11,19 +13,15 @@ import states.StateStageTwo;
 
 public class MachineXStage2FinishedDVD extends MachineXEvent {
 	
-	public MachineXStage2FinishedDVD(int t, int m, DVD d, int p) {
+	
+	public MachineXStage2FinishedDVD(int t, int m, int p) {
 		super(t, m);
 	
-		finishedDVD = d;
 		procTime = p;
 	}
 
-	private final DVD finishedDVD;
 	private final int procTime;
-
-	public DVD getFinishedDVD() {
-		return finishedDVD;
-	}
+	private MachineStageTwo m ;
 
 	public int getProcTime() {
 		return procTime;
@@ -31,61 +29,129 @@ public class MachineXStage2FinishedDVD extends MachineXEvent {
 
 	@Override
 	public void execute(Simulation sim) {
-		// TODO Auto-generated method stub
 		System.out.println("\t Looking at Stage 2, machine " + machineNumber);
-		MachineStageTwo m = sim.getMachineStage2(machineNumber);
+		m = sim.getMachineStage2(machineNumber);
 		// normal
-		if(!m.breakDVD()) {
-			System.out.println("\t Didn't break the DVD!");
-			ConveyorBelt cb = sim.getConveyorBelt(m.machineNumber);
-			
-			if(cb.state == StateConveyorBelt.Idle)
-			{
-				m.state = StateStageTwo.Idle;//TODO: enhance this
-				m.dvd = finishedDVD;
-			} else {
-				sim.DVDsprocessed++;
-				cb.dvdsOnBelt.add(finishedDVD);
-				cb.dvdsOnBeltTime.add(sim.getCurrentTime());
-				Event conveyorEvent = new ConveyorBeltXFinishedDVD(sim.getCurrentTime()+5, m.machineNumber, finishedDVD);
-				sim.addToEventQueue(conveyorEvent);
-			}
-			
-		} else {
+		if(m.breakDVD()) {
 			System.out.println("\t Machine " + m.machineNumber + " broke a DVD. :-(");
-		
+			try {
+				m.removeDVD();
+			} catch (BufferUnderflowException e) {
+				e.printStackTrace();
+				System.exit(1);
+			}
+			return;
 		}
 		
-		//schedule new event
-		int machineProcTime = m.generateProcessingTime(); 
-		int machineFinishedTime = machineProcTime + sim.getCurrentTime();
+		System.out.println("\t Didn't break the DVD!");
+		ConveyorBelt cb = sim.getConveyorBelt(m.machineNumber);
+		
+		if(cb.state == StateConveyorBelt.Blocked)
+		{
+			m.state = StateStageTwo.Blocked;//TODO: enhance this
+		} 
+		switch(m.state)
+		{
+		
+		case Idle:
+			handleIdleState();
+			break;
+		case Running:
+			handleRunningState(sim);
+			break;
+		default:
+			break;
+		
+		}
+			
+		
+	}
+	
+	private void handleIdleState()
+	{
+		System.out.println("\t I'm idle, doing nothing");
+	}
+	
+	private void handleRunningState(Simulation sim)
+	{
+		sim.DVDsprocessed++;
+	
+		scheduleNewConveyorBeltEvent(sim);
+		scheduleNewDVDEvent(sim);
+	}
+	
+	private void scheduleNewConveyorBeltEvent(Simulation sim) {
+
+		DVD dvdTemp = null;
+		ConveyorBelt cb = sim.getConveyorBelt(m.machineNumber);
+		try {
+			dvdTemp = m.removeDVD();
+		} catch (BufferUnderflowException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.exit(1);
+		}
+		System.out.println("Removed the DVD from the machine");
+		dvdTemp.timeOfEnteringConveyorBelt = sim.getCurrentTime();
+		try {
+			cb.addDVD(dvdTemp);
+		} catch (BufferOverflowException e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
+		Event conveyorEvent = new ConveyorBeltXFinishedDVD(sim.getCurrentTime()+cb.generateProcessingTime(), m.machineNumber);
+		sim.addToEventQueue(conveyorEvent);
+		if(cb.state == StateConveyorBelt.Idle) {
+			System.out.println("\t Reactivated the conveyorbelt!");
+			cb.state = StateConveyorBelt.Running;
+		}
+	}
+	
+	private void scheduleNewDVDEvent(Simulation sim)
+	{
 		// buffer to the left empty?
-		if(m.leftBuffer.isEmpty())
+		if(m.leftBuffer().isEmpty())
 		{
 			m.state = StateStageTwo.Idle;
 			System.out.println("\t Buffer empty, going idle");
 		} else {
-			DVD dvd = sim.popFromLayerOneBuffer(m.machineNumber);
-			Event event_m2 = new MachineXStage2FinishedDVD(machineFinishedTime, m.machineNumber, dvd , machineProcTime);
-			sim.addToEventQueue(event_m2);
+			try {
+				DVD dvd= m.leftBuffer().removeFromBuffer();
+				m.addDVD(dvd);
+			} catch (BufferUnderflowException e) {
+				e.printStackTrace();
+				System.exit(1);
+			} catch (BufferOverflowException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			//schedule new event for this machine
+			int machineProcTime = m.generateProcessingTime(); 
+			int machineFinishedTime = machineProcTime + sim.getCurrentTime();
+			Event eventStage2FinishedDVD = new MachineXStage2FinishedDVD(machineFinishedTime, m.machineNumber, machineProcTime);
+			sim.addToEventQueue(eventStage2FinishedDVD);
 			
-			MachineStageOne m1 = sim.getMachineStage1(m.machineNumber*2-1);
-			MachineStageOne m2 = sim.getMachineStage1(m.machineNumber*2);
-			if(m1.state == StateStageOne.Idle)
-			{
-				m1.state = StateStageOne.Running;
-				Event event_s1_m1 = new MachineXStage1FinishedDVD(sim.getCurrentTime(),m1.machineNumber,m1.dvdBeingProcessed,m1.totalProcessingTime);
-				sim.addToEventQueue(event_s1_m1);
-				System.out.println("\t Reactivating machine at stage 1");
-			}
-			if(m2.state == StateStageOne.Idle)
-			{
-				m2.state = StateStageOne.Running;
-				Event event_s1_m2 = new MachineXStage1FinishedDVD(sim.getCurrentTime(),m1.machineNumber,m1.dvdBeingProcessed,m1.totalProcessingTime);
-				sim.addToEventQueue(event_s1_m2);
-				System.out.println("\t Reactivating machine at stage 1");
-			}
+			reactivateStageOne(sim);
 		}
 	}
-
+	
+	private void reactivateStageOne(Simulation sim)
+	{
+		MachineStageOne s1m1 = sim.getMachineStage1(m.machineNumber*2-1);
+		MachineStageOne s1m2 = sim.getMachineStage1(m.machineNumber*2);
+		if(s1m1.state == StateStageOne.Idle)
+		{
+			s1m1.state = StateStageOne.Running;
+			Event event_s1_m1 = new MachineXStage1FinishedDVD(sim.getCurrentTime(),s1m1.machineNumber,s1m1.totalProcessingTime);
+			sim.addToEventQueue(event_s1_m1);
+			System.out.println("\t Reactivating machine at stage 1");
+		}
+		if(s1m2.state == StateStageOne.Idle)
+		{
+			s1m2.state = StateStageOne.Running;
+			Event event_s1_m2 = new MachineXStage1FinishedDVD(sim.getCurrentTime(),s1m1.machineNumber,s1m1.totalProcessingTime);
+			sim.addToEventQueue(event_s1_m2);
+			System.out.println("\t Reactivating machine at stage 1");
+		}
+	}
 }

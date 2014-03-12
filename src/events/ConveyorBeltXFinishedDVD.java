@@ -7,14 +7,12 @@ import states.StateConveyorBelt;
 
 public class ConveyorBeltXFinishedDVD extends Event {
 
-	public ConveyorBeltXFinishedDVD(int t, int c, DVD dvd) {
+	public ConveyorBeltXFinishedDVD(int t, int c) {
 		super(t);
 		this.conveyorbeltNumber = c;
-		this.dvd = dvd;
 	}
 	
 	public int conveyorbeltNumber;
-	public final DVD dvd;
 	
 	@Override
 	public void execute(Simulation sim) {
@@ -26,14 +24,15 @@ public class ConveyorBeltXFinishedDVD extends Event {
 		case Running:
 			//batch (buffer) to the right is not full
 			//TODO: make this nicer
-			if(sim.layerTwoBuffers.get(conveyorbeltNumber-1).size()!=sim.batchSize) {
-				sim.layerTwoBuffers.get(cb.conveyorBeltNumber-1).add(dvd);
+			//if
+			/*if(sim.layerTwoBuffers.get(conveyorbeltNumber-1).size()!=sim.batchSize) {
+				sim.layerTwoBuffers.get(cb.conveyorBeltNumber-1).add(cb);
 				cb.dvdsOnBelt.pop();
 			} else {
 				System.out.println("\t Buffer right to Conveyor Belt "+ cb.conveyorBeltNumber +" is full! Going Idle");
 				cb.state = StateConveyorBelt.Idle;
 				cb.timePaused = sim.getCurrentTime();
-			}
+			}*/
 			break;
 		}
 		// buffer to the right is full

@@ -20,9 +20,8 @@ public class MachineXStage1Breakdown extends MachineXEvent {
 
 	@Override
 	public void execute(Simulation sim) {
-		// TODO Auto-generated method stub
 		MachineStageOne m = sim.getMachineStage1(machineNumber);
-		m.setLastBreakDownTime(timeOfOccurence);
+		m.lastBreakDownTime = timeOfOccurence;
 			
 		m.state = StateStageOne.Broken;
 	

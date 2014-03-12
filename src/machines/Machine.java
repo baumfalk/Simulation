@@ -1,21 +1,26 @@
 package machines;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 
-import misc.DVD;
+import buffer.Buffer;
 
 public abstract class Machine {
 	public final int machineNumber;
-	public final LinkedList<DVD> leftBuffer;
-	public final LinkedList<DVD> rightBuffer;
+	 // array list since stage 3 can access multiple buffers.
+	protected final ArrayList<Buffer> leftBuffers;
+	protected final ArrayList<Buffer> rightBuffers;
 	
-	public Machine(int machineNumber, LinkedList<DVD> leftBuffer, LinkedList<DVD> rightBuffer)
+	protected final Buffer dvdsInMachine;
+	
+	public Machine(int machineNumber, ArrayList<Buffer> leftBuffers, ArrayList<Buffer> rightBuffers, int maxDVDInMachine)
 	{
 		this.machineNumber = machineNumber;
-		this.leftBuffer = leftBuffer;
-		this.rightBuffer = rightBuffer;
+		this.leftBuffers = leftBuffers;
+		this.rightBuffers = rightBuffers;
+		dvdsInMachine = new Buffer(maxDVDInMachine);
 	}
 	
+
 	
 	
 	public abstract int generateProcessingTime();

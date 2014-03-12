@@ -2,5 +2,6 @@ package states;
 
 public enum StateConveyorBelt {
 	Running,
-	Idle
+	Idle,
+	Blocked
 }
