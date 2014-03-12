@@ -1,8 +1,8 @@
-package Machines;
+package machines;
 
 import java.util.LinkedList;
 
-import Misc.DVD;
+import misc.DVD;
 
 public abstract class Machine {
 	public final int machineNumber;

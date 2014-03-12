@@ -1,4 +1,4 @@
-package Misc;
+package misc;
 
 public class Tuple<X,Y,Z> {
 

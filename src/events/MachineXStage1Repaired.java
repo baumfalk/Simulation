@@ -1,8 +1,8 @@
-package Events;
+package events;
 
-import Machines.MachineStageOne;
-import Simulation.Simulation;
-import Stages.StateStageOne;
+import machines.MachineStageOne;
+import simulation.Simulation;
+import states.StateStageOne;
 
 public class MachineXStage1Repaired extends MachineXEvent {
 

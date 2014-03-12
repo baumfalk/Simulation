@@ -1,4 +1,4 @@
-package Misc;
+package misc;
 
 import java.util.HashMap;
 

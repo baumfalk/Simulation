@@ -1,9 +1,9 @@
-package Machines;
+package machines;
 
 import java.util.LinkedList;
 
-import Misc.DVD;
-import Stages.StateStageTwo;
+import misc.DVD;
+import states.StateStageTwo;
 
 public class MachineStageTwo extends Machine {
 

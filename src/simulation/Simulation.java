@@ -1,27 +1,19 @@
-package Simulation;
+package simulation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
 
-import org.w3c.dom.events.EventTarget;
-
-import Events.ConveyorBeltXFinishedDVD;
-import Events.Event;
-import Events.MachineXStage1Breakdown;
-import Events.MachineXStage1FinishedDVD;
-import Events.MachineXStage1Repaired;
-import Events.MachineXStage2FinishedDVD;
-import Events.SimulationFinished;
-import Machines.ConveyorBelt;
-import Machines.Machine;
-import Machines.MachineStageOne;
-import Machines.MachineStageTwo;
-import Misc.DVD;
-import Misc.Statistics;
-import Stages.StateConveyorBelt;
-import Stages.StateStageOne;
-import Stages.StateStageTwo;
+import events.Event;
+import events.MachineXStage1Breakdown;
+import events.MachineXStage1FinishedDVD;
+import events.SimulationFinished;
+import machines.ConveyorBelt;
+import machines.Machine;
+import machines.MachineStageOne;
+import machines.MachineStageTwo;
+import misc.DVD;
+import misc.Statistics;
 
 public class Simulation {
 	
@@ -33,8 +25,8 @@ public class Simulation {
 
 
 	private int runTime;
-	private int maxBufferSize; // the same for every buffer
-	private int batchSize;
+	public final int maxBufferSize; // the same for every buffer
+	public final int batchSize;
 	
 	public boolean simulationFinished;
 	private PriorityQueue<Event> eventQueue;
@@ -93,17 +85,6 @@ public class Simulation {
 			layerThreeBuffers.add(new LinkedList<DVD>());
 		}
 	}
-	
-	public int getBatchSize() {
-		// TODO Auto-generated method stub
-		return batchSize;
-	}
-
-
-	public int getMaxBufferSize() {
-		return maxBufferSize;
-	}
-
 
 	public MachineStageOne getMachineStage1(int machineNumber)
 	{

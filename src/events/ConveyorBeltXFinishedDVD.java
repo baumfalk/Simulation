@@ -1,9 +1,9 @@
-package Events;
+package events;
 
-import Machines.ConveyorBelt;
-import Misc.DVD;
-import Simulation.Simulation;
-import Stages.StateConveyorBelt;
+import machines.ConveyorBelt;
+import misc.DVD;
+import simulation.Simulation;
+import states.StateConveyorBelt;
 
 public class ConveyorBeltXFinishedDVD extends Event {
 
@@ -26,7 +26,7 @@ public class ConveyorBeltXFinishedDVD extends Event {
 		case Running:
 			//batch (buffer) to the right is not full
 			//TODO: make this nicer
-			if(sim.layerTwoBuffers.get(conveyorbeltNumber-1).size()!=sim.getBatchSize()) {
+			if(sim.layerTwoBuffers.get(conveyorbeltNumber-1).size()!=sim.batchSize) {
 				sim.layerTwoBuffers.get(cb.conveyorBeltNumber-1).add(dvd);
 				cb.dvdsOnBelt.pop();
 			} else {

@@ -1,4 +1,4 @@
-package Events;
+package events;
 
 public abstract class MachineXEvent extends Event {
 

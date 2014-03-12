@@ -1,6 +1,6 @@
-package Events;
+package events;
 
-import Simulation.Simulation;
+import simulation.Simulation;
 
 public class SimulationFinished extends Event{
 

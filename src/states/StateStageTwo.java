@@ -1,4 +1,4 @@
-package Stages;
+package states;
 
 public enum StateStageTwo {
 	Running,

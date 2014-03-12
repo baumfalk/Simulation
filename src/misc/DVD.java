@@ -1,4 +1,4 @@
-package Misc;
+package misc;
 
 public class DVD {
 	private final int timeOfEnteringPipeLine;

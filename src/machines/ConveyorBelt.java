@@ -1,9 +1,9 @@
-package Machines;
+package machines;
 
 import java.util.LinkedList;
 
-import Misc.DVD;
-import Stages.StateConveyorBelt;
+import misc.DVD;
+import states.StateConveyorBelt;
 
 public class ConveyorBelt {
 

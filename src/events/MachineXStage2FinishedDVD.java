@@ -1,13 +1,13 @@
-package Events;
+package events;
 
-import Machines.ConveyorBelt;
-import Machines.MachineStageOne;
-import Machines.MachineStageTwo;
-import Misc.DVD;
-import Simulation.Simulation;
-import Stages.StateConveyorBelt;
-import Stages.StateStageOne;
-import Stages.StateStageTwo;
+import machines.ConveyorBelt;
+import machines.MachineStageOne;
+import machines.MachineStageTwo;
+import misc.DVD;
+import simulation.Simulation;
+import states.StateConveyorBelt;
+import states.StateStageOne;
+import states.StateStageTwo;
 
 public class MachineXStage2FinishedDVD extends MachineXEvent {
 	

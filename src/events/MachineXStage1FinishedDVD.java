@@ -1,11 +1,11 @@
-package Events;
+package events;
 
-import Machines.MachineStageOne;
-import Machines.MachineStageTwo;
-import Misc.DVD;
-import Simulation.Simulation;
-import Stages.StateStageOne;
-import Stages.StateStageTwo;
+import machines.MachineStageOne;
+import machines.MachineStageTwo;
+import misc.DVD;
+import simulation.Simulation;
+import states.StateStageOne;
+import states.StateStageTwo;
 
 public class MachineXStage1FinishedDVD extends MachineXEvent {
 	public MachineXStage1FinishedDVD(int t, int m, DVD d, int p) {
@@ -48,7 +48,7 @@ public class MachineXStage1FinishedDVD extends MachineXEvent {
 				sim.addToEventQueue(event_m2);
 			}
 			
-			if(m.rightBuffer.size() == sim.getMaxBufferSize())
+			if(m.rightBuffer.size() == sim.maxBufferSize)
 			{
 				m.state = StateStageOne.Idle;
 				m.dvdBeingProcessed = finishedDVD;
