@@ -38,7 +38,9 @@ public class Buffer {
 	
 	public ArrayList<DVD> emptyBuffer()
 	{
-		return new ArrayList<DVD>(dvdList);
+		ArrayList list = new ArrayList<DVD>(dvdList);
+		dvdList.clear();
+		return list;
 	}
 
 	public boolean isEmpty() {

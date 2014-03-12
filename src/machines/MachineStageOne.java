@@ -42,7 +42,7 @@ public class MachineStageOne extends Machine {
 
 	@Override
 	public int generateProcessingTime() {
-		// TODO Auto-generated method stub
+		// TODO Randomize
 		return 60;
 	}
 	

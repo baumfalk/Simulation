@@ -1,7 +1,10 @@
 package events;
 
+import exceptions.BufferOverflowException;
+import exceptions.BufferUnderflowException;
 import machines.ConveyorBelt;
 import simulation.Simulation;
+import states.StateConveyorBelt;
 
 public class ConveyorBeltXFinishedDVD extends Event {
 
@@ -11,15 +14,17 @@ public class ConveyorBeltXFinishedDVD extends Event {
 	}
 	
 	public int conveyorbeltNumber;
+	private ConveyorBelt cb;
 	
 	@Override
 	public void execute(Simulation sim) {
 		// TODO Auto-generated method stub
-		ConveyorBelt cb = sim.getConveyorBelt(conveyorbeltNumber);
+		cb = sim.getConveyorBelt(conveyorbeltNumber);
 		switch (cb.state) {
 		case Idle:
 			break;
 		case Running:
+			handleRunningState();
 			//batch (buffer) to the right is not full
 			//TODO: make this nicer
 			//if
@@ -39,5 +44,34 @@ public class ConveyorBeltXFinishedDVD extends Event {
 		}
 		// buffer to the right is full
 	}
-
+	
+	private void handleRunningState() {
+		if(!cb.rightBuffer().isFull()) {
+			handleCrateNotFull();
+		} else {
+			
+			handleCrateFull();
+		}
+	}
+	private void handleCrateFull()
+	{
+		cb.rightBuffer().emptyBuffer();
+		//cb.state = StateConveyorBelt.Blocked;
+	}
+	private void handleCrateNotFull()
+	{
+		try {
+			cb.rightBuffer().addToBuffer(cb.removeDVD());
+			
+		} catch (BufferOverflowException e) {
+			e.printStackTrace();
+			System.exit(1);
+		} catch (BufferUnderflowException e) {
+			e.printStackTrace();
+		}
+		
+		if(cb.machineIsEmpty()) {
+			cb.state = StateConveyorBelt.Idle;
+		}
+	}
 }

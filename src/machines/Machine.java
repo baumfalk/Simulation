@@ -20,7 +20,9 @@ public abstract class Machine {
 		dvdsInMachine = new Buffer(maxDVDInMachine);
 	}
 	
-
+	public boolean machineIsEmpty() {
+		return dvdsInMachine.isEmpty();
+	}
 	
 	
 	public abstract int generateProcessingTime();

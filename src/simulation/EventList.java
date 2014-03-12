@@ -8,6 +8,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 
 public class EventList extends JFrame {
@@ -51,11 +52,15 @@ public class EventList extends JFrame {
 		lblEventList.setBounds(20, 11, 70, 14);
 		contentPane.add(lblEventList);
 		listModel = new DefaultListModel<String>();
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setBounds(20, 36, 274, 399);
 		JList list = new JList();
 		list.setModel(listModel);
 		
 		list.setBounds(20, 36, 274, 399);
-		contentPane.add(list);
+		scrollPane.setViewportView(list);
+		//contentPane.add(list);
+		contentPane.add(scrollPane);
 	}
 	
 	public void newList(ArrayList<String> stringList)

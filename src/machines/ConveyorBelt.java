@@ -22,6 +22,7 @@ public class ConveyorBelt extends Machine{
 		this.dvdsInMachine.addToBuffer(dvd);
 	}
 	
+		
 	public DVD removeDVD() throws BufferUnderflowException
 	{
 		return this.dvdsInMachine.removeFromBuffer();
@@ -31,7 +32,6 @@ public class ConveyorBelt extends Machine{
 	{
 		return this.rightBuffers.get(0);
 	}
-	
 	
 
 	public int generateProcessingTime() {

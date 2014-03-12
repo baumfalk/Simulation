@@ -17,6 +17,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.OverlayLayout;
+import javax.swing.Timer;
+import javax.swing.text.html.HTMLDocument.Iterator;
+
+import com.sun.xml.internal.ws.api.pipe.NextAction;
 
 import machines.ConveyorBelt;
 import machines.MachineStageOne;
@@ -27,6 +31,9 @@ public class SimulationGUI {
 	private JFrame frmDvdFactorySimulation;
 	private static EventList eventListWindow;
 	private final ButtonGroup buttonGroup = new ButtonGroup();
+	
+	private Timer timer; 
+	
 	private Simulation simulation;
 	private ArrayList<JLabel> stage1Labels;
 	private ArrayList<JLabel> stage2Labels;
@@ -36,6 +43,9 @@ public class SimulationGUI {
 	private ArrayList<JLabel> buffersOne;
 	private ArrayList<JLabel> buffersTwo;
 	private ArrayList<JLabel> buffersThree;
+	private ActionListener listener;
+	private JLabel lblTime;
+	
 	/**
 	 * Launch the application.
 	 */
@@ -79,6 +89,8 @@ public class SimulationGUI {
 			buffersTwo.get(i-1).setText(cb.rightBuffer().currentDVDCount()+"");
 		}
 		eventListWindow.newList(simulation.getEventListString());
+		lblTime.setText("Time: " + simulation.getCurrentTime());
+		
 		eventListWindow.repaint();
 		frmDvdFactorySimulation.repaint();
 	}
@@ -87,78 +99,8 @@ public class SimulationGUI {
 	 * @throws IOException 
 	 */
 	private void initialize() throws IOException {
-		frmDvdFactorySimulation = new JFrame();
-		frmDvdFactorySimulation.setTitle("DVD Factory Simulation");
-		frmDvdFactorySimulation.setBounds(100, 100, 991, 653);
-		frmDvdFactorySimulation.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frmDvdFactorySimulation.getContentPane().setLayout(null);
-		
-	
-		JButton btnStart = new JButton("Start");
-		btnStart.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent arg0) {
-				simulation = new Simulation(60*60*24*30*6, 20, 20);
-				updateGUI();
-			}
-		});
-		btnStart.setBounds(10, 11, 89, 23);
-		frmDvdFactorySimulation.getContentPane().add(btnStart);
-		
-		JButton btnReset = new JButton("Reset");
-		btnReset.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent arg0) {
-				simulation = new Simulation(60*60*24*30*6, 20, 20);
-				updateGUI();
-			}
-		});
-		btnReset.setBounds(208, 11, 89, 23);
-		frmDvdFactorySimulation.getContentPane().add(btnReset);
-		
-		JButton btnPause = new JButton("Pause");
-		btnPause.setBounds(109, 11, 89, 23);
-		frmDvdFactorySimulation.getContentPane().add(btnPause);
-		
-		JButton btnNextEvent = new JButton("Next Event");
-		btnNextEvent.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				simulation.nextStep();
-				updateGUI();
-			}
-		});
-		btnNextEvent.setBounds(307, 11, 89, 23);
-		frmDvdFactorySimulation.getContentPane().add(btnNextEvent);
-		
-		JLabel lblSimulationSpeed = new JLabel("Simulation Speed:");
-		lblSimulationSpeed.setBounds(406, 15, 119, 14);
-		frmDvdFactorySimulation.getContentPane().add(lblSimulationSpeed);
-		
-		JRadioButton rdbtnMsevent = new JRadioButton("10 ms/event");
-		rdbtnMsevent.setBounds(512, 11, 95, 23);
-		rdbtnMsevent.setSelected(true);
-		buttonGroup.add(rdbtnMsevent);
-		frmDvdFactorySimulation.getContentPane().add(rdbtnMsevent);
-		
-		JRadioButton rdbtnMsevent_1 = new JRadioButton("50 ms/event");
-		rdbtnMsevent_1.setBounds(623, 11, 105, 23);
-		buttonGroup.add(rdbtnMsevent_1);
-		frmDvdFactorySimulation.getContentPane().add(rdbtnMsevent_1);
-		
-		JRadioButton rdbtnMsevent_2 = new JRadioButton("300 ms/event");
-		rdbtnMsevent_2.setBounds(730, 11, 102, 23);
-		buttonGroup.add(rdbtnMsevent_2);
-		frmDvdFactorySimulation.getContentPane().add(rdbtnMsevent_2);
-		
-		JLabel lblState = new JLabel("State:");
-		lblState.setBounds(838, 15, 35, 14);
-		frmDvdFactorySimulation.getContentPane().add(lblState);
-		
-		JLabel lblPaused = new JLabel("Paused");
-		lblPaused.setBounds(873, 15, 46, 14);
-		lblPaused.setBackground(Color.YELLOW);
-		lblPaused.setOpaque(true);
-		frmDvdFactorySimulation.getContentPane().add(lblPaused);
+		initWindow();
+		initButtons();
 		
 		initBuffers();
 		initStage1();
@@ -167,16 +109,142 @@ public class SimulationGUI {
 		initStage3();
 		initStage4();
 	
-		
+		initImage();
+	}
+
+	private void initWindow() {
+		frmDvdFactorySimulation = new JFrame();
+		frmDvdFactorySimulation.setTitle("DVD Factory Simulation");
+		frmDvdFactorySimulation.setBounds(100, 100, 991, 653);
+		frmDvdFactorySimulation.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frmDvdFactorySimulation.getContentPane().setLayout(null);
+	}
+
+	private void initImage() {
 		JPanel panel = new JPanel();
 		panel.setBounds(10, 45, 955, 559);
 		frmDvdFactorySimulation.getContentPane().add(panel);
 		panel.setLayout(new OverlayLayout(panel));
 		
 		JLabel lblFlowchart = new JLabel();
-		lblFlowchart.setIcon(new ImageIcon("E:\\Projects\\Simulation\\flowchart.png"));
+		lblFlowchart.setIcon(new ImageIcon("./flowchart.png"));
 		panel.add(lblFlowchart);
 		lblFlowchart.setBounds(10, 45, 955, 559);
+	}
+
+	private void initButtons() {
+		
+		lblTime = new JLabel("Time:");
+		lblTime.setBounds(853, 15, 112, 14);
+		frmDvdFactorySimulation.getContentPane().add(lblTime);
+		listener = new ActionListener() {
+		    @Override 
+		    public void actionPerformed(ActionEvent e) {
+		    	nextSimulationState();
+		    	
+		    }
+		};
+		timer = new Timer(1, listener);
+		final JLabel lblPaused = new JLabel("Paused");
+		lblPaused.setBounds(797, 15, 46, 14);
+		lblPaused.setBackground(Color.YELLOW);
+		lblPaused.setOpaque(true);
+		frmDvdFactorySimulation.getContentPane().add(lblPaused);
+		
+		
+		
+		final JButton btnPause = new JButton("Pause");
+		btnPause.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if(btnPause.getText().equals("Pause")) {
+					btnPause.setText("Unpause");
+					timer.stop();
+					lblPaused.setText("Paused");
+					lblPaused.setBackground(Color.YELLOW);
+					
+				} else {
+					btnPause.setText("Pause");
+					timer.start();
+					lblPaused.setText("Running");
+					lblPaused.setBackground(Color.GREEN);
+				}
+			}
+		});
+		btnPause.setBounds(109, 11, 89, 23);
+		frmDvdFactorySimulation.getContentPane().add(btnPause);
+		
+		
+		
+		final JButton btnStart = new JButton("Start");
+		
+		btnStart.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				simulation = new Simulation(60*60*24*30*6, 20, 20);
+				updateGUI();
+				timer.start();
+				btnPause.setText("Pause");
+				btnStart.setText("Restart");
+				lblPaused.setText("Running");
+				lblPaused.setBackground(Color.GREEN);
+			}
+		});
+		btnStart.setBounds(10, 11, 89, 23);
+		frmDvdFactorySimulation.getContentPane().add(btnStart);
+		
+		JButton btnNextEvent = new JButton("Next Event");
+		btnNextEvent.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				nextSimulationState();
+			}
+		});
+		btnNextEvent.setBounds(208, 11, 97, 23);
+		frmDvdFactorySimulation.getContentPane().add(btnNextEvent);
+		
+		JLabel lblSimulationSpeed = new JLabel("Simulation Speed:");
+		lblSimulationSpeed.setBounds(315, 15, 119, 14);
+		frmDvdFactorySimulation.getContentPane().add(lblSimulationSpeed);
+		
+		JRadioButton rdbtn10ms = new JRadioButton("10 ms/event");
+		rdbtn10ms.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				setTimerTime(10);
+			}
+		});
+		rdbtn10ms.setBounds(440, 11, 95, 23);
+		rdbtn10ms.setSelected(true);
+		buttonGroup.add(rdbtn10ms);
+		frmDvdFactorySimulation.getContentPane().add(rdbtn10ms);
+		
+		JRadioButton rdbtn50ms = new JRadioButton("50 ms/event");
+		rdbtn50ms.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				setTimerTime(50);
+			}
+		});
+		rdbtn50ms.setBounds(537, 11, 105, 23);
+		buttonGroup.add(rdbtn50ms);
+		frmDvdFactorySimulation.getContentPane().add(rdbtn50ms);
+		
+		JRadioButton rdbtn300ms = new JRadioButton("300 ms/event");
+		rdbtn300ms.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				setTimerTime(300);
+			}
+		});
+		rdbtn300ms.setBounds(644, 11, 102, 23);
+		buttonGroup.add(rdbtn300ms);
+		frmDvdFactorySimulation.getContentPane().add(rdbtn300ms);
+		
+		JLabel lblState = new JLabel("State:");
+		lblState.setBounds(752, 15, 35, 14);
+		frmDvdFactorySimulation.getContentPane().add(lblState);
+		
+	
 	}
 	
 	private void initStage1() {
@@ -278,17 +346,27 @@ public class SimulationGUI {
 		stage3Labels.add(lblS3M2State);
 	}
 	
-private void initStage4() {
-		
-		stage4Labels = new ArrayList<JLabel>();
-		JLabel lblS4M1State = new JLabel("S4M1 State");
-		lblS4M1State.setBounds(832, 202, 110, 14);
-		frmDvdFactorySimulation.getContentPane().add(lblS4M1State);
-		stage4Labels.add(lblS4M1State);
-		
-		JLabel lblS4M2State = new JLabel("S4M2 State");
-		lblS4M2State.setBounds(838, 421, 119, 14);
-		frmDvdFactorySimulation.getContentPane().add(lblS4M2State);
-		stage4Labels.add(lblS4M2State);
+	private void initStage4() {
+			
+			stage4Labels = new ArrayList<JLabel>();
+			JLabel lblS4M1State = new JLabel("S4M1 State");
+			lblS4M1State.setBounds(832, 202, 110, 14);
+			frmDvdFactorySimulation.getContentPane().add(lblS4M1State);
+			stage4Labels.add(lblS4M1State);
+			
+			JLabel lblS4M2State = new JLabel("S4M2 State");
+			lblS4M2State.setBounds(838, 421, 119, 14);
+			frmDvdFactorySimulation.getContentPane().add(lblS4M2State);
+			stage4Labels.add(lblS4M2State);
+		}
+	
+	private void nextSimulationState() {
+		simulation.nextStep();
+		updateGUI();
+	}
+	
+	private void setTimerTime(int time) {
+		timer.setDelay(time);
+		timer.restart();
 	}
 }

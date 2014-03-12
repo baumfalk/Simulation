@@ -36,6 +36,7 @@ public class MachineStageTwo extends Machine {
 	
 	@Override
 	public int generateProcessingTime() {
+		//TODO: randomize
 		return 24;
 	}
 

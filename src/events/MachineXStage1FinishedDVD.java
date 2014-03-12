@@ -48,8 +48,7 @@ public class MachineXStage1FinishedDVD extends MachineXEvent {
 	}
 
 	private void handleRunningState(Simulation sim) {
-		int machineProcTime = m.generateProcessingTime();
-		int machineFinishedTime = machineProcTime + sim.getCurrentTime();
+	
 		int machine2Number = (m.machineNumber <= 2) ? 1 : 2;
 		MachineStageTwo m2 =sim.getMachineStage2(machine2Number);
 		
@@ -75,19 +74,24 @@ public class MachineXStage1FinishedDVD extends MachineXEvent {
 					e.printStackTrace();
 					System.exit(1);
 				}
-				
-				DVD dvd = new DVD(sim.getCurrentTime());
-				try {
-					m.addDVD(dvd);
-				} catch (BufferOverflowException e) {
-					e.printStackTrace();
-					System.exit(1);
-				}
-				Event machinestage1 = new MachineXStage1FinishedDVD(machineFinishedTime, m.machineNumber, machineProcTime);
-				sim.addToEventQueue(machinestage1);
+				scheduleNewStageOneEvent(sim);
 				System.out.println("\t DVD successfully processed in Stage 1, machine " +machineNumber);
 			}
 		}
+	}
+
+	private void scheduleNewStageOneEvent(Simulation sim) {
+		int machineProcTime = m.generateProcessingTime();
+		int machineFinishedTime = machineProcTime + sim.getCurrentTime();
+		DVD dvd = new DVD(sim.getCurrentTime());
+		try {
+			m.addDVD(dvd);
+		} catch (BufferOverflowException e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
+		Event machinestage1 = new MachineXStage1FinishedDVD(machineFinishedTime, m.machineNumber, machineProcTime);
+		sim.addToEventQueue(machinestage1);
 	}
 	
 	private void handleStage2Idle(Simulation sim)
@@ -110,6 +114,7 @@ public class MachineXStage1FinishedDVD extends MachineXEvent {
 		int machineFinishedTimeM2 = machineProcTimeM2 + sim.getCurrentTime();
 		Event event_m2 = new MachineXStage2FinishedDVD(machineFinishedTimeM2, m2.machineNumber, machineProcTimeM2);
 		sim.addToEventQueue(event_m2);
+		scheduleNewStageOneEvent(sim);
 	}
 	
 	private void handleBrokenState(Simulation sim) {
