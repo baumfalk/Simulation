@@ -4,24 +4,24 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import misc.DVD;
-import states.StateStageOne;
+import states.StateStage1;
 import buffer.Buffer;
 import exceptions.BufferOverflowException;
 import exceptions.BufferUnderflowException;
 
-public class MachineStageOne extends Machine {
+public class MachineStage1 extends Machine {
 
-	public StateStageOne state; 
+	public StateStage1 state; 
 	
 	public int lastBreakDownTime;
 	public int lastRepairTime;
 	public int processingTimeLeft;
 	public int totalProcessingTime;
 
-	public MachineStageOne(int machineNumber,Buffer rightBuffer) {
+	public MachineStage1(int machineNumber,Buffer rightBuffer) {
 		super(machineNumber,null,new ArrayList<Buffer>(Arrays.asList(rightBuffer)),1);
 		
-		state = StateStageOne.Running;
+		state = StateStage1.Running;
 	}
 
 	public void addDVD(DVD dvd) throws BufferOverflowException {

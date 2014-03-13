@@ -4,8 +4,9 @@ import java.util.Arrays;
 import java.util.PriorityQueue;
 
 import machines.ConveyorBelt;
-import machines.MachineStageOne;
-import machines.MachineStageTwo;
+import machines.MachineStage1;
+import machines.MachineStage3;
+import machines.MachineStage2;
 import misc.DVD;
 import misc.Statistics;
 import buffer.Buffer;
@@ -23,7 +24,6 @@ public class Simulation {
 		return currentTime;
 	}
 
-
 	private int runTime;
 	public final int maxBufferSize; // the same for every buffer
 	public final int batchSize;
@@ -36,12 +36,16 @@ public class Simulation {
 	public ArrayList<Buffer> layerTwoBuffers;
 	private ArrayList<Buffer> layerThreeBuffers;
 	
-	private ArrayList<MachineStageOne> stageOneMachines;
-	private ArrayList<MachineStageTwo> stageTwoMachines;
+	private ArrayList<MachineStage1> stageOneMachines;
+	private ArrayList<MachineStage2> stageTwoMachines;
 	private ArrayList<ConveyorBelt> conveyorBelts;
+	private ArrayList<MachineStage3> stageThreeMachines;
+	
 	//TODO:remove this in final
 	public int DVDsprocessed;
+
 	public static int hours = 1;
+	
 	public static void main(String [] args) {
 		if (args.length < 3) {
 			System.out.println("Not enough arguments!");
@@ -75,6 +79,44 @@ public class Simulation {
 		setup();
 	}
 	
+	public ArrayList<String> getEventListString()
+	{
+		ArrayList<String> listString = new ArrayList<String>();
+		Event[] eventList = new Event[eventQueue.size()];
+		eventQueue.toArray(eventList) ;
+		Arrays.sort(eventList);
+		for(int i =0; i < eventQueue.size();i++) {		
+			listString.add(eventList[i].getClass().getSimpleName() + " at "+  eventList[i].getTimeOfOccurence());
+		}
+		return listString;
+	}
+
+
+	public MachineStage1 getMachineStage1(int machineNumber)
+	{
+		return stageOneMachines.get(machineNumber-1);
+	}
+	
+	public MachineStage2 getMachineStage2(int machineNumber)
+	{
+		return stageTwoMachines.get(machineNumber-1);
+	}
+	
+	public MachineStage3 getMachineStage3(int machineNumber) {
+		// TODO Auto-generated method stub
+		return stageThreeMachines.get(machineNumber-1);
+	}
+
+
+	public ConveyorBelt getConveyorBelt (int conveyorBeltNumber)
+	{
+		return conveyorBelts.get(conveyorBeltNumber-1);
+	}
+	
+	public void addToEventQueue(Event e) {
+		eventQueue.add(e);
+	}
+
 	private void createBuffers()  {
 		layerOneBuffers = new ArrayList<Buffer>();
 		layerTwoBuffers = new ArrayList<Buffer>();
@@ -87,43 +129,28 @@ public class Simulation {
 		}
 	}
 
-	public MachineStageOne getMachineStage1(int machineNumber)
-	{
-		return stageOneMachines.get(machineNumber-1);
-	}
-	
-	public MachineStageTwo getMachineStage2(int machineNumber)
-	{
-		return stageTwoMachines.get(machineNumber-1);
-	}
-	
-	public ConveyorBelt getConveyorBelt (int conveyorBeltNumber)
-	{
-		return conveyorBelts.get(conveyorBeltNumber-1);
-	}
-	
-	public void addToEventQueue(Event e) {
-		eventQueue.add(e);
-	}
 
 	private void createMachines() {
-		stageOneMachines = new ArrayList<MachineStageOne>();
-		stageTwoMachines = new ArrayList<MachineStageTwo>();
+		stageOneMachines = new ArrayList<MachineStage1>();
+		stageTwoMachines = new ArrayList<MachineStage2>();
+		stageThreeMachines = new ArrayList<MachineStage3>();
 		conveyorBelts = new ArrayList<ConveyorBelt>();
 		for (int i = 1; i <= 4;i++) 
 		{
 			// first two connected to buffer one,
 			if(i <= 2) 
-				stageOneMachines.add(new MachineStageOne(i,layerOneBuffers.get(0)));
+				stageOneMachines.add(new MachineStage1(i,layerOneBuffers.get(0)));
 			// second two connected to buffer two
 			else 
-				stageOneMachines.add(new MachineStageOne(i,layerOneBuffers.get(1)));
+				stageOneMachines.add(new MachineStage1(i,layerOneBuffers.get(1)));
 		}
 		
 		for (int i = 1; i <= 2;i++) 
 		{
-			stageTwoMachines.add(new MachineStageTwo(i,layerOneBuffers.get(i-1)));
+			stageTwoMachines.add(new MachineStage2(i,layerOneBuffers.get(i-1)));
 			conveyorBelts.add(new ConveyorBelt(i, layerTwoBuffers.get(i-1)));
+			// connected to all buffers
+			stageThreeMachines.add(new MachineStage3(i, layerTwoBuffers, layerThreeBuffers, batchSize));
 		}
 	}
 	
@@ -137,7 +164,7 @@ public class Simulation {
 	private void setup()
 	{
 		// setup the first stage
-		for(MachineStageOne m : stageOneMachines) 
+		for(MachineStage1 m : stageOneMachines) 
 		{
 			// production
 			DVD dvd = new DVD(currentTime);
@@ -163,18 +190,6 @@ public class Simulation {
 		// when are we finished with the simulation
 		Event simulationFinished = new SimulationFinished(runTime);
 		eventQueue.add(simulationFinished);
-	}
-	
-	public ArrayList<String> getEventListString()
-	{
-		ArrayList<String> listString = new ArrayList<String>();
-		Event[] eventList = new Event[eventQueue.size()];
-		eventQueue.toArray(eventList) ;
-		Arrays.sort(eventList);
-		for(int i =0; i < eventQueue.size();i++) {		
-			listString.add(eventList[i].getClass().getSimpleName() + " at "+  eventList[i].getTimeOfOccurence());
-		}
-		return listString;
 	}
 	
 	private void printState()

@@ -1,6 +1,6 @@
 package states;
 
-public enum StateStageTwo {
+public enum StateStage2 {
 	Running,
 	Idle,
 	Blocked

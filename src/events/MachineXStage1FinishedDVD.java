@@ -2,12 +2,12 @@ package events;
 
 import exceptions.BufferOverflowException;
 import exceptions.BufferUnderflowException;
-import machines.MachineStageOne;
-import machines.MachineStageTwo;
+import machines.MachineStage1;
+import machines.MachineStage2;
 import misc.DVD;
 import simulation.Simulation;
-import states.StateStageOne;
-import states.StateStageTwo;
+import states.StateStage1;
+import states.StateStage2;
 
 public class MachineXStage1FinishedDVD extends MachineXEvent {
 	public MachineXStage1FinishedDVD(int t, int m, int p) {
@@ -17,7 +17,7 @@ public class MachineXStage1FinishedDVD extends MachineXEvent {
 	}
 
 	private final int procTime;
-	private MachineStageOne m;
+	private MachineStage1 m;
 
 	@Override
 	public void execute(Simulation sim) {
@@ -50,16 +50,16 @@ public class MachineXStage1FinishedDVD extends MachineXEvent {
 	private void handleRunningState(Simulation sim) {
 	
 		int machine2Number = (m.machineNumber <= 2) ? 1 : 2;
-		MachineStageTwo m2 =sim.getMachineStage2(machine2Number);
+		MachineStage2 m2 =sim.getMachineStage2(machine2Number);
 		
 		// directly feed the dvd into machine two
-		if(m2.state == StateStageTwo.Idle){
+		if(m2.state == StateStage2.Idle){
 			handleStage2Idle(sim);
 		}
 		else {
 			if(m.rightBuffer().isFull())
 			{
-				m.state = StateStageOne.Blocked;
+				m.state = StateStage1.Blocked;
 				m.processingTimeLeft = 0;
 				m.totalProcessingTime = procTime;
 				//TODO: statistics for idle time
@@ -97,9 +97,9 @@ public class MachineXStage1FinishedDVD extends MachineXEvent {
 	private void handleStage2Idle(Simulation sim)
 	{
 		int machine2Number = (m.machineNumber <= 2) ? 1 : 2;
-		MachineStageTwo m2 =sim.getMachineStage2(machine2Number);
+		MachineStage2 m2 =sim.getMachineStage2(machine2Number);
 		System.out.println("\t Reactivating machine " +m2.machineNumber + " at stage 2!");
-		m2.state = StateStageTwo.Running;
+		m2.state = StateStage2.Running;
 		try {
 			m2.addDVD(m.removeDVD());
 		} catch (BufferUnderflowException e) {
@@ -118,7 +118,7 @@ public class MachineXStage1FinishedDVD extends MachineXEvent {
 	}
 	
 	private void handleBrokenState(Simulation sim) {
-		m.state = StateStageOne.BrokenAndDVDBeforeRepair;
+		m.state = StateStage1.BrokenAndDVDBeforeRepair;
 		int timeSupposedlyFinished = timeOfOccurence;
 		int timeCrashed = m.lastBreakDownTime;
 		int processingTimeLeft = timeSupposedlyFinished-timeCrashed;
@@ -130,7 +130,7 @@ public class MachineXStage1FinishedDVD extends MachineXEvent {
 	}
 	private void handleBrokenAndRepairedState(Simulation sim) {
 		System.out.println("\t Machine " + m.machineNumber + " broke down and was repaired before it could finish it's dvd. Rescheduling.");
-		m.state = StateStageOne.Running;
+		m.state = StateStage1.Running;
 		int timeFalselyRun = m.lastRepairTime - m.lastBreakDownTime;
 		m.lastRepairTime = m.lastBreakDownTime = -1;
 		int newFinishTime = sim.getCurrentTime() + timeFalselyRun;

@@ -1,8 +1,8 @@
 package events;
 
-import machines.MachineStageOne;
+import machines.MachineStage1;
 import simulation.Simulation;
-import states.StateStageOne;
+import states.StateStage1;
 
 public class MachineXStage1Repaired extends MachineXEvent {
 
@@ -14,7 +14,7 @@ public class MachineXStage1Repaired extends MachineXEvent {
 	@Override
 	public void execute(Simulation sim) {
 		// TODO Auto-generated method stub
-		MachineStageOne m = sim.getMachineStage1(machineNumber);
+		MachineStage1 m = sim.getMachineStage1(machineNumber);
 		switch(m.state)
 		{
 		// no repair has taken place before
@@ -26,7 +26,7 @@ public class MachineXStage1Repaired extends MachineXEvent {
 		case BrokenAndDVDBeforeRepair:
 			Event dvdFinishedEvent = new MachineXStage1FinishedDVD(m.processingTimeLeft+sim.getCurrentTime(), m.machineNumber, m.totalProcessingTime);
 			sim.addToEventQueue(dvdFinishedEvent);
-			m.state = StateStageOne.Running;
+			m.state = StateStage1.Running;
 			break;
 			
 		// repair has taken place before finished dvd
@@ -35,7 +35,7 @@ public class MachineXStage1Repaired extends MachineXEvent {
 		// |------|-------|-----|
 		//
 		case Broken:
-			m.state = StateStageOne.BrokenAndRepairedBeforeDVD;
+			m.state = StateStage1.BrokenAndRepairedBeforeDVD;
 			m.lastRepairTime = timeOfOccurence;
 			break;
 		// other cases should not happen

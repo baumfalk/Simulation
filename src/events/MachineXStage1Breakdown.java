@@ -1,8 +1,8 @@
 package events;
 
-import machines.MachineStageOne;
+import machines.MachineStage1;
 import simulation.Simulation;
-import states.StateStageOne;
+import states.StateStage1;
 
 public class MachineXStage1Breakdown extends MachineXEvent {
 	
@@ -20,10 +20,10 @@ public class MachineXStage1Breakdown extends MachineXEvent {
 
 	@Override
 	public void execute(Simulation sim) {
-		MachineStageOne m = sim.getMachineStage1(machineNumber);
+		MachineStage1 m = sim.getMachineStage1(machineNumber);
 		m.lastBreakDownTime = timeOfOccurence;
 			
-		m.state = StateStageOne.Broken;
+		m.state = StateStage1.Broken;
 	
 		Event repairEvent = new MachineXStage1Repaired(sim.getCurrentTime()+repairTime,machineNumber);
 		sim.addToEventQueue(repairEvent);

@@ -18,7 +18,7 @@ public class EventList extends JFrame {
 	 */
 	private static final long serialVersionUID = 2608096954971610548L;
 	private JPanel contentPane;
-	private DefaultListModel<String> listModel;
+	private DefaultListModel listModel;
 
 	/**
 	 * Launch the application.
@@ -51,7 +51,7 @@ public class EventList extends JFrame {
 		JLabel lblEventList = new JLabel("Event List:");
 		lblEventList.setBounds(20, 11, 70, 14);
 		contentPane.add(lblEventList);
-		listModel = new DefaultListModel<String>();
+		listModel = new DefaultListModel();
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBounds(20, 36, 274, 399);
 		JList list = new JList();

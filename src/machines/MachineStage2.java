@@ -6,15 +6,15 @@ import java.util.Arrays;
 import exceptions.BufferOverflowException;
 import exceptions.BufferUnderflowException;
 import misc.DVD;
-import states.StateStageTwo;
+import states.StateStage2;
 import buffer.Buffer;
 
-public class MachineStageTwo extends Machine {
+public class MachineStage2 extends Machine {
 
-	public StateStageTwo state;
-	public MachineStageTwo(int machineNumber, Buffer leftBuffer) {
+	public StateStage2 state;
+	public MachineStage2(int machineNumber, Buffer leftBuffer) {
 		super(machineNumber,new ArrayList<Buffer>(Arrays.asList(leftBuffer)),null,1);
-		state = StateStageTwo.Idle;
+		state = StateStage2.Idle;
 	}
 
 	public void addDVD(DVD dvd) throws BufferOverflowException {

@@ -1,10 +1,12 @@
 package events;
 
-import exceptions.BufferOverflowException;
-import exceptions.BufferUnderflowException;
 import machines.ConveyorBelt;
+import machines.MachineStage3;
 import simulation.Simulation;
 import states.StateConveyorBelt;
+import states.StateStage3;
+import exceptions.BufferOverflowException;
+import exceptions.BufferUnderflowException;
 
 public class ConveyorBeltXFinishedDVD extends Event {
 
@@ -24,7 +26,7 @@ public class ConveyorBeltXFinishedDVD extends Event {
 		case Idle:
 			break;
 		case Running:
-			handleRunningState();
+			handleRunningState(sim);
 			//batch (buffer) to the right is not full
 			//TODO: make this nicer
 			//if
@@ -45,19 +47,40 @@ public class ConveyorBeltXFinishedDVD extends Event {
 		// buffer to the right is full
 	}
 	
-	private void handleRunningState() {
+	private void handleRunningState(Simulation sim) {
 		if(!cb.rightBuffer().isFull()) {
 			handleCrateNotFull();
 		} else {
 			
-			handleCrateFull();
+			handleCrateFull(sim);
 		}
 	}
-	private void handleCrateFull()
+	private void handleCrateFull(Simulation sim)
 	{
-		cb.rightBuffer().emptyBuffer();
+		MachineStage3 s3m1 = sim.getMachineStage3(conveyorbeltNumber);
+		MachineStage3 s3m2 = sim.getMachineStage3(3-conveyorbeltNumber);
+
+		if(s3m1.state == StateStage3.Idle)
+		{
+			System.out.println("em");
+			handleStageThreeEmpty(sim,s3m1);
+		} else if(s3m2.machineIsEmpty()) {
+			handleStageThreeEmpty(sim,s3m2);
+		} else {
+			handleStageThreeAllFull(sim);
+		}
+		
 		//cb.state = StateConveyorBelt.Blocked;
 	}
+	private void handleStageThreeAllFull(Simulation sim) {
+		System.out.println("\t All machines at stage 3 are busy!");
+		cb.state = StateConveyorBelt.Blocked;
+	}
+
+	private void handleStageThreeEmpty(Simulation sim, MachineStage3 s3m) {
+		s3m.addBatch(cb.rightBuffer().emptyBuffer());
+	}
+
 	private void handleCrateNotFull()
 	{
 		try {

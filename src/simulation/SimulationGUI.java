@@ -23,8 +23,8 @@ import javax.swing.text.html.HTMLDocument.Iterator;
 import com.sun.xml.internal.ws.api.pipe.NextAction;
 
 import machines.ConveyorBelt;
-import machines.MachineStageOne;
-import machines.MachineStageTwo;
+import machines.MachineStage1;
+import machines.MachineStage2;
 
 public class SimulationGUI {
 
@@ -45,6 +45,7 @@ public class SimulationGUI {
 	private ArrayList<JLabel> buffersThree;
 	private ActionListener listener;
 	private JLabel lblTime;
+	private JButton btnPause;
 	
 	/**
 	 * Launch the application.
@@ -76,12 +77,12 @@ public class SimulationGUI {
 	private void updateGUI()
 	{
 		for(int i=1;i<=4;i++) {
-			MachineStageOne m = simulation.getMachineStage1(i);
+			MachineStage1 m = simulation.getMachineStage1(i);
 			stage1Labels.get(i-1).setText(m.state.name());
 			
 		}
 		for(int i=1;i<=2;i++) {
-			MachineStageTwo m = simulation.getMachineStage2(i);
+			MachineStage2 m = simulation.getMachineStage2(i);
 			stage2Labels.get(i-1).setText(m.state.name());
 			buffersOne.get(i-1).setText(m.leftBuffer().currentDVDCount()+"");
 			ConveyorBelt cb = simulation.getConveyorBelt(i);
@@ -153,7 +154,7 @@ public class SimulationGUI {
 		
 		
 		
-		final JButton btnPause = new JButton("Pause");
+		btnPause = new JButton("Pause");
 		btnPause.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -368,5 +369,7 @@ public class SimulationGUI {
 	private void setTimerTime(int time) {
 		timer.setDelay(time);
 		timer.restart();
+		if(!btnPause.getText().equals("Pause"))
+			timer.stop();
 	}
 }
