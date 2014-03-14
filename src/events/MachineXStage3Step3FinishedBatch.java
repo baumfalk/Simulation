@@ -12,7 +12,6 @@ public class MachineXStage3Step3FinishedBatch extends MachineXEvent {
 
 	@Override
 	public void execute(Simulation sim) {
-		// TODO Auto-generated method stub
 		addStage4Event(sim);
 	}
 	private void addStage4Event(Simulation sim) {

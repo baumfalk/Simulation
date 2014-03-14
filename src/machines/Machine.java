@@ -2,6 +2,7 @@ package machines;
 
 import java.util.ArrayList;
 
+import misc.DVD;
 import buffer.Buffer;
 
 public abstract class Machine {
@@ -24,6 +25,34 @@ public abstract class Machine {
 		return dvdsInMachine.isEmpty();
 	}
 	
+	public void addDVD(DVD dvd) {
+		this.dvdsInMachine.addToBuffer(dvd);
+	}
+	
+	public DVD removeDVD()
+	{
+		return this.dvdsInMachine.removeFromBuffer();
+	}
+	
+	public Buffer leftBuffer(int i)
+	{
+		return this.leftBuffers.get(i);
+	}
+	
+	public Buffer rightBuffer(int i)
+	{
+		return this.rightBuffers.get(i);
+	}
+	
+	public Buffer leftBuffer()
+	{
+		return this.leftBuffer(0);
+	}
+	
+	public Buffer rightBuffer()
+	{
+		return this.rightBuffer(0);
+	}
 	
 	public abstract int generateProcessingTime();
 }

@@ -14,7 +14,6 @@ import events.Event;
 import events.MachineXStage1Breakdown;
 import events.MachineXStage1FinishedDVD;
 import events.SimulationFinished;
-import exceptions.BufferOverflowException;
 
 public class Simulation {
 	

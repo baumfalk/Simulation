@@ -14,8 +14,6 @@ public class MachineXStage3Step2FinishedBatch extends MachineXEvent {
 	@Override
 	public void execute(Simulation sim) {
 		addStep3Event(sim);
-		
-		
 	}
 
 	private void addStep3Event(Simulation sim) {

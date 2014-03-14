@@ -3,7 +3,6 @@ package machines;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import misc.DVD;
 import states.StateStage1;
 import buffer.Buffer;
 
@@ -20,22 +19,6 @@ public class MachineStage1 extends Machine {
 		super(machineNumber,null,new ArrayList<Buffer>(Arrays.asList(rightBuffer)),1);
 		
 		state = StateStage1.Running;
-	}
-
-	public void addDVD(DVD dvd) {
-		this.dvdsInMachine.addToBuffer(dvd);
-		System.out.println("\t Added dvd to stage 1 machine " + machineNumber);
-	}
-	
-	public DVD removeDVD()
-	{
-		System.out.println("\t removed dvd from stage 1 machine " + machineNumber);
-		return this.dvdsInMachine.removeFromBuffer();
-	}
-	
-	public Buffer rightBuffer()
-	{
-		return this.rightBuffers.get(0);
 	}
 
 	@Override

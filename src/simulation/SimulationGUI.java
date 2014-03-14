@@ -50,6 +50,7 @@ public class SimulationGUI {
 	 */
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
+			@Override
 			public void run() {
 				try {
 					SimulationGUI window = new SimulationGUI();
@@ -200,6 +201,7 @@ public class SimulationGUI {
 		
 		JButton btnNextEvent = new JButton("Next Event");
 		btnNextEvent.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				nextSimulationState();
 			}

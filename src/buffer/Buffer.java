@@ -73,7 +73,7 @@ public class Buffer {
 	{
 		if(maxSize == -1)
 			return 0;
-		return (double)(dvdList.size()/maxSize);
+		return dvdList.size()/maxSize;
 	}
 	
 	public boolean isFull() {
