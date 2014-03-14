@@ -106,4 +106,22 @@ public class ConveyorBeltXFinishedDVD extends MachineXEvent {
 		}
 		
 	}
+
+	@Override
+	public void scheduleEvents(Simulation sim) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void updateMachines(Simulation sim) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void updateStatistics(Simulation sim) {
+		// TODO Auto-generated method stub
+		
+	}
 }

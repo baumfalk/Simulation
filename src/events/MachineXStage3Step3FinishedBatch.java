@@ -61,5 +61,23 @@ public class MachineXStage3Step3FinishedBatch extends MachineXEvent {
 		sim.addToEventQueue(stage4finished);
 		m.state = StateStage3.Idle;
 	}
+
+	@Override
+	public void updateMachines(Simulation sim) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void scheduleEvents(Simulation sim) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void updateStatistics(Simulation sim) {
+		// TODO Auto-generated method stub
+		
+	}
 	
 }

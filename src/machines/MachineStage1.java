@@ -37,5 +37,15 @@ public class MachineStage1 extends Machine {
 		return 2*60*60;
 	}
 
+	public boolean isBroken() {
+		// TODO Auto-generated method stub
+		return state == StateStage1.Broken;
+	}
+
+	public void setBroken() {
+		// TODO Auto-generated method stub
+		state = StateStage1.Broken;
+	}
+
 	
 }

@@ -24,4 +24,9 @@ public class MachineStage2 extends Machine {
 	{
 		return false;
 	}
+
+	public boolean isIdle() {
+		// TODO Auto-generated method stub
+		return state == StateStage2.Idle;
+	}
 }

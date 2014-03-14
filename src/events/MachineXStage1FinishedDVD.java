@@ -125,4 +125,49 @@ public class MachineXStage1FinishedDVD extends MachineXEvent {
 		Event newEvent = new MachineXStage1FinishedDVD(newFinishTime, m.machineNumber, procTime);
 		sim.addToEventQueue(newEvent);
 	}
+
+	@Override
+	public void scheduleEvents(Simulation sim) {
+		// TODO Auto-generated method stub
+		m = sim.getMachineStage1(machineNumber);
+		// if the machine is broken
+		if(m.isBroken()) {
+			
+		}
+		// else if the machine is broken and was repaired in the meantime
+		int machine2Number = (m.machineNumber <= 2) ? 1 : 2;
+		MachineStage2 m2 =sim.getMachineStage2(machine2Number);
+		// else
+		// if stage 2 is idle
+		if(m2.isIdle()) {
+			int machineProcTimeM2 = m2.generateProcessingTime(); 
+			int machineFinishedTimeM2 = machineProcTimeM2 + sim.getCurrentTime();
+			Event stage2Event = new MachineXStage2FinishedDVD(machineFinishedTimeM2, m2.machineNumber, machineProcTimeM2);
+			sim.addToEventQueue(stage2Event);
+			scheduleNewStageOneEvent(sim);
+		}
+		// if buffer is not full
+		if(!m.rightBuffer().isFull()) {
+			// schedule new event
+			int machineProcTime = m.generateProcessingTime();
+			int machineFinishedTime = machineProcTime + sim.getCurrentTime();
+			m.addDVD(new DVD(sim.getCurrentTime()));
+			Event stage1Event = new MachineXStage1FinishedDVD(machineFinishedTime, m.machineNumber, machineProcTime);
+			sim.addToEventQueue(stage1Event);
+		}
+	}
+	
+	@Override
+	public void updateMachines(Simulation sim) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+	@Override
+	public void updateStatistics(Simulation sim) {
+		// TODO Auto-generated method stub
+		
+	}
 }

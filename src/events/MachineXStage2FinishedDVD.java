@@ -126,4 +126,22 @@ public class MachineXStage2FinishedDVD extends MachineXEvent {
 			System.out.println("\t Reactivating machine at stage 1");
 		}
 	}
+
+	@Override
+	public void updateMachines(Simulation sim) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void scheduleEvents(Simulation sim) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void updateStatistics(Simulation sim) {
+		// TODO Auto-generated method stub
+		
+	}
 }

@@ -45,4 +45,20 @@ public class MachineXStage4FinishedDVD extends MachineXEvent {
 		}
 	}
 
+	@Override
+	public void updateMachines(Simulation sim) {
+		
+	}
+
+	@Override
+	public void scheduleEvents(Simulation sim) {
+		
+	}
+
+	@Override
+	public void updateStatistics(Simulation sim) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

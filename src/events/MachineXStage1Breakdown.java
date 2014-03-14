@@ -6,27 +6,33 @@ import states.StateStage1;
 
 public class MachineXStage1Breakdown extends MachineXEvent {
 	
-	private final int repairTime;
-	
+	private MachineStage1 m;
+
 	public MachineXStage1Breakdown(int t, int m, int r) {
 		super(t,m);
-		repairTime = r;
 	
 	}
 
-	public int getRepairTime() {
-		return repairTime;
+
+	@Override
+	public void scheduleEvents(Simulation sim) {
+		m = sim.getMachineStage1(machineNumber);
+		int repairTime = m.generateRepairTime();
+		Event repairEvent = new MachineXStage1Repaired(sim.getCurrentTime()+repairTime,machineNumber);
+		sim.addToEventQueue(repairEvent);		
 	}
 
 	@Override
-	public void execute(Simulation sim) {
-		MachineStage1 m = sim.getMachineStage1(machineNumber);
+	public void updateMachines(Simulation sim) {
+		
 		m.lastBreakDownTime = timeOfOccurence;
-			
-		m.state = StateStage1.Broken;
+		m.setBroken();
+	}
+
 	
-		Event repairEvent = new MachineXStage1Repaired(sim.getCurrentTime()+repairTime,machineNumber);
-		sim.addToEventQueue(repairEvent);
+	@Override
+	public void updateStatistics(Simulation sim) {
+		// TODO Auto-generated method stub
 	}
 
 }

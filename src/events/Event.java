@@ -14,7 +14,13 @@ public abstract class Event implements Comparable<Event> {
 		return timeOfOccurence;
 	}
 
-	public abstract void execute(Simulation sim);
+	public void execute(Simulation sim) {
+		scheduleEvents(sim);
+		updateStatistics(sim);
+	}
+	public abstract void scheduleEvents(Simulation sim);
+	public abstract void updateStatistics(Simulation sim);
+	
 	
 	@Override
 	public int compareTo(Event event) {
@@ -26,4 +32,6 @@ public abstract class Event implements Comparable<Event> {
 		else output = 1;
 		return output;
 	}
+	
+	
 }

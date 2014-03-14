@@ -30,4 +30,22 @@ public class MachineXStage3Step2FinishedBatch extends MachineXEvent {
 		Event eventStage3Step3Finished = new MachineXStage3Step3FinishedBatch(machineFinishedTime, s3m.machineNumber);
 		sim.addToEventQueue(eventStage3Step3Finished);
 	}
+
+	@Override
+	public void updateMachines(Simulation sim) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void scheduleEvents(Simulation sim) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void updateStatistics(Simulation sim) {
+		// TODO Auto-generated method stub
+		
+	}
 }
