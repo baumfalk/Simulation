@@ -18,13 +18,11 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.OverlayLayout;
 import javax.swing.Timer;
-import javax.swing.text.html.HTMLDocument.Iterator;
-
-import com.sun.xml.internal.ws.api.pipe.NextAction;
 
 import machines.ConveyorBelt;
 import machines.MachineStage1;
 import machines.MachineStage2;
+import machines.MachineStage3;
 
 public class SimulationGUI {
 
@@ -77,17 +75,23 @@ public class SimulationGUI {
 	private void updateGUI()
 	{
 		for(int i=1;i<=4;i++) {
-			MachineStage1 m = simulation.getMachineStage1(i);
-			stage1Labels.get(i-1).setText(m.state.name());
+			MachineStage1 m1 = simulation.getMachineStage1(i);
+			stage1Labels.get(i-1).setText(m1.state.name());
 			
 		}
 		for(int i=1;i<=2;i++) {
-			MachineStage2 m = simulation.getMachineStage2(i);
-			stage2Labels.get(i-1).setText(m.state.name());
-			buffersOne.get(i-1).setText(m.leftBuffer().currentDVDCount()+"");
+			MachineStage2 m2 = simulation.getMachineStage2(i);
+			stage2Labels.get(i-1).setText(m2.state.name());
+			buffersOne.get(i-1).setText(m2.leftBuffer().currentDVDCount()+"");
+			
 			ConveyorBelt cb = simulation.getConveyorBelt(i);
 			conveyorBeltLabels.get(i-1).setText(cb.state.name());
 			buffersTwo.get(i-1).setText(cb.rightBuffer().currentDVDCount()+"");
+			
+			MachineStage3 m3 = simulation.getMachineStage3(i);
+			stage3Labels.get(i-1).setText(m3.state.name());
+			buffersThree.get(i-1).setText(m3.rightBuffer(i-1).currentDVDCount()+"");
+
 		}
 		eventListWindow.newList(simulation.getEventListString());
 		lblTime.setText("Time: " + simulation.getCurrentTime());

@@ -18,6 +18,12 @@ public class Buffer {
 		dvdList = new LinkedList<DVD>();
 	}
 	
+	public void addBatchToBuffer(ArrayList<DVD> batch) throws BufferOverflowException {
+		for(DVD dvd : batch) {
+			addToBuffer(dvd);
+		}
+	}
+	
 	public void addToBuffer(DVD dvd) throws BufferOverflowException
 	{
 		if(isFull()) {
@@ -38,7 +44,7 @@ public class Buffer {
 	
 	public ArrayList<DVD> emptyBuffer()
 	{
-		ArrayList list = new ArrayList<DVD>(dvdList);
+		ArrayList<DVD> list = new ArrayList<DVD>(dvdList);
 		dvdList.clear();
 		return list;
 	}

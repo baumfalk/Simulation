@@ -64,7 +64,7 @@ public class ConveyorBeltXFinishedDVD extends Event {
 		{
 			System.out.println("em");
 			handleStageThreeEmpty(sim,s3m1);
-		} else if(s3m2.machineIsEmpty()) {
+		} else if(s3m2.state == StateStage3.Idle) {
 			handleStageThreeEmpty(sim,s3m2);
 		} else {
 			handleStageThreeAllFull(sim);
@@ -79,6 +79,11 @@ public class ConveyorBeltXFinishedDVD extends Event {
 
 	private void handleStageThreeEmpty(Simulation sim, MachineStage3 s3m) {
 		s3m.addBatch(cb.rightBuffer().emptyBuffer());
+		s3m.state = StateStage3.Running;
+		int processingTimeStep1 = s3m.generateProcessingTimeStep1();
+		int machineFinishedTime = sim.getCurrentTime() + processingTimeStep1;
+		Event eventStage3Step1Finished = new MachineXStage3Step1FinishedBatch(machineFinishedTime, s3m.machineNumber);
+		sim.addToEventQueue(eventStage3Step1Finished);
 	}
 
 	private void handleCrateNotFull()
