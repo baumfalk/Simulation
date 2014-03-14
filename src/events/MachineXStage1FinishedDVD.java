@@ -19,6 +19,18 @@ public class MachineXStage1FinishedDVD extends MachineXEvent {
 
 	@Override
 	public void execute(Simulation sim) {
+		
+		/*
+		 *  cases:
+		 *  	 normal (dvd finished, buffer not full, stage 2 busy)
+		 *  	 stage2 idle: dvd finished, buffer empty, stage 2 idle
+		 *  	
+		 *  	 buffer full: dvd finished, buffer full, stage 2 busy
+		 *       broken: dvd not finished, buffer ??, stage 2 ??
+		 *       brokenAndRepaired: dvd not finished, buffer??, stage 2 ??
+		 *  
+		 */
+		
 		System.out.println("\t Looking at Stage 1, machine " + machineNumber);
 		m = sim.getMachineStage1(machineNumber);
 		switch(m.state)

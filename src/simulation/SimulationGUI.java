@@ -23,6 +23,7 @@ import machines.ConveyorBelt;
 import machines.MachineStage1;
 import machines.MachineStage2;
 import machines.MachineStage3;
+import machines.MachineStage4;
 
 public class SimulationGUI {
 
@@ -92,6 +93,9 @@ public class SimulationGUI {
 			MachineStage3 m3 = simulation.getMachineStage3(i);
 			stage3Labels.get(i-1).setText(m3.state.name());
 			buffersThree.get(i-1).setText(m3.rightBuffer(i-1).currentDVDCount()+"");
+			
+			MachineStage4 m4 = simulation.getMachineStage4(i);
+			stage4Labels.get(i-1).setText(m4.state.name());
 
 		}
 		eventListWindow.newList(simulation.getEventListString());

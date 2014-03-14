@@ -5,8 +5,9 @@ import java.util.PriorityQueue;
 
 import machines.ConveyorBelt;
 import machines.MachineStage1;
-import machines.MachineStage3;
 import machines.MachineStage2;
+import machines.MachineStage3;
+import machines.MachineStage4;
 import misc.DVD;
 import misc.Statistics;
 import buffer.Buffer;
@@ -39,6 +40,9 @@ public class Simulation {
 	private ArrayList<MachineStage2> stageTwoMachines;
 	private ArrayList<ConveyorBelt> conveyorBelts;
 	private ArrayList<MachineStage3> stageThreeMachines;
+	private ArrayList<MachineStage4> stageFourMachines;
+
+	
 	
 	//TODO:remove this in final
 	public int DVDsprocessed;
@@ -105,6 +109,11 @@ public class Simulation {
 		// TODO Auto-generated method stub
 		return stageThreeMachines.get(machineNumber-1);
 	}
+	
+	public MachineStage4 getMachineStage4(int machineNumber) {
+		// TODO Auto-generated method stub
+		return stageFourMachines.get(machineNumber-1);
+	}
 
 
 	public ConveyorBelt getConveyorBelt (int conveyorBeltNumber)
@@ -133,6 +142,7 @@ public class Simulation {
 		stageOneMachines = new ArrayList<MachineStage1>();
 		stageTwoMachines = new ArrayList<MachineStage2>();
 		stageThreeMachines = new ArrayList<MachineStage3>();
+		stageFourMachines = new ArrayList<MachineStage4>();
 		conveyorBelts = new ArrayList<ConveyorBelt>();
 		for (int i = 1; i <= 4;i++) 
 		{
@@ -150,6 +160,7 @@ public class Simulation {
 			conveyorBelts.add(new ConveyorBelt(i, layerTwoBuffers.get(i-1)));
 			// connected to all buffers
 			stageThreeMachines.add(new MachineStage3(i, layerTwoBuffers, layerThreeBuffers, batchSize));
+			stageFourMachines.add(new MachineStage4(i,layerThreeBuffers.get(i-1)));
 		}
 	}
 	

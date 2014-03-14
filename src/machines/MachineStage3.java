@@ -49,15 +49,7 @@ public class MachineStage3 extends Machine {
 		return this.dvdsInMachine.peekBuffer();
 	}
 	
-	public Buffer leftBuffer(int i)
-	{
-		return this.leftBuffers.get(i);
-	}
 	
-	public Buffer rightBuffer(int i)
-	{
-		return this.rightBuffers.get(i);
-	}
 	
 	public ArrayList<DVD> removeBatch() {
 		return this.dvdsInMachine.emptyBuffer();

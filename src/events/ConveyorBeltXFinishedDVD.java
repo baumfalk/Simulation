@@ -6,20 +6,18 @@ import simulation.Simulation;
 import states.StateConveyorBelt;
 import states.StateStage3;
 
-public class ConveyorBeltXFinishedDVD extends Event {
+public class ConveyorBeltXFinishedDVD extends MachineXEvent {
 
 	public ConveyorBeltXFinishedDVD(int t, int c) {
-		super(t);
-		this.conveyorbeltNumber = c;
+		super(t, c);
 	}
 	
-	public int conveyorbeltNumber;
 	private ConveyorBelt cb;
 	
 	@Override
 	public void execute(Simulation sim) {
 		// TODO Auto-generated method stub
-		cb = sim.getConveyorBelt(conveyorbeltNumber);
+		cb = sim.getConveyorBelt(machineNumber);
 		switch (cb.state) {
 		case Idle:
 			break;
@@ -55,8 +53,8 @@ public class ConveyorBeltXFinishedDVD extends Event {
 	}
 	private void handleCrateFull(Simulation sim)
 	{
-		MachineStage3 s3m1 = sim.getMachineStage3(conveyorbeltNumber);
-		MachineStage3 s3m2 = sim.getMachineStage3(3-conveyorbeltNumber);
+		MachineStage3 s3m1 = sim.getMachineStage3(machineNumber);
+		MachineStage3 s3m2 = sim.getMachineStage3(3-machineNumber);
 
 		if(s3m1.state == StateStage3.Idle)
 		{
@@ -91,7 +89,6 @@ public class ConveyorBeltXFinishedDVD extends Event {
 	private void handleCrateNotFull()
 	{
 		cb.rightBuffer().addToBuffer(cb.removeDVD());
-			
 		
 		if(cb.machineIsEmpty()) {
 			cb.state = StateConveyorBelt.Idle;
