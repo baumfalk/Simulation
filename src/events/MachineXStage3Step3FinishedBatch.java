@@ -1,9 +1,11 @@
 package events;
 
+import machines.ConveyorBelt;
 import machines.MachineStage3;
 import machines.MachineStage4;
 import misc.DVD;
 import simulation.Simulation;
+import states.StateConveyorBelt;
 import states.StateStage3;
 import states.StateStage4;
 
@@ -19,7 +21,7 @@ public class MachineXStage3Step3FinishedBatch extends MachineXEvent {
 	public void execute(Simulation sim) {
 		
 		MachineStage4 s4m1 = sim.getMachineStage4(machineNumber);
-		MachineStage4 s4m2 = sim.getMachineStage4(2-machineNumber+1);
+		MachineStage4 s4m2 = sim.getMachineStage4(3-machineNumber);
 		m = sim.getMachineStage3(machineNumber);
 		if(s4m1.state == StateStage4.Idle) {
 			addStage4Event(sim, s4m1);
@@ -38,6 +40,13 @@ public class MachineXStage3Step3FinishedBatch extends MachineXEvent {
 						+ " blocked!");
 			}
 		}
+		ConveyorBelt cb = sim.getConveyorBelt(machineNumber);
+		if(cb.state == StateConveyorBelt.Blocked) {
+			cb.state = StateConveyorBelt.Running;
+			
+			Event conveyorEvent = new ConveyorBeltXFinishedDVD(sim.getCurrentTime(), cb.machineNumber);
+			sim.addToEventQueue(conveyorEvent);
+		}
 	}
 	
 	// directly add the buffer to stage 4.
@@ -53,8 +62,4 @@ public class MachineXStage3Step3FinishedBatch extends MachineXEvent {
 		m.state = StateStage3.Idle;
 	}
 	
-	private void temp(Simulation sim) {
-		MachineStage3 m = sim.getMachineStage3(machineNumber);
-		
-	}
 }

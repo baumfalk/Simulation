@@ -37,6 +37,8 @@ public class MachineXStage1Repaired extends MachineXEvent {
 		case Broken:
 			m.state = StateStage1.BrokenAndRepairedBeforeDVD;
 			m.lastRepairTime = timeOfOccurence;
+			Event dvdFinishedEvent2 = new MachineXStage1FinishedDVD(sim.getCurrentTime(), m.machineNumber, m.totalProcessingTime);
+			sim.addToEventQueue(dvdFinishedEvent2);
 			break;
 		// other cases should not happen
 		default:

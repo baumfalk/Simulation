@@ -45,7 +45,6 @@ public class MachineXStage2FinishedDVD extends MachineXEvent {
 		} 
 		switch(m.state)
 		{
-		
 		case Idle:
 			handleIdleState();
 			break;
@@ -56,8 +55,6 @@ public class MachineXStage2FinishedDVD extends MachineXEvent {
 			break;
 		
 		}
-			
-		
 	}
 	
 	private void handleIdleState()

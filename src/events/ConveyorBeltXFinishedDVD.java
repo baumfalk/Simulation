@@ -1,9 +1,11 @@
 package events;
 
 import machines.ConveyorBelt;
+import machines.MachineStage2;
 import machines.MachineStage3;
 import simulation.Simulation;
 import states.StateConveyorBelt;
+import states.StateStage2;
 import states.StateStage3;
 
 public class ConveyorBeltXFinishedDVD extends MachineXEvent {
@@ -15,6 +17,7 @@ public class ConveyorBeltXFinishedDVD extends MachineXEvent {
 	private ConveyorBelt cb;
 	
 	@Override
+	//TODO: do something with delay.
 	public void execute(Simulation sim) {
 		// TODO Auto-generated method stub
 		cb = sim.getConveyorBelt(machineNumber);
@@ -65,9 +68,8 @@ public class ConveyorBeltXFinishedDVD extends MachineXEvent {
 		} else {
 			handleStageThreeAllFull(sim);
 		}
-		
-		//cb.state = StateConveyorBelt.Blocked;
 	}
+
 	private void handleStageThreeAllFull(Simulation sim) {
 		System.out.println("\t All machines at stage 3 are busy!");
 		cb.state = StateConveyorBelt.Blocked;
@@ -77,6 +79,15 @@ public class ConveyorBeltXFinishedDVD extends MachineXEvent {
 		s3m.addBatch(cb.rightBuffer().emptyBuffer());
 		s3m.state = StateStage3.Running;
 		scheduleNewStage3Event(sim, s3m);
+		MachineStage2 s2m = sim.getMachineStage2(machineNumber);
+		if(s2m.state == StateStage2.Blocked)
+		{
+			int machineProcTimeM2 = 0;
+			s2m.state = StateStage2.Running;
+			int machineFinishedTimeM2 = sim.getCurrentTime();
+			Event event_m2 = new MachineXStage2FinishedDVD(machineFinishedTimeM2,s2m.machineNumber, machineProcTimeM2);
+			sim.addToEventQueue(event_m2);
+		}
 	}
 
 	private void scheduleNewStage3Event(Simulation sim, MachineStage3 s3m) {
@@ -93,5 +104,6 @@ public class ConveyorBeltXFinishedDVD extends MachineXEvent {
 		if(cb.machineIsEmpty()) {
 			cb.state = StateConveyorBelt.Idle;
 		}
+		
 	}
 }
