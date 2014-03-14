@@ -47,7 +47,7 @@ public class Simulation {
 	//TODO:remove this in final
 	public int DVDsprocessed;
 
-	public static int hours = 1;
+	public static int hours = 24*60*60;
 	
 	public static void main(String [] args) {
 		if (args.length < 3) {
@@ -57,7 +57,7 @@ public class Simulation {
 		int runTime = Integer.parseInt(args[0]);
 		int maxBufferSize = Integer.parseInt(args[1]);
 		int batchSize = Integer.parseInt(args[2]);
-		runTime =hours*60*60;
+		runTime =60*60*24*30*6;
 		System.out.println("Starting a simulation with");
 		System.out.println("\t running time: " + runTime);
 		System.out.println("\t maximum buffer size: " + maxBufferSize);
@@ -196,54 +196,11 @@ public class Simulation {
 		eventQueue.add(simulationFinished);
 	}
 	
-	private void printState()
-	{
-		Event[] eventList = new Event[eventQueue.size()];
-		eventQueue.toArray(eventList) ;
-		Arrays.sort(eventList);
-		System.out.println("EventQueue: ");
-		for(int i =0; i < eventQueue.size();i++) {
-			System.out.println(eventList[i].getClass().getSimpleName() + " at "+  eventList[i].getTimeOfOccurence());
-		}
-		System.out.println();
-		System.out.println("Machines Stage 1");
-		for(int i =0;i<4;i++)
-		{
-			System.out.println("Machine " +(i+1)+" state: " + stageOneMachines.get(i).state);
-		}
-		System.out.println("Buffers between Stage 1 and 2");
-		for(int i =0;i<2;i++)
-		{
-			System.out.println("Buffer " +(i+1)+" size: "+ layerOneBuffers.get(i).currentDVDCount()  + " ("+Math.round(layerTwoBuffers.get(i).currentLoad()*100)+")%");
-		}
-		System.out.println("Machines Stage 2");
-		for(int i =0;i<2;i++)
-		{
-			System.out.println("Machine " +(i+1)+" state: " + stageTwoMachines.get(i).state);
-		}
-		System.out.println("Conveyor Belts");
-		for(int i =0;i<2;i++)
-		{
-			System.out.println("CB " +(i+1)+" state: " + conveyorBelts.get(i).state);
-		}
-		System.out.println("Crates between Conveyor Belt and Stage 3");
-		for(int i =0;i<2;i++)
-		{
-			System.out.println("Crate " +(i+1)+" size: "+ layerTwoBuffers.get(i).currentDVDCount() + " ("+Math.round(layerTwoBuffers.get(i).currentLoad()*100)+")%");
-		}
-		System.out.println("Crates between Stage 3 and Stage 4");
-		for(int i =0;i<2;i++)
-		{
-			System.out.println("Crate " +(i+1)+" size: "+ layerThreeBuffers.get(i).currentDVDCount()  + " ("+Math.round(layerTwoBuffers.get(i).currentLoad()*100)+")%");
-		}
-	}
-	
 	public void run() {
 		do {
 			nextStep();
 		} while(!simulationFinished);
 	}
-
 
 	public void nextStep()
 	{
@@ -252,7 +209,6 @@ public class Simulation {
 			return;
 		}
 		System.out.println("The current time is " + currentTime);
-		//printState();
 		
 		Event event = eventQueue.remove();
 		currentTime = event.getTimeOfOccurence();

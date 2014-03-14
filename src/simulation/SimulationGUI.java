@@ -184,8 +184,6 @@ public class SimulationGUI {
 		btnPause.setBounds(109, 11, 89, 23);
 		frmDvdFactorySimulation.getContentPane().add(btnPause);
 		
-		
-		
 		final JButton btnStart = new JButton("Start");
 		
 		btnStart.addMouseListener(new MouseAdapter() {
@@ -217,17 +215,17 @@ public class SimulationGUI {
 		lblSimulationSpeed.setBounds(315, 15, 119, 14);
 		frmDvdFactorySimulation.getContentPane().add(lblSimulationSpeed);
 		
-		JRadioButton rdbtn10ms = new JRadioButton("10 ms/event");
-		rdbtn10ms.addMouseListener(new MouseAdapter() {
+		JRadioButton rdbtn1ms = new JRadioButton("1 ms/event");
+		rdbtn1ms.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				setTimerTime(10);
+				setTimerTime(1);
 			}
 		});
-		rdbtn10ms.setBounds(440, 11, 95, 23);
-		rdbtn10ms.setSelected(true);
-		buttonGroup.add(rdbtn10ms);
-		frmDvdFactorySimulation.getContentPane().add(rdbtn10ms);
+		rdbtn1ms.setBounds(440, 11, 95, 23);
+		rdbtn1ms.setSelected(true);
+		buttonGroup.add(rdbtn1ms);
+		frmDvdFactorySimulation.getContentPane().add(rdbtn1ms);
 		
 		JRadioButton rdbtn50ms = new JRadioButton("50 ms/event");
 		rdbtn50ms.addMouseListener(new MouseAdapter() {
