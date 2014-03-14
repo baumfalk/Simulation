@@ -6,8 +6,6 @@ import java.util.Arrays;
 import misc.DVD;
 import states.StateConveyorBelt;
 import buffer.Buffer;
-import exceptions.BufferOverflowException;
-import exceptions.BufferUnderflowException;
 
 public class ConveyorBelt extends Machine{
 
@@ -18,12 +16,12 @@ public class ConveyorBelt extends Machine{
 		state = StateConveyorBelt.Idle;
 	}
 	
-	public void addDVD(DVD dvd) throws BufferOverflowException {
+	public void addDVD(DVD dvd) {
 		this.dvdsInMachine.addToBuffer(dvd);
 	}
 	
 		
-	public DVD removeDVD() throws BufferUnderflowException
+	public DVD removeDVD() 
 	{
 		return this.dvdsInMachine.removeFromBuffer();
 	}
@@ -34,6 +32,7 @@ public class ConveyorBelt extends Machine{
 	}
 	
 
+	@Override
 	public int generateProcessingTime() {
 		return 5*60;
 	}

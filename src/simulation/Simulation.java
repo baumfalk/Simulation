@@ -168,13 +168,7 @@ public class Simulation {
 		{
 			// production
 			DVD dvd = new DVD(currentTime);
-			try {
-				m.addDVD(dvd);
-			} catch (BufferOverflowException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				System.exit(1);
-			}
+			m.addDVD(dvd);
 		
 			int machineProcTime = stageOneMachines.get(m.machineNumber-1).generateProcessingTime();
 			int machineFinishedTime = machineProcTime + currentTime;

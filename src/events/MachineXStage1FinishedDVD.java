@@ -1,7 +1,5 @@
 package events;
 
-import exceptions.BufferOverflowException;
-import exceptions.BufferUnderflowException;
 import machines.MachineStage1;
 import machines.MachineStage2;
 import misc.DVD;
@@ -65,15 +63,7 @@ public class MachineXStage1FinishedDVD extends MachineXEvent {
 				//TODO: statistics for idle time
 				System.out.println("\t Buffer next to Stage 1, machine " + m.machineNumber +" is full!");
 			} else {
-				try {
-					m.rightBuffer().addToBuffer(m.removeDVD());
-				} catch (BufferUnderflowException e) {
-					e.printStackTrace();
-					System.exit(1);
-				} catch (BufferOverflowException e) {
-					e.printStackTrace();
-					System.exit(1);
-				}
+				m.rightBuffer().addToBuffer(m.removeDVD());
 				scheduleNewStageOneEvent(sim);
 				System.out.println("\t DVD successfully processed in Stage 1, machine " +machineNumber);
 			}
@@ -84,12 +74,7 @@ public class MachineXStage1FinishedDVD extends MachineXEvent {
 		int machineProcTime = m.generateProcessingTime();
 		int machineFinishedTime = machineProcTime + sim.getCurrentTime();
 		DVD dvd = new DVD(sim.getCurrentTime());
-		try {
-			m.addDVD(dvd);
-		} catch (BufferOverflowException e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
+		m.addDVD(dvd);
 		Event machinestage1 = new MachineXStage1FinishedDVD(machineFinishedTime, m.machineNumber, machineProcTime);
 		sim.addToEventQueue(machinestage1);
 	}
@@ -100,16 +85,7 @@ public class MachineXStage1FinishedDVD extends MachineXEvent {
 		MachineStage2 m2 =sim.getMachineStage2(machine2Number);
 		System.out.println("\t Reactivating machine " +m2.machineNumber + " at stage 2!");
 		m2.state = StateStage2.Running;
-		try {
-			m2.addDVD(m.removeDVD());
-		} catch (BufferUnderflowException e) {
-			e.printStackTrace();
-			System.exit(1);
-		} catch (BufferOverflowException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			System.exit(1);
-		}
+		m2.addDVD(m.removeDVD());
 		int machineProcTimeM2 = m2.generateProcessingTime(); 
 		int machineFinishedTimeM2 = machineProcTimeM2 + sim.getCurrentTime();
 		Event event_m2 = new MachineXStage2FinishedDVD(machineFinishedTimeM2, m2.machineNumber, machineProcTimeM2);

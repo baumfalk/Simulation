@@ -2,7 +2,6 @@ package machines;
 
 import java.util.ArrayList;
 
-import exceptions.BufferOverflowException;
 import misc.DVD;
 import states.StateStage3;
 import buffer.Buffer;
@@ -10,7 +9,7 @@ import buffer.Buffer;
 public class MachineStage3 extends Machine {
 
 	public StateStage3 state;
-	private int batchSize;
+	public final int batchSize;
 	public MachineStage3(int machineNumber, ArrayList<Buffer> leftBuffers,
 			ArrayList<Buffer> rightBuffers, int maxDVDInMachine) {
 		super(machineNumber, leftBuffers, rightBuffers, maxDVDInMachine);
@@ -31,19 +30,23 @@ public class MachineStage3 extends Machine {
 		return batchSize * 6;
 	}
 	
+	public boolean machineStuckOnDVD() {
+		return true;
+	}
+	
 	public int generateProcessingTimeStep3() {
 		return 3 * 60;
 	}
 	
 	public void addBatch(ArrayList<DVD> batch) {
 		
-		try {
-			this.dvdsInMachine.addBatchToBuffer(batch);
-		} catch (BufferOverflowException e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
+		this.dvdsInMachine.addBatchToBuffer(batch);
 		System.out.println("\t added batch to stage 3 machine " + machineNumber);
+	}
+	
+	public ArrayList<DVD> peekBatch()
+	{
+		return this.dvdsInMachine.peekBuffer();
 	}
 	
 	public Buffer leftBuffer(int i)

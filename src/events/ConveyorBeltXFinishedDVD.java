@@ -5,8 +5,6 @@ import machines.MachineStage3;
 import simulation.Simulation;
 import states.StateConveyorBelt;
 import states.StateStage3;
-import exceptions.BufferOverflowException;
-import exceptions.BufferUnderflowException;
 
 public class ConveyorBeltXFinishedDVD extends Event {
 
@@ -80,6 +78,10 @@ public class ConveyorBeltXFinishedDVD extends Event {
 	private void handleStageThreeEmpty(Simulation sim, MachineStage3 s3m) {
 		s3m.addBatch(cb.rightBuffer().emptyBuffer());
 		s3m.state = StateStage3.Running;
+		scheduleNewStage3Event(sim, s3m);
+	}
+
+	private void scheduleNewStage3Event(Simulation sim, MachineStage3 s3m) {
 		int processingTimeStep1 = s3m.generateProcessingTimeStep1();
 		int machineFinishedTime = sim.getCurrentTime() + processingTimeStep1;
 		Event eventStage3Step1Finished = new MachineXStage3Step1FinishedBatch(machineFinishedTime, s3m.machineNumber);
@@ -88,15 +90,8 @@ public class ConveyorBeltXFinishedDVD extends Event {
 
 	private void handleCrateNotFull()
 	{
-		try {
-			cb.rightBuffer().addToBuffer(cb.removeDVD());
+		cb.rightBuffer().addToBuffer(cb.removeDVD());
 			
-		} catch (BufferOverflowException e) {
-			e.printStackTrace();
-			System.exit(1);
-		} catch (BufferUnderflowException e) {
-			e.printStackTrace();
-		}
 		
 		if(cb.machineIsEmpty()) {
 			cb.state = StateConveyorBelt.Idle;

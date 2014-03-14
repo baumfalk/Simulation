@@ -1,7 +1,5 @@
 package events;
 
-import exceptions.BufferOverflowException;
-import exceptions.BufferUnderflowException;
 import machines.ConveyorBelt;
 import machines.MachineStage1;
 import machines.MachineStage2;
@@ -34,12 +32,7 @@ public class MachineXStage2FinishedDVD extends MachineXEvent {
 		// normal
 		if(m.breakDVD()) {
 			System.out.println("\t Machine " + m.machineNumber + " broke a DVD. :-(");
-			try {
-				m.removeDVD();
-			} catch (BufferUnderflowException e) {
-				e.printStackTrace();
-				System.exit(1);
-			}
+			m.removeDVD();
 			return;
 		}
 		
@@ -84,21 +77,11 @@ public class MachineXStage2FinishedDVD extends MachineXEvent {
 
 		DVD dvdTemp = null;
 		ConveyorBelt cb = sim.getConveyorBelt(m.machineNumber);
-		try {
-			dvdTemp = m.removeDVD();
-		} catch (BufferUnderflowException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			System.exit(1);
-		}
+		dvdTemp = m.removeDVD();
 		System.out.println("Removed the DVD from the machine");
+		
 		dvdTemp.timeOfEnteringConveyorBelt = sim.getCurrentTime();
-		try {
-			cb.addDVD(dvdTemp);
-		} catch (BufferOverflowException e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
+		cb.addDVD(dvdTemp);
 		Event conveyorEvent = new ConveyorBeltXFinishedDVD(sim.getCurrentTime()+cb.generateProcessingTime(), m.machineNumber);
 		sim.addToEventQueue(conveyorEvent);
 		if(cb.state == StateConveyorBelt.Idle) {
@@ -115,16 +98,8 @@ public class MachineXStage2FinishedDVD extends MachineXEvent {
 			m.state = StateStage2.Idle;
 			System.out.println("\t Buffer empty, going idle");
 		} else {
-			try {
-				DVD dvd= m.leftBuffer().removeFromBuffer();
-				m.addDVD(dvd);
-			} catch (BufferUnderflowException e) {
-				e.printStackTrace();
-				System.exit(1);
-			} catch (BufferOverflowException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			DVD dvd= m.leftBuffer().removeFromBuffer();
+			m.addDVD(dvd);
 			//schedule new event for this machine
 			int machineProcTime = m.generateProcessingTime(); 
 			int machineFinishedTime = machineProcTime + sim.getCurrentTime();

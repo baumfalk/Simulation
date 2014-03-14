@@ -6,8 +6,6 @@ import java.util.Arrays;
 import misc.DVD;
 import states.StateStage1;
 import buffer.Buffer;
-import exceptions.BufferOverflowException;
-import exceptions.BufferUnderflowException;
 
 public class MachineStage1 extends Machine {
 
@@ -24,12 +22,12 @@ public class MachineStage1 extends Machine {
 		state = StateStage1.Running;
 	}
 
-	public void addDVD(DVD dvd) throws BufferOverflowException {
+	public void addDVD(DVD dvd) {
 		this.dvdsInMachine.addToBuffer(dvd);
 		System.out.println("\t Added dvd to stage 1 machine " + machineNumber);
 	}
 	
-	public DVD removeDVD() throws BufferUnderflowException
+	public DVD removeDVD()
 	{
 		System.out.println("\t removed dvd from stage 1 machine " + machineNumber);
 		return this.dvdsInMachine.removeFromBuffer();

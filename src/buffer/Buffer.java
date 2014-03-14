@@ -18,27 +18,38 @@ public class Buffer {
 		dvdList = new LinkedList<DVD>();
 	}
 	
-	public void addBatchToBuffer(ArrayList<DVD> batch) throws BufferOverflowException {
+	public void addBatchToBuffer(ArrayList<DVD> batch) {
 		for(DVD dvd : batch) {
 			addToBuffer(dvd);
 		}
 	}
 	
-	public void addToBuffer(DVD dvd) throws BufferOverflowException
+	public void addToBuffer(DVD dvd)
 	{
 		if(isFull()) {
-			throw new BufferOverflowException();
+			try {
+				throw new BufferOverflowException();
+			} catch (BufferOverflowException e) {
+				e.printStackTrace();
+				System.exit(1);
+			}
 		} else {
 			dvdList.add(dvd);
 		}
 	}
 	
-	public DVD removeFromBuffer() throws BufferUnderflowException{
+	public DVD removeFromBuffer() {
 		if(isEmpty()) {
-			throw new BufferUnderflowException();
+			try {
+				throw new BufferUnderflowException();
+			} catch (BufferUnderflowException e) {
+				e.printStackTrace();
+				System.exit(1);
+			}
 		} else {
 			return dvdList.pop();
 		}
+		return null;
 		
 	}
 	
@@ -69,5 +80,9 @@ public class Buffer {
 		if(maxSize == -1) // infinite capacity 
 			return false;
 		return dvdList.size() >= maxSize;
+	}
+
+	public ArrayList<DVD> peekBuffer() {
+		return new ArrayList<DVD>(dvdList);
 	}
 }
