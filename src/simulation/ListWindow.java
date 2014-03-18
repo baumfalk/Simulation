@@ -11,7 +11,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 
-public class EventList extends JFrame {
+public class ListWindow extends JFrame {
 
 	/**
 	 * 
@@ -28,7 +28,7 @@ public class EventList extends JFrame {
 			@Override
 			public void run() {
 				try {
-					EventList frame = new EventList();
+					ListWindow frame = new ListWindow("Sample");
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -40,8 +40,8 @@ public class EventList extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public EventList() {
-		setTitle("DVD Factory Simulation - Event List");
+	public ListWindow(String name) {
+		setTitle("DVD Factory Simulation - " + name);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 320, 484);
 		contentPane = new JPanel();
@@ -49,7 +49,7 @@ public class EventList extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
-		JLabel lblEventList = new JLabel("Event List:");
+		JLabel lblEventList = new JLabel(name);
 		lblEventList.setBounds(20, 11, 70, 14);
 		contentPane.add(lblEventList);
 		listModel = new DefaultListModel();

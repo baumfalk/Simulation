@@ -98,7 +98,6 @@ public class MachineXStage1FinishedDVD extends MachineXEvent {
 			break;
 		case BrokenAndRepairedBeforeDVD:
 			m.setRunning();
-			
 			m.lastRepairTime = m.lastBreakDownTime = -1;
 			break;
 		case Running:

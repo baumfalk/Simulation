@@ -97,7 +97,6 @@ public class MachineXStage1Repaired extends MachineXEvent {
 
 	@Override
 	public void updateStatistics(Simulation sim) {
-		// TODO Auto-generated method stub
 		
 	}
 }

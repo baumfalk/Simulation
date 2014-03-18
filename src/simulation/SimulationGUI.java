@@ -28,7 +28,8 @@ import machines.MachineStage4;
 public class SimulationGUI {
 
 	private JFrame frmDvdFactorySimulation;
-	private static EventList eventListWindow;
+	private static ListWindow eventListWindow;
+	private static ListWindow statisticsWindow;
 	private final ButtonGroup buttonGroup = new ButtonGroup();
 	
 	private Timer timer; 
@@ -56,8 +57,10 @@ public class SimulationGUI {
 				try {
 					SimulationGUI window = new SimulationGUI();
 					window.frmDvdFactorySimulation.setVisible(true);
-					eventListWindow = new EventList();
+					eventListWindow = new ListWindow("Event List");
 					eventListWindow.setVisible(true);
+					statisticsWindow = new ListWindow("Statistics");
+					statisticsWindow.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -72,7 +75,6 @@ public class SimulationGUI {
 	public SimulationGUI() throws IOException {
 		initialize();
 	}
-
 	
 	private void updateGUI()
 	{
@@ -99,7 +101,9 @@ public class SimulationGUI {
 
 		}
 		eventListWindow.newList(simulation.getEventListString());
+		statisticsWindow.newList(simulation.statistics.getStatisticList());
 		lblTime.setText("Time: " + simulation.getCurrentTime());
+		
 		
 		eventListWindow.repaint();
 		frmDvdFactorySimulation.repaint();
@@ -161,8 +165,6 @@ public class SimulationGUI {
 		lblPaused.setOpaque(true);
 		frmDvdFactorySimulation.getContentPane().add(lblPaused);
 		
-		
-		
 		btnPause = new JButton("Pause");
 		btnPause.addMouseListener(new MouseAdapter() {
 			@Override
@@ -189,7 +191,7 @@ public class SimulationGUI {
 		btnStart.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				simulation = new Simulation(60*60*24*30*6, 20, 20);
+				simulation = new Simulation(60*60*24, 20, 20);
 				updateGUI();
 				timer.start();
 				btnPause.setText("Pause");

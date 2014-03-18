@@ -2,11 +2,14 @@ package events;
 
 import machines.MachineStage3;
 import machines.MachineStage4;
+import misc.DVD;
 import simulation.Simulation;
 import states.StateStage3;
 import states.StateStage4;
 
 public class MachineXStage4FinishedDVD extends MachineXEvent {
+
+	private DVD dvd;
 
 	public MachineXStage4FinishedDVD(int t, int tos, int m) {
 		super(t, tos,m);
@@ -20,7 +23,7 @@ public class MachineXStage4FinishedDVD extends MachineXEvent {
 		 * 
 		 */
 		MachineStage4 m = sim.getMachineStage4(machineNumber);
-		m.removeDVD();
+		dvd = m.removeDVD();
 		if(m.leftBuffer().isEmpty())
 		{
 			m.state = StateStage4.Idle;
@@ -43,6 +46,7 @@ public class MachineXStage4FinishedDVD extends MachineXEvent {
 			Event stage4finished =  new MachineXStage4FinishedDVD(machineFinishedTime,sim.getCurrentTime(), machineNumber);
 			sim.addToEventQueue(stage4finished);
 		}
+		updateStatistics(sim);
 	}
 
 	@Override
@@ -57,8 +61,11 @@ public class MachineXStage4FinishedDVD extends MachineXEvent {
 
 	@Override
 	public void updateStatistics(Simulation sim) {
-		// TODO Auto-generated method stub
-		
+		if(dvd !=null) {
+			sim.statistics.addToStatistic("Total DVDs processed", 1);
+			sim.statistics.updateAverage("Throughput time per DVD",timeOfOccurence-dvd.getTimeOfEnteringPipeLine() );
+			System.out.println(timeOfOccurence-dvd.getTimeOfEnteringPipeLine());
+		}
 	}
 
 }

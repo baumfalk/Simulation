@@ -54,7 +54,7 @@ public class MachineXStage3Step3FinishedBatch extends MachineXEvent {
 		m.rightBuffer(s4m.machineNumber-1).addBatchToBuffer(m.removeBatch());
 		DVD dvd = m.rightBuffer(s4m.machineNumber-1).removeFromBuffer();
 		s4m.addDVD(dvd);
-		
+		s4m.state = StateStage4.Running;
 		int processingTime = s4m.generateProcessingTime();
 		int machineFinishedTime = sim.getCurrentTime() + processingTime; 
 		Event stage4finished =  new MachineXStage4FinishedDVD(machineFinishedTime,sim.getCurrentTime(), s4m.machineNumber);

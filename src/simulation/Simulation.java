@@ -167,6 +167,7 @@ public class Simulation {
 	private void createStatistics() {
 		statistics = new Statistics();
 		
+		statistics.addStatistic("Total DVDs processed", 0f, "DVDs");
 		statistics.addStatistic("Throughput time per DVD",0.0f,"seconds");
 		statistics.addStatistic("Output per hour",0.0f,"DVD/hour");
 	}
@@ -205,7 +206,7 @@ public class Simulation {
 	public void nextStep()
 	{
 		if(simulationFinished) {
-			System.out.println("Simulation is finished!");
+		//	System.out.println("Simulation is finished!");
 			return;
 		}
 		System.out.println("The current time is " + currentTime);

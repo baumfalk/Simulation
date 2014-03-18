@@ -61,7 +61,6 @@ public class ConveyorBeltXFinishedDVD extends MachineXEvent {
 
 		if(s3m1.state == StateStage3.Idle)
 		{
-			System.out.println("em");
 			handleStageThreeEmpty(sim,s3m1);
 		} else if(s3m2.state == StateStage3.Idle) {
 			handleStageThreeEmpty(sim,s3m2);

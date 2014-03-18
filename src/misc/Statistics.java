@@ -1,5 +1,6 @@
 package misc;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Statistics {
@@ -22,10 +23,16 @@ public class Statistics {
 		stats.put(s, pair);
 	}
 	
+	public void addToStatistic(String s, float f) {
+		float newAverage = (getStatistic(s).first+f);
+		updateStatistic(s, newAverage,0,getStatistic(s).third);
+	}
+	
 	public void updateStatistic(String s, Float f, int i, String type)
 	{
 		addStatistic(s,f,i, type);
 	}
+	
 	public void updateAverage(String s, int f) {
 		// weighted average
 		float newAverage = (getStatistic(s).first*getStatistic(s).second+f)/(getStatistic(s).second+1);
@@ -50,5 +57,14 @@ public class Statistics {
 			sb.append(" (").append(stats.get(s).third).append(")\r\n");
 		}
 		return sb.toString();
+	}
+
+	public ArrayList<String> getStatisticList() {
+		ArrayList<String> list = new ArrayList<String>();
+		for(String s : stats.keySet())
+		{
+			list.add(s+":\t"+stats.get(s).first+" ("+stats.get(s).third+")\r\n");
+		}
+		return list;
 	}
 }
