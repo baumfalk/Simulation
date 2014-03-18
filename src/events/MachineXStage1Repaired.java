@@ -67,8 +67,8 @@ public class MachineXStage1Repaired extends MachineXEvent {
 		// |------|-------|-----|
 		//
 		case Broken:
-			Event dvdFinishedEvent2 = new MachineXStage1FinishedDVD(sim.getCurrentTime(), m.machineNumber, m.totalProcessingTime);
-			sim.addToEventQueue(dvdFinishedEvent2);
+			dvdFinishedEvent = new MachineXStage1FinishedDVD(sim.getCurrentTime(), m.machineNumber, m.totalProcessingTime);
+			sim.addToEventQueue(dvdFinishedEvent);
 			break;
 		// other cases should not happen
 		default:

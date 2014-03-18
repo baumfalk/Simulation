@@ -1,5 +1,6 @@
 package events;
 
+import exceptions.InvalidStateException;
 import machines.MachineStage1;
 import simulation.Simulation;
 import states.StateStage1;
@@ -13,7 +14,6 @@ public class MachineXStage1Breakdown extends MachineXEvent {
 	
 	}
 
-
 	@Override
 	public void scheduleEvents(Simulation sim) {
 		m = sim.getMachineStage1(machineNumber);
@@ -24,9 +24,22 @@ public class MachineXStage1Breakdown extends MachineXEvent {
 
 	@Override
 	public void updateMachines(Simulation sim) {
-		
 		m.lastBreakDownTime = timeOfOccurence;
-		m.setBroken();
+		if(m.isStateX(StateStage1.Running))
+			m.setBroken();
+		else if(m.isStateX(StateStage1.Blocked))
+			m.setBrokenAndBlocked();
+		else
+		{
+			try {
+				throw new InvalidStateException();
+			} catch (InvalidStateException e) {
+				e.printStackTrace();
+				System.exit(1);
+			}
+		
+		}
+			
 	}
 
 	

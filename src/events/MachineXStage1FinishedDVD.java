@@ -16,20 +16,10 @@ public class MachineXStage1FinishedDVD extends MachineXEvent {
 
 	private final int procTime;
 	private MachineStage1 m;
+	private MachineStage2 m2;
 
-	@Override
-	public void execute(Simulation sim) {
-		
-		/*
-		 *  cases:
-		 *  	 normal (dvd finished, buffer not full, stage 2 busy)
-		 *  	 stage2 idle: dvd finished, buffer empty, stage 2 idle
-		 *  	
-		 *  	 buffer full: dvd finished, buffer full, stage 2 busy
-		 *       broken: dvd not finished, buffer ??, stage 2 ??
-		 *       brokenAndRepaired: dvd not finished, buffer??, stage 2 ??
-		 *  
-		 */
+	/*@Override
+		public void execute(Simulation sim) {
 		
 		System.out.println("\t Looking at Stage 1, machine " + machineNumber);
 		m = sim.getMachineStage1(machineNumber);
@@ -55,7 +45,7 @@ public class MachineXStage1FinishedDVD extends MachineXEvent {
 		default:
 			break;
 		}
-	}
+	}*/
 
 	private void handleRunningState(Simulation sim) {
 	
@@ -85,8 +75,7 @@ public class MachineXStage1FinishedDVD extends MachineXEvent {
 	private void scheduleNewStageOneEvent(Simulation sim) {
 		int machineProcTime = m.generateProcessingTime();
 		int machineFinishedTime = machineProcTime + sim.getCurrentTime();
-		DVD dvd = new DVD(sim.getCurrentTime());
-		m.addDVD(dvd);
+		
 		Event machinestage1 = new MachineXStage1FinishedDVD(machineFinishedTime, m.machineNumber, machineProcTime);
 		sim.addToEventQueue(machinestage1);
 	}
@@ -106,15 +95,15 @@ public class MachineXStage1FinishedDVD extends MachineXEvent {
 	}
 	
 	private void handleBrokenState(Simulation sim) {
-		m.state = StateStage1.BrokenAndDVDBeforeRepair;
-		int timeSupposedlyFinished = timeOfOccurence;
-		int timeCrashed = m.lastBreakDownTime;
-		int processingTimeLeft = timeSupposedlyFinished-timeCrashed;
-		System.out.println("\t Machine broken, DVD stuck! Time still needed in machine: " + processingTimeLeft);
-		// machine is broken, DVD is stuck in machine!
-		
-		m.processingTimeLeft = processingTimeLeft;
-		m.totalProcessingTime = procTime;
+		// we would have finished a dvd by now, but we falsely counted
+				// the from the breakdown up until the finish time.
+				m.state = StateStage1.BrokenAndDVDBeforeRepair;
+				int timeSupposedlyFinished = timeOfOccurence;
+				int timeCrashed = m.lastBreakDownTime;
+				int processingTimeLeft = timeSupposedlyFinished-timeCrashed;
+				
+				m.processingTimeLeft = processingTimeLeft;
+				m.totalProcessingTime = procTime;
 	}
 	private void handleBrokenAndRepairedState(Simulation sim) {
 		System.out.println("\t Machine " + m.machineNumber + " broke down and was repaired before it could finish it's dvd. Rescheduling.");
@@ -128,18 +117,19 @@ public class MachineXStage1FinishedDVD extends MachineXEvent {
 
 	@Override
 	public void scheduleEvents(Simulation sim) {
-		// TODO Auto-generated method stub
 		m = sim.getMachineStage1(machineNumber);
-		// if the machine is broken
-		if(m.isBroken()) {
-			
-		}
-		// else if the machine is broken and was repaired in the meantime
 		int machine2Number = (m.machineNumber <= 2) ? 1 : 2;
-		MachineStage2 m2 =sim.getMachineStage2(machine2Number);
-		// else
+		m2 =sim.getMachineStage2(machine2Number);
+		if(m.isStateX(StateStage1.BrokenAndRepairedBeforeDVD)) {
+			// falsely counted the time between breakdown and repair.
+			int timeFalselyRun = m.lastRepairTime - m.lastBreakDownTime;
+			m.lastRepairTime = m.lastBreakDownTime = -1;
+			int newFinishTime = sim.getCurrentTime() + timeFalselyRun;
+			Event newEvent = new MachineXStage1FinishedDVD(newFinishTime, m.machineNumber, procTime);
+			sim.addToEventQueue(newEvent);
+		} 
 		// if stage 2 is idle
-		if(m2.isIdle()) {
+		else if(m2.isIdle()) {
 			int machineProcTimeM2 = m2.generateProcessingTime(); 
 			int machineFinishedTimeM2 = machineProcTimeM2 + sim.getCurrentTime();
 			Event stage2Event = new MachineXStage2FinishedDVD(machineFinishedTimeM2, m2.machineNumber, machineProcTimeM2);
@@ -151,7 +141,6 @@ public class MachineXStage1FinishedDVD extends MachineXEvent {
 			// schedule new event
 			int machineProcTime = m.generateProcessingTime();
 			int machineFinishedTime = machineProcTime + sim.getCurrentTime();
-			m.addDVD(new DVD(sim.getCurrentTime()));
 			Event stage1Event = new MachineXStage1FinishedDVD(machineFinishedTime, m.machineNumber, machineProcTime);
 			sim.addToEventQueue(stage1Event);
 		}
@@ -159,15 +148,61 @@ public class MachineXStage1FinishedDVD extends MachineXEvent {
 	
 	@Override
 	public void updateMachines(Simulation sim) {
-		// TODO Auto-generated method stub
+		switch (m.state) {
+		case Blocked:
+			// do nothing
+			break;
+		case Broken:
+			// we would have finished a dvd by now, but we falsely counted
+			// the from the breakdown up until the finish time.
+			m.state = StateStage1.BrokenAndDVDBeforeRepair;
+			int timeSupposedlyFinished = timeOfOccurence;
+			int timeCrashed = m.lastBreakDownTime;
+			int processingTimeLeft = timeSupposedlyFinished-timeCrashed;
+			
+			m.processingTimeLeft = processingTimeLeft;
+			m.totalProcessingTime = procTime;
+			break;
+		case BrokenAndBlocked:
+			// do nothing
+			break;
+		case BrokenAndDVDBeforeRepair:
+			// do nothing
+			break;
+		case BrokenAndRepairedBeforeDVD:
+			// do nothing
+			break;
+		case Running:
+			break;
+		default:
+			break;
+
+		}
+		// if m is broken
+		if(m.isStateX(StateStage1.Broken)) {
 		
+		} else if(m.rightBuffer().isFull()) {
+			m.state = StateStage1.Blocked;
+			m.processingTimeLeft = 0;
+			m.totalProcessingTime = procTime;
+		} else {
+			if(m2.isIdle()) {
+				//m2.addDVD(m.removeDVD());
+			} else {
+				// we add a new dvd
+				m.rightBuffer().addToBuffer(m.removeDVD());
+			}
+			DVD dvd = new DVD(sim.getCurrentTime());
+			m.addDVD(dvd);
+		}
 	}
-
-
 
 	@Override
 	public void updateStatistics(Simulation sim) {
-		// TODO Auto-generated method stub
-		
+		if(m.rightBuffer().isFull())
+		{
+			
+			//TODO: statistics for idle time
+		} 
 	}
 }
