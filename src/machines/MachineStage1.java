@@ -3,12 +3,14 @@ package machines;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import exceptions.InvalidStateException;
+
 import states.StateStage1;
 import buffer.Buffer;
 
 public class MachineStage1 extends Machine {
 
-	public StateStage1 state; 
+	private StateStage1 state; 
 	
 	public int lastBreakDownTime;
 	public int lastRepairTime;
@@ -37,19 +39,98 @@ public class MachineStage1 extends Machine {
 		return 2*60*60;
 	}
 
-	public boolean isStateX(StateStage1 s) {
-		return state == s;
-	}
 
 	public void setBroken() {
-		state = StateStage1.Broken;
+		if(state == StateStage1.Running)
+			state = StateStage1.Broken;
+		else {
+			try {
+				throw new InvalidStateException();
+			} catch (InvalidStateException e) {
+				e.printStackTrace();
+				System.out.println("\t Cannot change the state of machine 1 to Broken with the state " + state);
+				System.exit(1);
+			}
+		}
 	}
-
 
 	public void setBrokenAndBlocked() {
-		// TODO Auto-generated method stub
-		state = StateStage1.BrokenAndBlocked;
+		if(state == StateStage1.Blocked)
+			state = StateStage1.BrokenAndBlocked;
+		else {
+			try {
+				throw new InvalidStateException();
+			} catch (InvalidStateException e) {
+				e.printStackTrace();
+				System.out.println("\t Cannot change the state of a machine of stage 1 to BrokenAndBlocked with the state " + state);
+				System.exit(1);
+			}
+		}
 	}
 
+	public StateStage1 getState() {
+
+		return state;
+	}
+
+	public void setBrokenAndDVDBeforeRepair() {
+		// TODO Auto-generated method stub
+		if(state == StateStage1.Broken)
+			state = StateStage1.BrokenAndDVDBeforeRepair;
+		else {
+			try {
+				throw new InvalidStateException();
+			} catch (InvalidStateException e) {
+				e.printStackTrace();
+				System.out.println("\t Cannot change the state of machine 1 to BrokenAndDVDBeforeRepair with the state " + state);
+				System.exit(1);
+			}
+		}
+		
+	}
+
+	public void setRunning() {
+		if(state == StateStage1.Blocked || state == StateStage1.BrokenAndRepairedBeforeDVD || state == StateStage1.BrokenAndDVDBeforeRepair)
+			state = StateStage1.Running;
+		else {
+			try {
+				throw new InvalidStateException();
+			} catch (InvalidStateException e) {
+				e.printStackTrace();
+				System.out.println("\t Cannot change the state of a machine of stage 1 to Running with the state " + state);
+				System.exit(1);
+			}
+		}
+		state = StateStage1.Running;
+	}
+
+	public void setBlocked() {
+		if(state == StateStage1.Running)
+			state = StateStage1.Blocked;
+		else {
+			try {
+				throw new InvalidStateException();
+			} catch (InvalidStateException e) {
+				e.printStackTrace();
+				System.out.println("\t Cannot change the state of a machine of stage 1 to Blocked with the state " + state);
+				System.exit(1);
+			}
+		}
+	}
+
+	public void brokenAndRepairedBeforeDVD() {
+		// TODO Auto-generated method stub
+		if(state == StateStage1.Broken)
+			state = StateStage1.BrokenAndRepairedBeforeDVD;
+		else {
+			try {
+				throw new InvalidStateException();
+			} catch (InvalidStateException e) {
+				e.printStackTrace();
+				System.out.println("\t Cannot change the state of a machine of stage 1 to BrokenAndRepairedBeforeDVD with the state " + state);
+				System.exit(1);
+			}
+		}
 	
+	}	
 }

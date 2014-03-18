@@ -78,7 +78,7 @@ public class SimulationGUI {
 	{
 		for(int i=1;i<=4;i++) {
 			MachineStage1 m1 = simulation.getMachineStage1(i);
-			stage1Labels.get(i-1).setText(m1.state.name());
+			stage1Labels.get(i-1).setText(m1.getState().name());
 			
 		}
 		for(int i=1;i<=2;i++) {

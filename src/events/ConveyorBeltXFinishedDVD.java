@@ -10,8 +10,8 @@ import states.StateStage3;
 
 public class ConveyorBeltXFinishedDVD extends MachineXEvent {
 
-	public ConveyorBeltXFinishedDVD(int t, int c) {
-		super(t, c);
+	public ConveyorBeltXFinishedDVD(int t, int tos, int c) {
+		super(t,tos, c);
 	}
 	
 	private ConveyorBelt cb;
@@ -85,7 +85,7 @@ public class ConveyorBeltXFinishedDVD extends MachineXEvent {
 			int machineProcTimeM2 = 0;
 			s2m.state = StateStage2.Running;
 			int machineFinishedTimeM2 = sim.getCurrentTime();
-			Event event_m2 = new MachineXStage2FinishedDVD(machineFinishedTimeM2,s2m.machineNumber, machineProcTimeM2);
+			Event event_m2 = new MachineXStage2FinishedDVD(machineFinishedTimeM2,sim.getCurrentTime(),s2m.machineNumber, machineProcTimeM2);
 			sim.addToEventQueue(event_m2);
 		}
 	}
@@ -93,7 +93,7 @@ public class ConveyorBeltXFinishedDVD extends MachineXEvent {
 	private void scheduleNewStage3Event(Simulation sim, MachineStage3 s3m) {
 		int processingTimeStep1 = s3m.generateProcessingTimeStep1();
 		int machineFinishedTime = sim.getCurrentTime() + processingTimeStep1;
-		Event eventStage3Step1Finished = new MachineXStage3Step1FinishedBatch(machineFinishedTime, s3m.machineNumber);
+		Event eventStage3Step1Finished = new MachineXStage3Step1FinishedBatch(machineFinishedTime,sim.getCurrentTime(), s3m.machineNumber);
 		sim.addToEventQueue(eventStage3Step1Finished);
 	}
 

@@ -5,8 +5,8 @@ import simulation.Simulation;
 public abstract class MachineXEvent extends Event {
 
 	protected final int machineNumber;
-	public MachineXEvent(int t, int m) {
-		super(t);
+	public MachineXEvent(int t, int tos, int m) {
+		super(t, tos);
 		machineNumber = m;
 	
 	}

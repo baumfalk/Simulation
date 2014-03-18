@@ -182,17 +182,17 @@ public class Simulation {
 		
 			int machineProcTime = stageOneMachines.get(m.machineNumber-1).generateProcessingTime();
 			int machineFinishedTime = machineProcTime + currentTime;
-			Event machinestage1 = new MachineXStage1FinishedDVD(machineFinishedTime, m.machineNumber, machineProcTime);
+			Event machinestage1 = new MachineXStage1FinishedDVD(machineFinishedTime, currentTime, m.machineNumber, machineProcTime);
 			eventQueue.add(machinestage1);
 			
 			//and breakdown
 			int breakdownTime = currentTime+stageOneMachines.get(m.machineNumber-1).generateBreakDownTime();
 			int repairTime =  Math.round(stageOneMachines.get(m.machineNumber-1).generateRepairTime());
-			Event machinestage1breakdown = new MachineXStage1Breakdown(breakdownTime, m.machineNumber, repairTime);
+			Event machinestage1breakdown = new MachineXStage1Breakdown(breakdownTime, currentTime, m.machineNumber, repairTime);
 			eventQueue.add(machinestage1breakdown);
 		}
 		// when are we finished with the simulation
-		Event simulationFinished = new SimulationFinished(runTime);
+		Event simulationFinished = new SimulationFinished(runTime,currentTime);
 		eventQueue.add(simulationFinished);
 	}
 	
@@ -213,6 +213,7 @@ public class Simulation {
 		Event event = eventQueue.remove();
 		currentTime = event.getTimeOfOccurence();
 		System.out.println("The event that will be processed is " + event.getClass().getSimpleName());
+		System.out.println("It was scheduled at " + event.getTimeOfScheduling());
 		
 		event.execute(this);
 	

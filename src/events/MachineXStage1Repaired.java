@@ -1,5 +1,6 @@
 package events;
 
+import exceptions.InvalidStateException;
 import machines.MachineStage1;
 import simulation.Simulation;
 import states.StateStage1;
@@ -8,15 +9,15 @@ public class MachineXStage1Repaired extends MachineXEvent {
 
 	private MachineStage1 m;
 
-	public MachineXStage1Repaired(int t, int m) {
-		super(t, m);
+	public MachineXStage1Repaired(int t, int tos, int m) {
+		super(t, tos,m);
 	
 	}
 
 	@Override
 	public void updateMachines(Simulation sim) {
 		
-		switch(m.state)
+		switch(m.getState())
 		{
 		// no repair has taken place before
 		// finished dvd
@@ -25,7 +26,7 @@ public class MachineXStage1Repaired extends MachineXEvent {
 		// |------|-------|------|
 		//
 		case BrokenAndDVDBeforeRepair:
-			m.state = StateStage1.Running;
+			m.setRunning();
 			break;
 			
 		// repair has taken place before finished dvd
@@ -34,13 +35,25 @@ public class MachineXStage1Repaired extends MachineXEvent {
 		// |------|-------|-----|
 		//
 		case Broken:
-			m.state = StateStage1.BrokenAndRepairedBeforeDVD;
+			m.brokenAndRepairedBeforeDVD();
+			
 			m.lastRepairTime = timeOfOccurence;
 			
 			break;
-		// other cases should not happen
+
+		case BrokenAndBlocked:
+			m.setBlocked();
+			break;
+		
 		default:
-			
+			try {
+				throw new InvalidStateException();
+			} catch (InvalidStateException e) {
+				
+				e.printStackTrace();
+				System.out.println("\t State " + m.getState() + " is invalid for the event " + this.getClass().getSimpleName() + "!");
+				System.exit(1);
+			}
 			break;
 		}
 	}
@@ -48,7 +61,7 @@ public class MachineXStage1Repaired extends MachineXEvent {
 	@Override
 	public void scheduleEvents(Simulation sim) {
 		m = sim.getMachineStage1(machineNumber);
-		switch(m.state)
+		switch(m.getState())
 		{
 		// no repair has taken place before
 		// finished dvd
@@ -57,7 +70,7 @@ public class MachineXStage1Repaired extends MachineXEvent {
 		// |------|-------|------|
 		//
 		case BrokenAndDVDBeforeRepair:
-			Event dvdFinishedEvent = new MachineXStage1FinishedDVD(m.processingTimeLeft+sim.getCurrentTime(), m.machineNumber, m.totalProcessingTime);
+			Event dvdFinishedEvent = new MachineXStage1FinishedDVD(m.processingTimeLeft+sim.getCurrentTime(),sim.getCurrentTime(), m.machineNumber, m.totalProcessingTime);
 			sim.addToEventQueue(dvdFinishedEvent);
 			break;
 			
@@ -67,7 +80,7 @@ public class MachineXStage1Repaired extends MachineXEvent {
 		// |------|-------|-----|
 		//
 		case Broken:
-			dvdFinishedEvent = new MachineXStage1FinishedDVD(sim.getCurrentTime(), m.machineNumber, m.totalProcessingTime);
+			dvdFinishedEvent = new MachineXStage1FinishedDVD(sim.getCurrentTime(),sim.getCurrentTime(), m.machineNumber, m.totalProcessingTime);
 			sim.addToEventQueue(dvdFinishedEvent);
 			break;
 		// other cases should not happen
@@ -78,7 +91,7 @@ public class MachineXStage1Repaired extends MachineXEvent {
 		//and breakdown
 		int breakdownTime = sim.getCurrentTime()+sim.getMachineStage1(machineNumber).generateBreakDownTime();
 		int repairTime =  sim.getMachineStage1(machineNumber).generateRepairTime();
-		Event machinestage1breakdown = new MachineXStage1Breakdown(breakdownTime, m.machineNumber, repairTime);
+		Event machinestage1breakdown = new MachineXStage1Breakdown(breakdownTime,sim.getCurrentTime(), m.machineNumber, repairTime);
 		sim.addToEventQueue(machinestage1breakdown);
 	}
 

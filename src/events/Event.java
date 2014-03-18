@@ -4,14 +4,19 @@ import simulation.Simulation;
 
 public abstract class Event implements Comparable<Event> {
 	protected final int timeOfOccurence;
-
+	protected final int timeOfScheduling;
 	
-	public Event(int t)
+	public Event(int t, int tos)
 	{
 		this.timeOfOccurence = t;
+		this.timeOfScheduling = tos;
 	}
 	public int getTimeOfOccurence() {
 		return timeOfOccurence;
+	}
+	
+	public int getTimeOfScheduling() {
+		return timeOfScheduling;
 	}
 
 	public void execute(Simulation sim) {

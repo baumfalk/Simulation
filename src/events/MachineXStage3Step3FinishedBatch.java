@@ -13,8 +13,8 @@ public class MachineXStage3Step3FinishedBatch extends MachineXEvent {
 
 	private MachineStage3 m;
 
-	public MachineXStage3Step3FinishedBatch(int t, int m) {
-		super(t, m);
+	public MachineXStage3Step3FinishedBatch(int t, int tos, int m) {
+		super(t, tos,m);
 	}
 
 	@Override
@@ -44,7 +44,7 @@ public class MachineXStage3Step3FinishedBatch extends MachineXEvent {
 		if(cb.state == StateConveyorBelt.Blocked) {
 			cb.state = StateConveyorBelt.Running;
 			
-			Event conveyorEvent = new ConveyorBeltXFinishedDVD(sim.getCurrentTime(), cb.machineNumber);
+			Event conveyorEvent = new ConveyorBeltXFinishedDVD(sim.getCurrentTime(),sim.getCurrentTime(), cb.machineNumber);
 			sim.addToEventQueue(conveyorEvent);
 		}
 	}
@@ -57,7 +57,7 @@ public class MachineXStage3Step3FinishedBatch extends MachineXEvent {
 		
 		int processingTime = s4m.generateProcessingTime();
 		int machineFinishedTime = sim.getCurrentTime() + processingTime; 
-		Event stage4finished =  new MachineXStage4FinishedDVD(machineFinishedTime, s4m.machineNumber);
+		Event stage4finished =  new MachineXStage4FinishedDVD(machineFinishedTime,sim.getCurrentTime(), s4m.machineNumber);
 		sim.addToEventQueue(stage4finished);
 		m.state = StateStage3.Idle;
 	}

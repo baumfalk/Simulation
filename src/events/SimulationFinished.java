@@ -4,8 +4,8 @@ import simulation.Simulation;
 
 public class SimulationFinished extends Event{
 
-	public SimulationFinished(int t) {
-		super(t);
+	public SimulationFinished(int t, int tos) {
+		super(t, tos);
 	}
 
 	@Override

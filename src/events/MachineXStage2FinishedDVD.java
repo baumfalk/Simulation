@@ -12,8 +12,8 @@ import states.StateStage2;
 public class MachineXStage2FinishedDVD extends MachineXEvent {
 	
 	
-	public MachineXStage2FinishedDVD(int t, int m, int p) {
-		super(t, m);
+	public MachineXStage2FinishedDVD(int t, int tos, int m, int p) {
+		super(t, tos,m);
 	
 		procTime = p;
 	}
@@ -79,7 +79,7 @@ public class MachineXStage2FinishedDVD extends MachineXEvent {
 		
 		dvdTemp.timeOfEnteringConveyorBelt = sim.getCurrentTime();
 		cb.addDVD(dvdTemp);
-		Event conveyorEvent = new ConveyorBeltXFinishedDVD(sim.getCurrentTime()+cb.generateProcessingTime(), m.machineNumber);
+		Event conveyorEvent = new ConveyorBeltXFinishedDVD(sim.getCurrentTime()+cb.generateProcessingTime(),sim.getCurrentTime(), m.machineNumber);
 		sim.addToEventQueue(conveyorEvent);
 		if(cb.state == StateConveyorBelt.Idle) {
 			System.out.println("\t Reactivated the conveyorbelt!");
@@ -100,7 +100,7 @@ public class MachineXStage2FinishedDVD extends MachineXEvent {
 			//schedule new event for this machine
 			int machineProcTime = m.generateProcessingTime(); 
 			int machineFinishedTime = machineProcTime + sim.getCurrentTime();
-			Event eventStage2FinishedDVD = new MachineXStage2FinishedDVD(machineFinishedTime, m.machineNumber, machineProcTime);
+			Event eventStage2FinishedDVD = new MachineXStage2FinishedDVD(machineFinishedTime,sim.getCurrentTime(), m.machineNumber, machineProcTime);
 			sim.addToEventQueue(eventStage2FinishedDVD);
 			
 			reactivateStageOne(sim);
@@ -111,17 +111,17 @@ public class MachineXStage2FinishedDVD extends MachineXEvent {
 	{
 		MachineStage1 s1m1 = sim.getMachineStage1(m.machineNumber*2-1);
 		MachineStage1 s1m2 = sim.getMachineStage1(m.machineNumber*2);
-		if(s1m1.state == StateStage1.Blocked)
+		if(s1m1.getState() == StateStage1.Blocked)
 		{
-			s1m1.state = StateStage1.Running;
-			Event event_s1_m1 = new MachineXStage1FinishedDVD(sim.getCurrentTime(),s1m1.machineNumber,s1m1.totalProcessingTime);
+			s1m1.setRunning();
+			Event event_s1_m1 = new MachineXStage1FinishedDVD(sim.getCurrentTime(),sim.getCurrentTime(),s1m1.machineNumber,s1m1.totalProcessingTime);
 			sim.addToEventQueue(event_s1_m1);
 			System.out.println("\t Reactivating machine at stage 1");
 		}
-		if(s1m2.state == StateStage1.Blocked)
+		if(s1m2.getState() == StateStage1.Blocked)
 		{
-			s1m2.state = StateStage1.Running;
-			Event event_s1_m2 = new MachineXStage1FinishedDVD(sim.getCurrentTime(),s1m1.machineNumber,s1m1.totalProcessingTime);
+			s1m2.setRunning();
+			Event event_s1_m2 = new MachineXStage1FinishedDVD(sim.getCurrentTime(),sim.getCurrentTime(),s1m1.machineNumber,s1m1.totalProcessingTime);
 			sim.addToEventQueue(event_s1_m2);
 			System.out.println("\t Reactivating machine at stage 1");
 		}
