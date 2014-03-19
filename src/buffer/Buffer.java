@@ -85,4 +85,9 @@ public class Buffer {
 	public ArrayList<DVD> peekBuffer() {
 		return new ArrayList<DVD>(dvdList);
 	}
+
+	public DVD peekDVD() {
+		// TODO Auto-generated method stub
+		return dvdList.peek();
+	}
 }

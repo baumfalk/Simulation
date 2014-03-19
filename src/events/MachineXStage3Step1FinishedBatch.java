@@ -7,8 +7,8 @@ public class MachineXStage3Step1FinishedBatch extends MachineXEvent {
 
 	private MachineStage3 s3m;
 
-	public MachineXStage3Step1FinishedBatch(int t, int tos, int m) {
-		super(t, tos,m);
+	public MachineXStage3Step1FinishedBatch(int t, int tos, int m,String scheduledBy) {
+		super(t, tos,m, scheduledBy);
 	}
 
 	@Override
@@ -23,7 +23,7 @@ public class MachineXStage3Step1FinishedBatch extends MachineXEvent {
 	private void addStep2Event(Simulation sim) {
 		int processingTimeStep2 = s3m.generateProcessingTimeStep2();
 		int machineFinishedTime = sim.getCurrentTime() + processingTimeStep2;
-		Event eventStage3Step2Finished = new MachineXStage3Step2FinishedBatch(machineFinishedTime,sim.getCurrentTime(), s3m.machineNumber);
+		Event eventStage3Step2Finished = new MachineXStage3Step2FinishedBatch(machineFinishedTime,sim.getCurrentTime(), s3m.machineNumber,this.getClass().getSimpleName());
 		sim.addToEventQueue(eventStage3Step2Finished);
 	}
 

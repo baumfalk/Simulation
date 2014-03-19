@@ -13,8 +13,8 @@ public class MachineXStage3Step3FinishedBatch extends MachineXEvent {
 
 	private MachineStage3 m;
 
-	public MachineXStage3Step3FinishedBatch(int t, int tos, int m) {
-		super(t, tos,m);
+	public MachineXStage3Step3FinishedBatch(int t, int tos, int m,String scheduledBy) {
+		super(t, tos,m, scheduledBy);
 	}
 
 	@Override
@@ -41,11 +41,20 @@ public class MachineXStage3Step3FinishedBatch extends MachineXEvent {
 			}
 		}
 		ConveyorBelt cb = sim.getConveyorBelt(machineNumber);
-		if(cb.state == StateConveyorBelt.Blocked) {
-			cb.state = StateConveyorBelt.Running;
-			
-			Event conveyorEvent = new ConveyorBeltXFinishedDVD(sim.getCurrentTime(),sim.getCurrentTime(), cb.machineNumber);
-			sim.addToEventQueue(conveyorEvent);
+		if(cb.getState() == StateConveyorBelt.Blocked) {
+			cb.setRunning(); // update the expected finished time for all dvd's
+			// for all dvds whose events have already occurred
+			for(DVD dvd : cb.peekBuffer()) {
+				// reschedule those
+				if(dvd.expectedLeavingTimeConveyorBelt <= sim.getCurrentTime()) {
+					Event conveyorEvent = new ConveyorBeltXFinishedDVD(dvd.expectedLeavingTimeConveyorBelt+(sim.getCurrentTime()-cb.beginDelayTime),sim.getCurrentTime(), cb.machineNumber,this.getClass().getSimpleName());
+					sim.addToEventQueue(conveyorEvent);
+					System.out.println("\t Rescheduling dvd!");
+				}
+			}
+			// update finishing time for all dvd's in the buffer
+			cb.updateExpectedFinishingTime(sim.getCurrentTime()-cb.beginDelayTime);
+			cb.beginDelayTime = -1;
 		}
 	}
 	
@@ -57,7 +66,7 @@ public class MachineXStage3Step3FinishedBatch extends MachineXEvent {
 		s4m.state = StateStage4.Running;
 		int processingTime = s4m.generateProcessingTime();
 		int machineFinishedTime = sim.getCurrentTime() + processingTime; 
-		Event stage4finished =  new MachineXStage4FinishedDVD(machineFinishedTime,sim.getCurrentTime(), s4m.machineNumber);
+		Event stage4finished =  new MachineXStage4FinishedDVD(machineFinishedTime,sim.getCurrentTime(), s4m.machineNumber,this.getClass().getSimpleName());
 		sim.addToEventQueue(stage4finished);
 		m.state = StateStage3.Idle;
 	}

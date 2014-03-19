@@ -3,14 +3,13 @@ package events;
 import exceptions.InvalidStateException;
 import machines.MachineStage1;
 import simulation.Simulation;
-import states.StateStage1;
 
 public class MachineXStage1Repaired extends MachineXEvent {
 
 	private MachineStage1 m;
 
-	public MachineXStage1Repaired(int t, int tos, int m) {
-		super(t, tos,m);
+	public MachineXStage1Repaired(int t, int tos, int m,String scheduledBy) {
+		super(t, tos,m, scheduledBy);
 	
 	}
 
@@ -70,7 +69,7 @@ public class MachineXStage1Repaired extends MachineXEvent {
 		// |------|-------|------|
 		//
 		case BrokenAndDVDBeforeRepair:
-			Event dvdFinishedEvent = new MachineXStage1FinishedDVD(m.processingTimeLeft+sim.getCurrentTime(),sim.getCurrentTime(), m.machineNumber, m.totalProcessingTime);
+			Event dvdFinishedEvent = new MachineXStage1FinishedDVD(m.processingTimeLeft+sim.getCurrentTime(),sim.getCurrentTime(), m.machineNumber, m.totalProcessingTime,this.getClass().getSimpleName());
 			sim.addToEventQueue(dvdFinishedEvent);
 			break;
 			
@@ -80,7 +79,7 @@ public class MachineXStage1Repaired extends MachineXEvent {
 		// |------|-------|-----|
 		//
 		case Broken:
-			dvdFinishedEvent = new MachineXStage1FinishedDVD(sim.getCurrentTime(),sim.getCurrentTime(), m.machineNumber, m.totalProcessingTime);
+			dvdFinishedEvent = new MachineXStage1FinishedDVD(sim.getCurrentTime(),sim.getCurrentTime(), m.machineNumber, m.totalProcessingTime,this.getClass().getSimpleName());
 			sim.addToEventQueue(dvdFinishedEvent);
 			break;
 		// other cases should not happen
@@ -91,7 +90,7 @@ public class MachineXStage1Repaired extends MachineXEvent {
 		//and breakdown
 		int breakdownTime = sim.getCurrentTime()+sim.getMachineStage1(machineNumber).generateBreakDownTime();
 		int repairTime =  sim.getMachineStage1(machineNumber).generateRepairTime();
-		Event machinestage1breakdown = new MachineXStage1Breakdown(breakdownTime,sim.getCurrentTime(), m.machineNumber, repairTime);
+		Event machinestage1breakdown = new MachineXStage1Breakdown(breakdownTime,sim.getCurrentTime(), m.machineNumber, repairTime,this.getClass().getSimpleName());
 		sim.addToEventQueue(machinestage1breakdown);
 	}
 

@@ -85,11 +85,11 @@ public class SimulationGUI {
 		}
 		for(int i=1;i<=2;i++) {
 			MachineStage2 m2 = simulation.getMachineStage2(i);
-			stage2Labels.get(i-1).setText(m2.state.name());
+			stage2Labels.get(i-1).setText(m2.getState().name());
 			buffersOne.get(i-1).setText(m2.leftBuffer().currentDVDCount()+"");
 			
 			ConveyorBelt cb = simulation.getConveyorBelt(i);
-			conveyorBeltLabels.get(i-1).setText(cb.state.name());
+			conveyorBeltLabels.get(i-1).setText(cb.getState().name());
 			buffersTwo.get(i-1).setText(cb.rightBuffer().currentDVDCount()+"");
 			
 			MachineStage3 m3 = simulation.getMachineStage3(i);
@@ -129,7 +129,7 @@ public class SimulationGUI {
 	private void initWindow() {
 		frmDvdFactorySimulation = new JFrame();
 		frmDvdFactorySimulation.setTitle("DVD Factory Simulation");
-		frmDvdFactorySimulation.setBounds(100, 100, 991, 653);
+		frmDvdFactorySimulation.setBounds(100, 100, 1063, 653);
 		frmDvdFactorySimulation.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frmDvdFactorySimulation.getContentPane().setLayout(null);
 	}

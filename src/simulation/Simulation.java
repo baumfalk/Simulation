@@ -42,8 +42,6 @@ public class Simulation {
 	private ArrayList<MachineStage3> stageThreeMachines;
 	private ArrayList<MachineStage4> stageFourMachines;
 
-	
-	
 	//TODO:remove this in final
 	public int DVDsprocessed;
 
@@ -183,17 +181,17 @@ public class Simulation {
 		
 			int machineProcTime = stageOneMachines.get(m.machineNumber-1).generateProcessingTime();
 			int machineFinishedTime = machineProcTime + currentTime;
-			Event machinestage1 = new MachineXStage1FinishedDVD(machineFinishedTime, currentTime, m.machineNumber, machineProcTime);
+			Event machinestage1 = new MachineXStage1FinishedDVD(machineFinishedTime, currentTime, m.machineNumber, machineProcTime,this.getClass().getSimpleName());
 			eventQueue.add(machinestage1);
 			
 			//and breakdown
 			int breakdownTime = currentTime+stageOneMachines.get(m.machineNumber-1).generateBreakDownTime();
 			int repairTime =  Math.round(stageOneMachines.get(m.machineNumber-1).generateRepairTime());
-			Event machinestage1breakdown = new MachineXStage1Breakdown(breakdownTime, currentTime, m.machineNumber, repairTime);
+			Event machinestage1breakdown = new MachineXStage1Breakdown(breakdownTime, currentTime, m.machineNumber, repairTime,this.getClass().getSimpleName());
 			eventQueue.add(machinestage1breakdown);
 		}
 		// when are we finished with the simulation
-		Event simulationFinished = new SimulationFinished(runTime,currentTime);
+		Event simulationFinished = new SimulationFinished(runTime,currentTime,this.getClass().getSimpleName());
 		eventQueue.add(simulationFinished);
 	}
 	
@@ -214,7 +212,7 @@ public class Simulation {
 		Event event = eventQueue.remove();
 		currentTime = event.getTimeOfOccurence();
 		System.out.println("The event that will be processed is " + event.getClass().getSimpleName());
-		System.out.println("It was scheduled at " + event.getTimeOfScheduling());
+		System.out.println("It was scheduled at " + event.getTimeOfScheduling() + " by " + event.getScheduler());
 		
 		event.execute(this);
 	

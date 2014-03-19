@@ -4,14 +4,13 @@ import machines.ConveyorBelt;
 import machines.MachineStage2;
 import machines.MachineStage3;
 import simulation.Simulation;
-import states.StateConveyorBelt;
 import states.StateStage2;
 import states.StateStage3;
 
 public class ConveyorBeltXFinishedDVD extends MachineXEvent {
 
-	public ConveyorBeltXFinishedDVD(int t, int tos, int c) {
-		super(t,tos, c);
+	public ConveyorBeltXFinishedDVD(int t, int tos, int c, String scheduledBy) {
+		super(t,tos, c, scheduledBy);
 	}
 	
 	private ConveyorBelt cb;
@@ -21,37 +20,30 @@ public class ConveyorBeltXFinishedDVD extends MachineXEvent {
 	public void execute(Simulation sim) {
 		// TODO Auto-generated method stub
 		cb = sim.getConveyorBelt(machineNumber);
-		switch (cb.state) {
+		switch (cb.getState()) {
 		case Idle:
 			break;
 		case Running:
 			handleRunningState(sim);
-			//batch (buffer) to the right is not full
-			//TODO: make this nicer
-			//if
-			/*if(sim.layerTwoBuffers.get(conveyorbeltNumber-1).size()!=sim.batchSize) {
-				sim.layerTwoBuffers.get(cb.conveyorBeltNumber-1).add(cb);
-				cb.dvdsOnBelt.pop();
-			} else {
-				System.out.println("\t Buffer right to Conveyor Belt "+ cb.conveyorBeltNumber +" is full! Going Idle");
-				cb.state = StateConveyorBelt.Idle;
-				cb.timePaused = sim.getCurrentTime();
-			}*/
+			
 			break;
 		case Blocked:
 			break;
 		default:
 			break;
 		}
-		// buffer to the right is full
 	}
 	
 	private void handleRunningState(Simulation sim) {
-		if(!cb.rightBuffer().isFull()) {
-			handleCrateNotFull();
+		if(cb.peekDVD().expectedLeavingTimeConveyorBelt != sim.getCurrentTime()) {
+			Event conveyorEvent = new ConveyorBeltXFinishedDVD(cb.peekDVD().expectedLeavingTimeConveyorBelt,sim.getCurrentTime(), cb.machineNumber,this.getClass().getSimpleName());
+			sim.addToEventQueue(conveyorEvent);
 		} else {
-			
-			handleCrateFull(sim);
+			if(!cb.rightBuffer().isFull()) {
+				handleCrateNotFull();
+			} else {
+				handleCrateFull(sim);
+			}
 		}
 	}
 	private void handleCrateFull(Simulation sim)
@@ -71,7 +63,8 @@ public class ConveyorBeltXFinishedDVD extends MachineXEvent {
 
 	private void handleStageThreeAllFull(Simulation sim) {
 		System.out.println("\t All machines at stage 3 are busy!");
-		cb.state = StateConveyorBelt.Blocked;
+		cb.setBlocked();
+		cb.beginDelayTime = sim.getCurrentTime();
 	}
 
 	private void handleStageThreeEmpty(Simulation sim, MachineStage3 s3m) {
@@ -79,12 +72,12 @@ public class ConveyorBeltXFinishedDVD extends MachineXEvent {
 		s3m.state = StateStage3.Running;
 		scheduleNewStage3Event(sim, s3m);
 		MachineStage2 s2m = sim.getMachineStage2(machineNumber);
-		if(s2m.state == StateStage2.Blocked)
+		if(s2m.getState() == StateStage2.Blocked)
 		{
 			int machineProcTimeM2 = 0;
-			s2m.state = StateStage2.Running;
+			s2m.setRunning();
 			int machineFinishedTimeM2 = sim.getCurrentTime();
-			Event event_m2 = new MachineXStage2FinishedDVD(machineFinishedTimeM2,sim.getCurrentTime(),s2m.machineNumber, machineProcTimeM2);
+			Event event_m2 = new MachineXStage2FinishedDVD(machineFinishedTimeM2,sim.getCurrentTime(),s2m.machineNumber, machineProcTimeM2,this.getClass().getSimpleName());
 			sim.addToEventQueue(event_m2);
 		}
 	}
@@ -92,7 +85,7 @@ public class ConveyorBeltXFinishedDVD extends MachineXEvent {
 	private void scheduleNewStage3Event(Simulation sim, MachineStage3 s3m) {
 		int processingTimeStep1 = s3m.generateProcessingTimeStep1();
 		int machineFinishedTime = sim.getCurrentTime() + processingTimeStep1;
-		Event eventStage3Step1Finished = new MachineXStage3Step1FinishedBatch(machineFinishedTime,sim.getCurrentTime(), s3m.machineNumber);
+		Event eventStage3Step1Finished = new MachineXStage3Step1FinishedBatch(machineFinishedTime,sim.getCurrentTime(), s3m.machineNumber,this.getClass().getSimpleName());
 		sim.addToEventQueue(eventStage3Step1Finished);
 	}
 
@@ -101,15 +94,26 @@ public class ConveyorBeltXFinishedDVD extends MachineXEvent {
 		cb.rightBuffer().addToBuffer(cb.removeDVD());
 		
 		if(cb.machineIsEmpty()) {
-			cb.state = StateConveyorBelt.Idle;
+			cb.setIdle();
 		}
 		
 	}
 
 	@Override
 	public void scheduleEvents(Simulation sim) {
-		// TODO Auto-generated method stub
-		
+		cb = sim.getConveyorBelt(machineNumber);
+		switch (cb.getState()) {
+		case Idle:
+			break;
+		case Running:
+			handleRunningState(sim);
+			
+			break;
+		case Blocked:
+			break;
+		default:
+			break;
+		}
 	}
 
 	@Override

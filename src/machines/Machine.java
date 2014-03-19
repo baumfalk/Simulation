@@ -34,6 +34,11 @@ public abstract class Machine {
 		return this.dvdsInMachine.removeFromBuffer();
 	}
 	
+	public DVD peekDVD()
+	{
+		return this.dvdsInMachine.peekDVD();
+	}
+	
 	public Buffer leftBuffer(int i)
 	{
 		return this.leftBuffers.get(i);

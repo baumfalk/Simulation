@@ -5,12 +5,11 @@ import machines.MachineStage1;
 import machines.MachineStage2;
 import misc.DVD;
 import simulation.Simulation;
-import states.StateStage1;
 import states.StateStage2;
 
 public class MachineXStage1FinishedDVD extends MachineXEvent {
-	public MachineXStage1FinishedDVD(int t, int tos, int m, int p) {
-		super(t, tos,m);
+	public MachineXStage1FinishedDVD(int t, int tos, int m, int p,String scheduledBy) {
+		super(t, tos,m, scheduledBy);
 	
 		procTime = p;
 	}
@@ -19,20 +18,14 @@ public class MachineXStage1FinishedDVD extends MachineXEvent {
 	private MachineStage1 m;
 	private MachineStage2 m2;
 
-
-
 	private void scheduleNewStageOneEvent(Simulation sim) {
 		int machineProcTime = m.generateProcessingTime();
 		int machineFinishedTime = machineProcTime + sim.getCurrentTime();
 		
-		Event machinestage1 = new MachineXStage1FinishedDVD(machineFinishedTime,sim.getCurrentTime(), m.machineNumber, machineProcTime);
+		Event machinestage1 = new MachineXStage1FinishedDVD(machineFinishedTime,sim.getCurrentTime(), m.machineNumber, machineProcTime,this.getClass().getSimpleName());
 		sim.addToEventQueue(machinestage1);
 	}
 	
-	
-	
-
-
 	@Override
 	public void scheduleEvents(Simulation sim) {
 		
@@ -49,14 +42,15 @@ public class MachineXStage1FinishedDVD extends MachineXEvent {
 			int timeFalselyRun = m.lastRepairTime - m.lastBreakDownTime;
 			m.lastRepairTime = m.lastBreakDownTime = -1;
 			int newFinishTime = sim.getCurrentTime() + timeFalselyRun;
-			Event newEvent = new MachineXStage1FinishedDVD(newFinishTime,sim.getCurrentTime(), m.machineNumber, procTime);
+			Event newEvent = new MachineXStage1FinishedDVD(newFinishTime,sim.getCurrentTime(), m.machineNumber, procTime,this.getClass().getSimpleName());
 			sim.addToEventQueue(newEvent);
 			break;
 		case Running:
-			if(m2.isIdle()) {
+			// idle so feed directly
+			if(m2.getState() == StateStage2.Idle) {
 				int machineProcTimeM2 = m2.generateProcessingTime(); 
 				int machineFinishedTimeM2 = machineProcTimeM2 + sim.getCurrentTime();
-				Event stage2Event = new MachineXStage2FinishedDVD(machineFinishedTimeM2,sim.getCurrentTime(), m2.machineNumber, machineProcTimeM2);
+				Event stage2Event = new MachineXStage2FinishedDVD(machineFinishedTimeM2,sim.getCurrentTime(), m2.machineNumber, machineProcTimeM2,this.getClass().getSimpleName());
 				sim.addToEventQueue(stage2Event);
 				scheduleNewStageOneEvent(sim);
 			}
@@ -107,7 +101,7 @@ public class MachineXStage1FinishedDVD extends MachineXEvent {
 				m.processingTimeLeft = 0;
 				m.totalProcessingTime = procTime;
 			} 
-			else if(m2.isIdle()) {
+			else if(m2.getState() == StateStage2.Idle) {
 				m2.setRunning();
 				m2.addDVD(m.removeDVD());
 				DVD dvd = new DVD(sim.getCurrentTime());

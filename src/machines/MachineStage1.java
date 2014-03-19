@@ -105,7 +105,7 @@ public class MachineStage1 extends Machine {
 	}
 
 	public void setBlocked() {
-		if(state == StateStage1.Running)
+		if(state == StateStage1.Running || state == StateStage1.BrokenAndBlocked)
 			state = StateStage1.Blocked;
 		else {
 			try {

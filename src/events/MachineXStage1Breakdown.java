@@ -8,8 +8,8 @@ public class MachineXStage1Breakdown extends MachineXEvent {
 	
 	private MachineStage1 m;
 
-	public MachineXStage1Breakdown(int t, int tos, int m, int r) {
-		super(t,tos,m);
+	public MachineXStage1Breakdown(int t, int tos, int m, int r,String scheduledBy) {
+		super(t,tos,m, scheduledBy);
 	
 	}
 
@@ -20,7 +20,7 @@ public class MachineXStage1Breakdown extends MachineXEvent {
 		case Blocked:
 		case Running:
 			int repairTime = m.generateRepairTime();
-			Event repairEvent = new MachineXStage1Repaired(sim.getCurrentTime()+repairTime,sim.getCurrentTime(),machineNumber);
+			Event repairEvent = new MachineXStage1Repaired(sim.getCurrentTime()+repairTime,sim.getCurrentTime(),machineNumber,this.getClass().getSimpleName());
 			sim.addToEventQueue(repairEvent);
 			break;
 		default:

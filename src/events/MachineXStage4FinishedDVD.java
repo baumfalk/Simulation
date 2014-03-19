@@ -11,8 +11,8 @@ public class MachineXStage4FinishedDVD extends MachineXEvent {
 
 	private DVD dvd;
 
-	public MachineXStage4FinishedDVD(int t, int tos, int m) {
-		super(t, tos,m);
+	public MachineXStage4FinishedDVD(int t, int tos, int m,String scheduledBy) {
+		super(t, tos, m, scheduledBy);
 		// TODO Auto-generated constructor stub
 	}
 
@@ -31,11 +31,11 @@ public class MachineXStage4FinishedDVD extends MachineXEvent {
 			MachineStage3 s3m1 = sim.getMachineStage3(machineNumber);
 			MachineStage3 s3m2 = sim.getMachineStage3(3-machineNumber);
 			if(s3m1.state == StateStage3.Blocked) {
-				Event stage3finished =  new MachineXStage3Step3FinishedBatch(sim.getCurrentTime(),sim.getCurrentTime(), s3m1.machineNumber);
+				Event stage3finished =  new MachineXStage3Step3FinishedBatch(sim.getCurrentTime(),sim.getCurrentTime(), s3m1.machineNumber,this.getClass().getSimpleName());
 				sim.addToEventQueue(stage3finished);
 			}
 			if(s3m1.state == StateStage3.Blocked) {
-				Event stage3finished =  new MachineXStage3Step3FinishedBatch(sim.getCurrentTime(),sim.getCurrentTime(), s3m2.machineNumber);
+				Event stage3finished =  new MachineXStage3Step3FinishedBatch(sim.getCurrentTime(),sim.getCurrentTime(), s3m2.machineNumber,this.getClass().getSimpleName());
 				sim.addToEventQueue(stage3finished);
 			}
 			
@@ -43,7 +43,7 @@ public class MachineXStage4FinishedDVD extends MachineXEvent {
 			m.addDVD(m.leftBuffer().removeFromBuffer());
 			int processingTime = m.generateProcessingTime();
 			int machineFinishedTime = sim.getCurrentTime() + processingTime; 
-			Event stage4finished =  new MachineXStage4FinishedDVD(machineFinishedTime,sim.getCurrentTime(), machineNumber);
+			Event stage4finished =  new MachineXStage4FinishedDVD(machineFinishedTime,sim.getCurrentTime(), machineNumber,this.getClass().getSimpleName());
 			sim.addToEventQueue(stage4finished);
 		}
 		updateStatistics(sim);
