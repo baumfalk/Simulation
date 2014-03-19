@@ -13,7 +13,6 @@ public class MachineXStage4FinishedDVD extends MachineXEvent {
 
 	public MachineXStage4FinishedDVD(int t, int tos, int m,String scheduledBy) {
 		super(t, tos, m, scheduledBy);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
@@ -38,11 +37,17 @@ public class MachineXStage4FinishedDVD extends MachineXEvent {
 				Event stage3finished =  new MachineXStage3Step3FinishedBatch(sim.getCurrentTime(),sim.getCurrentTime(), s3m2.machineNumber,this.getClass().getSimpleName());
 				sim.addToEventQueue(stage3finished);
 			}
-			
 		} else {
+			int delay = 0;
+			if(m.dvdLeft() == 0) 
+			{
+				delay = m.generateCartridgeRenewalTime();
+				m.generateCartridgeRenewal();
+				System.out.println("CARTRIDGE RENEWAL");
+			} 
 			m.addDVD(m.leftBuffer().removeFromBuffer());
-			int processingTime = m.generateProcessingTime();
-			int machineFinishedTime = sim.getCurrentTime() + processingTime; 
+			int processingTime = m.generateProcessingTime()+delay;
+			int machineFinishedTime = sim.getCurrentTime() + processingTime ; 
 			Event stage4finished =  new MachineXStage4FinishedDVD(machineFinishedTime,sim.getCurrentTime(), machineNumber,this.getClass().getSimpleName());
 			sim.addToEventQueue(stage4finished);
 		}

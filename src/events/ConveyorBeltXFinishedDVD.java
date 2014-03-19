@@ -16,7 +16,6 @@ public class ConveyorBeltXFinishedDVD extends MachineXEvent {
 	private ConveyorBelt cb;
 	
 	@Override
-	//TODO: do something with delay.
 	public void execute(Simulation sim) {
 		// TODO Auto-generated method stub
 		cb = sim.getConveyorBelt(machineNumber);
@@ -46,6 +45,7 @@ public class ConveyorBeltXFinishedDVD extends MachineXEvent {
 			}
 		}
 	}
+	
 	private void handleCrateFull(Simulation sim)
 	{
 		MachineStage3 s3m1 = sim.getMachineStage3(machineNumber);
@@ -96,7 +96,6 @@ public class ConveyorBeltXFinishedDVD extends MachineXEvent {
 		if(cb.machineIsEmpty()) {
 			cb.setIdle();
 		}
-		
 	}
 
 	@Override

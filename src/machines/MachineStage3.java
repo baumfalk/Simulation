@@ -40,6 +40,7 @@ public class MachineStage3 extends Machine {
 	
 	public void addBatch(ArrayList<DVD> batch) {
 		
+		System.out.println(this.dvdsInMachine.currentDVDCount());
 		this.dvdsInMachine.addBatchToBuffer(batch);
 		System.out.println("\t added batch to stage 3 machine " + machineNumber);
 	}

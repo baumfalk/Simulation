@@ -30,6 +30,10 @@ public class MachineStage4 extends Machine {
 	public void generateCartridgeRenewal() {
 		dvdsLeft = 200;
 	}
+	
+	public int generateCartridgeRenewalTime() {
+		return 15*60;
+	}
 
 	@Override
 	public int generateProcessingTime() {

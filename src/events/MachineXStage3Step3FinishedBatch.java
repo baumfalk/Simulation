@@ -64,10 +64,18 @@ public class MachineXStage3Step3FinishedBatch extends MachineXEvent {
 		DVD dvd = m.rightBuffer(s4m.machineNumber-1).removeFromBuffer();
 		s4m.addDVD(dvd);
 		s4m.state = StateStage4.Running;
-		int processingTime = s4m.generateProcessingTime();
-		int machineFinishedTime = sim.getCurrentTime() + processingTime; 
-		Event stage4finished =  new MachineXStage4FinishedDVD(machineFinishedTime,sim.getCurrentTime(), s4m.machineNumber,this.getClass().getSimpleName());
+		int delay = 0;
+		if(s4m.dvdLeft() == 0) 
+		{
+			delay = s4m.generateCartridgeRenewalTime();
+			s4m.generateCartridgeRenewal();
+			System.out.println("CARTRIDGE RENEWAL");
+		} 
+		int processingTime = m.generateProcessingTime()+delay;
+		int machineFinishedTime = sim.getCurrentTime() + processingTime ; 
+		Event stage4finished =  new MachineXStage4FinishedDVD(machineFinishedTime,sim.getCurrentTime(), machineNumber,this.getClass().getSimpleName());
 		sim.addToEventQueue(stage4finished);
+		
 		m.state = StateStage3.Idle;
 	}
 
