@@ -3,23 +3,37 @@ package machines;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import exceptions.InvalidStateException;
+import org.apache.commons.math3.distribution.NormalDistribution;
 
 import states.StateStage2;
 import buffer.Buffer;
+import exceptions.InvalidStateException;
 
 public class MachineStage2 extends Machine {
 
 	private StateStage2 state;
+	private NormalDistribution dist;
+	
 	public MachineStage2(int machineNumber, Buffer leftBuffer) {
 		super(machineNumber,new ArrayList<Buffer>(Arrays.asList(leftBuffer)),null,1);
 		state = StateStage2.Idle;
+		
+		double theta = 0.0414757;
+		// see wikipedia for how to convert
+		// theta = sqrt(pi)/(sigma*sqrt(2))
+		double sigma = (1/(theta/(Math.sqrt(Math.PI))))/(Math.sqrt(2));
+		System.out.println(sigma);
+		dist = new NormalDistribution(0,sigma);
+		
+		double[] temp = dist.sample(100);
+		
+		System.exit(1);
 	}
 
 	@Override
 	public int generateProcessingTime() {
 		//TODO: randomize
-		return 24;
+		return (int) Math.round(dist.sample()); // wrap around
 	}
 
 	public boolean breakDVD()

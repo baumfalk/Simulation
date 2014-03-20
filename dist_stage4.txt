@@ -1,0 +1,1 @@
+\ndistribution | uniform distribution\nminimum | 20\nmaximum | 30\nnull hypothesis | datadistributeduniform distribution\ntest | Cramér-von Mises\nstatistic | 0.246\np-value | 0.194 (~~ 1 in 5.17)\nconclusion | do not reject (at 5% significance level)

@@ -3,15 +3,16 @@ package machines;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import exceptions.InvalidStateException;
+import org.apache.commons.math3.distribution.LogNormalDistribution;
 
 import states.StateStage1;
 import buffer.Buffer;
+import exceptions.InvalidStateException;
 
 public class MachineStage1 extends Machine {
 
 	private StateStage1 state; 
-	
+	private LogNormalDistribution dist;
 	public int lastBreakDownTime;
 	public int lastRepairTime;
 	public int processingTimeLeft;
@@ -21,12 +22,13 @@ public class MachineStage1 extends Machine {
 		super(machineNumber,null,new ArrayList<Buffer>(Arrays.asList(rightBuffer)),1);
 		
 		state = StateStage1.Running;
+		dist = new LogNormalDistribution(3.51, 1.23);
 	}
 
 	@Override
 	public int generateProcessingTime() {
 		// TODO Randomize
-		return 60;
+		return (int) Math.round(dist.sample());
 	}
 	
 	public int generateBreakDownTime()

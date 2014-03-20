@@ -1,0 +1,2 @@
+distribution | half-normal distribution
+parameter | 0.0415

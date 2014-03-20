@@ -76,7 +76,7 @@ public class Simulation {
 		createBuffers();
 		createMachines();
 		createStatistics();
-		
+
 		setup();
 	}
 	
