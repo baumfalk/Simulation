@@ -31,7 +31,7 @@ public class MachineStage3 extends Machine {
 	}
 	
 	public boolean machineStuckOnDVD() {
-		return true;
+		return false;
 	}
 	
 	public int generateProcessingTimeStep3() {

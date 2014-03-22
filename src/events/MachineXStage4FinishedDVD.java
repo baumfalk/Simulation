@@ -33,7 +33,7 @@ public class MachineXStage4FinishedDVD extends MachineXEvent {
 				Event stage3finished =  new MachineXStage3Step3FinishedBatch(sim.getCurrentTime(),sim.getCurrentTime(), s3m1.machineNumber,this.getClass().getSimpleName());
 				sim.addToEventQueue(stage3finished);
 			}
-			if(s3m1.state == StateStage3.Blocked) {
+			if(s3m2.state == StateStage3.Blocked) {
 				Event stage3finished =  new MachineXStage3Step3FinishedBatch(sim.getCurrentTime(),sim.getCurrentTime(), s3m2.machineNumber,this.getClass().getSimpleName());
 				sim.addToEventQueue(stage3finished);
 			}
@@ -69,7 +69,6 @@ public class MachineXStage4FinishedDVD extends MachineXEvent {
 		if(dvd !=null) {
 			sim.statistics.addToStatistic("Total DVDs processed", 1);
 			sim.statistics.updateAverage("Throughput time per DVD",timeOfOccurence-dvd.getTimeOfEnteringPipeLine() );
-			System.out.println(timeOfOccurence-dvd.getTimeOfEnteringPipeLine());
 		}
 	}
 

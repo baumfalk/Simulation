@@ -191,7 +191,7 @@ public class SimulationGUI {
 		btnStart.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				simulation = new Simulation(60*60*24, 20, 20);
+				simulation = new Simulation(2*60*60, 20, 20);
 				updateGUI();
 				timer.start();
 				btnPause.setText("Pause");

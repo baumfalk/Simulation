@@ -22,12 +22,8 @@ public class MachineStage2 extends Machine {
 		// see wikipedia for how to convert
 		// theta = sqrt(pi)/(sigma*sqrt(2))
 		double sigma = (1/(theta/(Math.sqrt(Math.PI))))/(Math.sqrt(2));
-		System.out.println(sigma);
 		dist = new NormalDistribution(0,sigma);
-		
-		double[] temp = dist.sample(100);
-		
-		System.exit(1);
+
 	}
 
 	@Override
