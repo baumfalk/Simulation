@@ -21,6 +21,8 @@ public class MachineStage1 extends Machine {
 	public int processingTimeLeft;
 	public int totalProcessingTime;
 
+	public boolean eventScheduled;
+	
 	public MachineStage1(int machineNumber,Buffer rightBuffer) {
 		super(machineNumber,null,new ArrayList<Buffer>(Arrays.asList(rightBuffer)),1);
 		
@@ -38,17 +40,17 @@ public class MachineStage1 extends Machine {
 	
 	public int generateBreakDownTime()
 	{
-		return (int) Math.round(0.01*distBreakdown.sample());
+		return (int) Math.round(distBreakdown.sample());
 	}
 
 	public int generateRepairTime()
 	{
-		return (int) Math.round(0.01*distRepair.sample());
+		return (int) Math.round(distRepair.sample());
 	}
 
 
 	public void setBroken() {
-		if(state == StateStage1.Running)
+		if(state == StateStage1.Running || state == StateStage1.BrokenAndRepairedBeforeDVD)
 			state = StateStage1.Broken;
 		else {
 			try {
@@ -82,8 +84,10 @@ public class MachineStage1 extends Machine {
 
 	public void setBrokenAndDVDBeforeRepair() {
 		// TODO Auto-generated method stub
-		if(state == StateStage1.Broken)
+		if(state == StateStage1.Broken) {
 			state = StateStage1.BrokenAndDVDBeforeRepair;
+			System.out.println("\t Set the state to BrokenAndDVDBeforeRepair" );
+		}
 		else {
 			try {
 				throw new InvalidStateException();

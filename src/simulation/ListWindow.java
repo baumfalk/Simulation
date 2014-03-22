@@ -50,7 +50,7 @@ public class ListWindow extends JFrame {
 		contentPane.setLayout(null);
 		
 		JLabel lblEventList = new JLabel(name);
-		lblEventList.setBounds(20, 11, 70, 14);
+		lblEventList.setBounds(20, 11, 286, 14);
 		contentPane.add(lblEventList);
 		listModel = new DefaultListModel();
 		JScrollPane scrollPane = new JScrollPane();

@@ -31,11 +31,11 @@ public class MachineStage4 extends Machine {
 	
 	
 	public void generateCartridgeRenewal() {
-		dvdsLeft = 200;
+		dvdsLeft = 200; // todo fix this
 	}
 	
 	public int generateCartridgeRenewalTime() {
-		return 15*60;
+		return 15*60; // todo fix this
 	}
 
 	@Override

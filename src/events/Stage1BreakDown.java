@@ -23,6 +23,11 @@ public class Stage1BreakDown extends MachineXEvent {
 			Event repairEvent = new Stage1Repaired(sim.getCurrentTime()+repairTime,sim.getCurrentTime(),machineNumber,this.getClass().getSimpleName());
 			sim.addToEventQueue(repairEvent);
 			break;
+		case BrokenAndRepairedBeforeDVD:
+			repairTime = m.generateRepairTime();
+			repairEvent = new Stage1Repaired(sim.getCurrentTime()+repairTime,sim.getCurrentTime(),machineNumber,this.getClass().getSimpleName());
+			sim.addToEventQueue(repairEvent);
+			break;
 		default:
 			try {
 				throw new InvalidStateException();
@@ -47,6 +52,9 @@ public class Stage1BreakDown extends MachineXEvent {
 		case Running:
 			m.setBroken();
 			break;
+		case BrokenAndRepairedBeforeDVD:
+			m.setBroken();
+			break;	
 		default:
 			try {
 				throw new InvalidStateException();

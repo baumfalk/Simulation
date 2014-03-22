@@ -123,6 +123,7 @@ public class Simulation {
 	public void addToEventQueue(Event e) {
 		eventQueue.add(e);
 		System.out.println("Added event " + e.getClass().getSimpleName() + " to the event queue.");
+		System.out.println("Added on " + e.getTimeOfScheduling() + " for time " + e.getTimeOfOccurrence());
 	}
 
 	private void createBuffers()  {
@@ -228,5 +229,18 @@ public class Simulation {
 		event.execute(this);
 		System.out.println("Executed the event");
 		System.out.println();
+	}
+
+
+	public ArrayList<String> getConveyorBeltData(int i) {
+		ConveyorBelt cb = getConveyorBelt(i);
+		ArrayList<DVD> dvdList = cb.getConveyorBeltData();
+		ArrayList<String> list = new ArrayList<String>();
+		int j =0;
+		for(DVD dvd : dvdList) {
+			list.add(j++ +" enter"+dvd.timeOfEnteringConveyorBelt + " expectedLeave " + dvd.expectedLeavingTimeConveyorBelt);
+		}
+		
+		return list;
 	}
 }

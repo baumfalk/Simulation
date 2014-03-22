@@ -65,7 +65,7 @@ public class Stage1Finished extends MachineXEvent {
 	private void scheduleStageTwoEvent(Simulation sim) {
 		int machineProcTimeM2 = m2.generateProcessingTime(); 
 		int machineFinishedTimeM2 = machineProcTimeM2 + sim.getCurrentTime();
-		Event stage2Event = new Stage2Finished(machineFinishedTimeM2,sim.getCurrentTime(), m2.machineNumber, machineProcTimeM2,this.getClass().getSimpleName());
+		Event stage2Event = new Stage2Finished(machineFinishedTimeM2,sim.getCurrentTime(), m2.machineNumber, this.getClass().getSimpleName());
 		sim.addToEventQueue(stage2Event);
 	}
 

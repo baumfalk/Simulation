@@ -50,7 +50,7 @@ public class Stage3Step3Finished extends MachineXEvent {
 				if(dvd.expectedLeavingTimeConveyorBelt <= sim.getCurrentTime()) {
 					int newTime = sim.getCurrentTime() + (dvd.expectedLeavingTimeConveyorBelt-cb.beginDelayTime);
 					System.out.println("newtime: " + newTime);
-					if(newTime <= sim.getCurrentTime()) {
+					if(newTime < sim.getCurrentTime()) {
 						System.out.println("OEPS: " + newTime + " "+ dvd.expectedLeavingTimeConveyorBelt + " beginDelayTime: " + cb.beginDelayTime );
 						System.exit(1);
 					}
@@ -88,13 +88,11 @@ public class Stage3Step3Finished extends MachineXEvent {
 
 	@Override
 	protected void updateMachines(Simulation sim) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	protected void scheduleEvents(Simulation sim) {
-		// TODO Auto-generated method stub
 		
 	}
 

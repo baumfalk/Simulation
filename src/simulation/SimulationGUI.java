@@ -46,6 +46,8 @@ public class SimulationGUI {
 	private ActionListener listener;
 	private JLabel lblTime;
 	private JButton btnPause;
+	protected static ListWindow conveyorBelt1;
+	protected static ListWindow conveyorBelt2;
 	
 	/**
 	 * Launch the application.
@@ -61,6 +63,11 @@ public class SimulationGUI {
 					eventListWindow.setVisible(true);
 					statisticsWindow = new ListWindow("Statistics");
 				//	statisticsWindow.setVisible(true);
+					
+					conveyorBelt1 = new ListWindow("conveyorBelt1");
+					conveyorBelt1.setVisible(true);
+					conveyorBelt2 = new ListWindow("conveyorBelt2");
+					conveyorBelt2.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -102,10 +109,16 @@ public class SimulationGUI {
 		}
 		eventListWindow.newList(simulation.getEventListString());
 		statisticsWindow.newList(simulation.statistics.getStatisticList());
+		conveyorBelt1.newList(simulation.getConveyorBeltData(1));
+		conveyorBelt2.newList(simulation.getConveyorBeltData(2));
 		lblTime.setText("Time: " + simulation.getCurrentTime());
 		
 		
 		eventListWindow.repaint();
+		conveyorBelt1.repaint();
+		conveyorBelt2.repaint();
+		statisticsWindow.repaint();
+		
 		frmDvdFactorySimulation.repaint();
 	}
 	/**

@@ -19,7 +19,7 @@ public class ConveyorBelt extends Machine {
 	
 	@Override
 	public int generateProcessingTime() {
-		return 1;//5*60;
+		return 1;//5*60; //TODO: fix this
 	}
 
 	public StateConveyorBelt getState() {
@@ -78,6 +78,11 @@ public class ConveyorBelt extends Machine {
 	}
 
 	public ArrayList<DVD> peekBuffer() {
+		// TODO Auto-generated method stub
+		return this.dvdsInMachine.peekBuffer();
+	}
+
+	public ArrayList<DVD> getConveyorBeltData() {
 		// TODO Auto-generated method stub
 		return this.dvdsInMachine.peekBuffer();
 	}

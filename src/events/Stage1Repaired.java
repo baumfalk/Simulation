@@ -14,6 +14,41 @@ public class Stage1Repaired extends MachineXEvent {
 	}
 
 	@Override
+	protected void scheduleEvents(Simulation sim) {
+		m = sim.getMachineStage1(machineNumber);
+		switch(m.getState())
+		{
+		// no repair has taken place before
+		// finished dvd
+		// so repair can reschedule
+		// df-----br------df-----r
+		// |------|-------|------|
+		//
+		case BrokenAndDVDBeforeRepair:
+			Event dvdFinishedEvent = new Stage1Finished(m.processingTimeLeft+sim.getCurrentTime(),sim.getCurrentTime(), m.machineNumber, m.totalProcessingTime,this.getClass().getSimpleName());
+			sim.addToEventQueue(dvdFinishedEvent);
+			break;
+			
+		// repair has taken place before finished dvd
+		// no reschedule
+		// df-----br------r-----df
+		// |------|-------|-----|
+		//
+		case Broken:
+			break;
+		// other cases should not happen
+		default:
+			invalidStateCase();
+			break;
+		}
+		//and breakdown
+		int breakdownTime = sim.getCurrentTime()+sim.getMachineStage1(machineNumber).generateBreakDownTime();
+		int repairTime =  sim.getMachineStage1(machineNumber).generateRepairTime();
+		Event machinestage1breakdown = new Stage1BreakDown(breakdownTime,sim.getCurrentTime(), m.machineNumber, repairTime,this.getClass().getSimpleName());
+		sim.addToEventQueue(machinestage1breakdown);
+	}
+
+	@Override
 	protected void updateMachines(Simulation sim) {
 		
 		switch(m.getState())
@@ -45,57 +80,26 @@ public class Stage1Repaired extends MachineXEvent {
 			break;
 		
 		default:
-			try {
-				throw new InvalidStateException();
-			} catch (InvalidStateException e) {
-				
-				e.printStackTrace();
-				System.out.println("\t State " + m.getState() + " is invalid for the event " + this.getClass().getSimpleName() + "!");
-				System.exit(1);
-			}
+			invalidStateCase();
 			break;
 		}
-	}
-
-	@Override
-	protected void scheduleEvents(Simulation sim) {
-		m = sim.getMachineStage1(machineNumber);
-		switch(m.getState())
-		{
-		// no repair has taken place before
-		// finished dvd
-		// so repair can reschedule
-		// df-----br------df-----r
-		// |------|-------|------|
-		//
-		case BrokenAndDVDBeforeRepair:
-			Event dvdFinishedEvent = new Stage1Finished(m.processingTimeLeft+sim.getCurrentTime(),sim.getCurrentTime(), m.machineNumber, m.totalProcessingTime,this.getClass().getSimpleName());
-			sim.addToEventQueue(dvdFinishedEvent);
-			break;
-			
-		// repair has taken place before finished dvd
-		// no reschedule
-		// df-----br------r-----df
-		// |------|-------|-----|
-		//
-		case Broken:
-			dvdFinishedEvent = new Stage1Finished(sim.getCurrentTime(),sim.getCurrentTime(), m.machineNumber, m.totalProcessingTime,this.getClass().getSimpleName());
-			sim.addToEventQueue(dvdFinishedEvent);
-			break;
-		// other cases should not happen
-		default:
-			
-			break;
-		}
-		//and breakdown
-		int breakdownTime = sim.getCurrentTime()+sim.getMachineStage1(machineNumber).generateBreakDownTime();
-		int repairTime =  sim.getMachineStage1(machineNumber).generateRepairTime();
-		Event machinestage1breakdown = new Stage1BreakDown(breakdownTime,sim.getCurrentTime(), m.machineNumber, repairTime,this.getClass().getSimpleName());
-		sim.addToEventQueue(machinestage1breakdown);
 	}
 
 	@Override
 	protected void updateStatistics(Simulation sim) {
 		
+	}
+	
+	
+	private void invalidStateCase() {
+		try {
+			throw new InvalidStateException();
+		} catch (InvalidStateException e) {
+			
+			e.printStackTrace();
+			System.out.println("\t State " + m.getState() + " is invalid for the event " + this.getClass().getSimpleName() + "!");
+			System.out.println("\t It was scheduled at " + this.getTimeOfScheduling());
+			System.exit(1);
+		}
 	}
 }

@@ -11,22 +11,15 @@ import states.StateStage1;
 
 public class Stage2Finished extends MachineXEvent {
 	
-	
-	public Stage2Finished(int t, int tos, int m, int p,String scheduledBy) {
-		super(t, tos,m, scheduledBy);
-	
-		procTime = p;
-	}
-
-	private final int procTime;
 	private MachineStage2 m ;
 	private ConveyorBelt cb;
 	private MachineStage1 s1m1;
 	private MachineStage1 s1m2;
 
-	public int getProcTime() {
-		return procTime;
+	public Stage2Finished(int t, int tos, int m,String scheduledBy) {
+		super(t, tos,m, scheduledBy);
 	}
+
 
 	@Override
 	protected void scheduleEvents(Simulation sim) {
@@ -49,7 +42,7 @@ public class Stage2Finished extends MachineXEvent {
 					//schedule new event for this machine
 					int machineProcTime = m.generateProcessingTime(); 
 					int machineFinishedTime = machineProcTime + sim.getCurrentTime();
-					Event eventStage2FinishedDVD = new Stage2Finished(machineFinishedTime,sim.getCurrentTime(), m.machineNumber, machineProcTime,this.getClass().getSimpleName());
+					Event eventStage2FinishedDVD = new Stage2Finished(machineFinishedTime,sim.getCurrentTime(), m.machineNumber,this.getClass().getSimpleName());
 					sim.addToEventQueue(eventStage2FinishedDVD);
 				
 					if(s1m1.getState() == StateStage1.Blocked) {

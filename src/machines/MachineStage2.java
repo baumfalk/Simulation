@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.apache.commons.math3.distribution.NormalDistribution;
+import org.apache.commons.math3.distribution.UniformRealDistribution;
 
 import states.StateStage2;
 import buffer.Buffer;
@@ -13,6 +14,7 @@ public class MachineStage2 extends Machine {
 
 	private StateStage2 state;
 	private NormalDistribution dist;
+	private UniformRealDistribution distFailure;
 	
 	public MachineStage2(int machineNumber, Buffer leftBuffer) {
 		super(machineNumber,new ArrayList<Buffer>(Arrays.asList(leftBuffer)),null,1);
@@ -23,6 +25,7 @@ public class MachineStage2 extends Machine {
 		// theta = sqrt(pi)/(sigma*sqrt(2))
 		double sigma = (1/(theta/(Math.sqrt(Math.PI))))/(Math.sqrt(2));
 		dist = new NormalDistribution(0,sigma);
+		distFailure = new UniformRealDistribution(0, 1);
 
 	}
 
@@ -33,7 +36,7 @@ public class MachineStage2 extends Machine {
 
 	public boolean breakDVD()
 	{
-		return false;
+		return distFailure.sample() <= 0.02;
 	}
 
 	public void setRunning() {
