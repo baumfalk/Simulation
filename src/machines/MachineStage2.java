@@ -28,8 +28,7 @@ public class MachineStage2 extends Machine {
 
 	@Override
 	public int generateProcessingTime() {
-		//TODO: randomize
-		return (int) Math.round(dist.sample()); // wrap around
+		return (int) Math.abs(Math.round(dist.sample())); // wrap around
 	}
 
 	public boolean breakDVD()

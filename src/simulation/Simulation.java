@@ -12,9 +12,10 @@ import misc.DVD;
 import misc.Statistics;
 import buffer.Buffer;
 import events.Event;
-import events.MachineXStage1Breakdown;
-import events.MachineXStage1FinishedDVD;
+import events.Stage1BreakDown;
+import events.Stage1Finished;
 import events.SimulationFinished;
+import exceptions.InvalidTimeError;
 
 public class Simulation {
 	
@@ -87,7 +88,7 @@ public class Simulation {
 		eventQueue.toArray(eventList) ;
 		Arrays.sort(eventList);
 		for(int i =0; i < eventQueue.size();i++) {		
-			listString.add(eventList[i].getClass().getSimpleName() + " at "+  eventList[i].getTimeOfOccurence());
+			listString.add(eventList[i].toString());
 		}
 		return listString;
 	}
@@ -121,6 +122,7 @@ public class Simulation {
 	
 	public void addToEventQueue(Event e) {
 		eventQueue.add(e);
+		System.out.println("Added event " + e.getClass().getSimpleName() + " to the event queue.");
 	}
 
 	private void createBuffers()  {
@@ -181,13 +183,13 @@ public class Simulation {
 		
 			int machineProcTime = stageOneMachines.get(m.machineNumber-1).generateProcessingTime();
 			int machineFinishedTime = machineProcTime + currentTime;
-			Event machinestage1 = new MachineXStage1FinishedDVD(machineFinishedTime, currentTime, m.machineNumber, machineProcTime,this.getClass().getSimpleName());
+			Event machinestage1 = new Stage1Finished(machineFinishedTime, currentTime, m.machineNumber, machineProcTime,this.getClass().getSimpleName());
 			eventQueue.add(machinestage1);
 			
 			//and breakdown
 			int breakdownTime = currentTime+stageOneMachines.get(m.machineNumber-1).generateBreakDownTime();
 			int repairTime =  Math.round(stageOneMachines.get(m.machineNumber-1).generateRepairTime());
-			Event machinestage1breakdown = new MachineXStage1Breakdown(breakdownTime, currentTime, m.machineNumber, repairTime,this.getClass().getSimpleName());
+			Event machinestage1breakdown = new Stage1BreakDown(breakdownTime, currentTime, m.machineNumber, repairTime,this.getClass().getSimpleName());
 			eventQueue.add(machinestage1breakdown);
 		}
 		// when are we finished with the simulation
@@ -207,15 +209,24 @@ public class Simulation {
 		//	System.out.println("Simulation is finished!");
 			return;
 		}
-		System.out.println("The current time is " + currentTime);
-		
 		Event event = eventQueue.remove();
-		currentTime = event.getTimeOfOccurence();
+		System.out.println("The current time is " + currentTime);
 		System.out.println("The event that will be processed is " + event.getClass().getSimpleName());
 		System.out.println("It was scheduled at " + event.getTimeOfScheduling() + " by " + event.getScheduler());
 		
+		if(event.getTimeOfOccurrence() < currentTime) {
+			try {
+				throw new InvalidTimeError();
+			} catch (InvalidTimeError e) {
+				e.printStackTrace();
+				System.out.println("Current time:"+ currentTime + " " + " new time:" + event.getTimeOfOccurrence() + " scheduled at " + event.getTimeOfScheduling());
+				System.exit(1);
+			}
+		}
+		currentTime = event.getTimeOfOccurrence();
+		
 		event.execute(this);
-	
+		System.out.println("Executed the event");
 		System.out.println();
 	}
 }

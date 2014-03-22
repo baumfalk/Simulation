@@ -9,12 +9,12 @@ public class SimulationFinished extends Event{
 	}
 
 	@Override
-	public void scheduleEvents(Simulation sim) {
+	protected void scheduleEvents(Simulation sim) {
 		
 	}
 
 	@Override
-	public void updateStatistics(Simulation sim) {
+	protected void updateStatistics(Simulation sim) {
 		sim.simulationFinished = true;
 		System.out.println(sim.DVDsprocessed/Simulation.hours);
 		System.out.println(sim.statistics);

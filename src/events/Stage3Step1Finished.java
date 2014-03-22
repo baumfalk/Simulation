@@ -3,11 +3,11 @@ package events;
 import machines.MachineStage3;
 import simulation.Simulation;
 
-public class MachineXStage3Step1FinishedBatch extends MachineXEvent {
+public class Stage3Step1Finished extends MachineXEvent {
 
 	private MachineStage3 s3m;
 
-	public MachineXStage3Step1FinishedBatch(int t, int tos, int m,String scheduledBy) {
+	public Stage3Step1Finished(int t, int tos, int m,String scheduledBy) {
 		super(t, tos,m, scheduledBy);
 	}
 
@@ -23,24 +23,24 @@ public class MachineXStage3Step1FinishedBatch extends MachineXEvent {
 	private void addStep2Event(Simulation sim) {
 		int processingTimeStep2 = s3m.generateProcessingTimeStep2();
 		int machineFinishedTime = sim.getCurrentTime() + processingTimeStep2;
-		Event eventStage3Step2Finished = new MachineXStage3Step2FinishedBatch(machineFinishedTime,sim.getCurrentTime(), s3m.machineNumber,this.getClass().getSimpleName());
+		Event eventStage3Step2Finished = new Stage3Step2Finished(machineFinishedTime,sim.getCurrentTime(), s3m.machineNumber,this.getClass().getSimpleName());
 		sim.addToEventQueue(eventStage3Step2Finished);
 	}
 
 	@Override
-	public void updateMachines(Simulation sim) {
+	protected void updateMachines(Simulation sim) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void scheduleEvents(Simulation sim) {
+	protected void scheduleEvents(Simulation sim) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void updateStatistics(Simulation sim) {
+	protected void updateStatistics(Simulation sim) {
 		// TODO Auto-generated method stub
 		
 	}

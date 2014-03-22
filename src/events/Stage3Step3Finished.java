@@ -9,11 +9,11 @@ import states.StateConveyorBelt;
 import states.StateStage3;
 import states.StateStage4;
 
-public class MachineXStage3Step3FinishedBatch extends MachineXEvent {
+public class Stage3Step3Finished extends MachineXEvent {
 
 	private MachineStage3 m;
 
-	public MachineXStage3Step3FinishedBatch(int t, int tos, int m,String scheduledBy) {
+	public Stage3Step3Finished(int t, int tos, int m,String scheduledBy) {
 		super(t, tos,m, scheduledBy);
 	}
 
@@ -23,6 +23,7 @@ public class MachineXStage3Step3FinishedBatch extends MachineXEvent {
 		MachineStage4 s4m1 = sim.getMachineStage4(machineNumber);
 		MachineStage4 s4m2 = sim.getMachineStage4(3-machineNumber);
 		m = sim.getMachineStage3(machineNumber);
+		// if stage 4 machine is idle, reactivate it
 		if(s4m1.state == StateStage4.Idle) {
 			addStage4Event(sim, s4m1);
 		} else if(s4m2.state == StateStage4.Idle) {
@@ -47,7 +48,13 @@ public class MachineXStage3Step3FinishedBatch extends MachineXEvent {
 			for(DVD dvd : cb.peekBuffer()) {
 				// reschedule those
 				if(dvd.expectedLeavingTimeConveyorBelt <= sim.getCurrentTime()) {
-					Event conveyorEvent = new ConveyorBeltXFinishedDVD(dvd.expectedLeavingTimeConveyorBelt+(sim.getCurrentTime()-cb.beginDelayTime),sim.getCurrentTime(), cb.machineNumber,this.getClass().getSimpleName());
+					int newTime = sim.getCurrentTime() + (dvd.expectedLeavingTimeConveyorBelt-cb.beginDelayTime);
+					System.out.println("newtime: " + newTime);
+					if(newTime <= sim.getCurrentTime()) {
+						System.out.println("OEPS: " + newTime + " "+ dvd.expectedLeavingTimeConveyorBelt + " beginDelayTime: " + cb.beginDelayTime );
+						System.exit(1);
+					}
+					Event conveyorEvent = new CBFinished(newTime,sim.getCurrentTime(), cb.machineNumber,this.getClass().getSimpleName());
 					sim.addToEventQueue(conveyorEvent);
 					System.out.println("\t Rescheduling dvd!");
 				}
@@ -73,26 +80,26 @@ public class MachineXStage3Step3FinishedBatch extends MachineXEvent {
 		} 
 		int processingTime = m.generateProcessingTime()+delay;
 		int machineFinishedTime = sim.getCurrentTime() + processingTime ; 
-		Event stage4finished =  new MachineXStage4FinishedDVD(machineFinishedTime,sim.getCurrentTime(), machineNumber,this.getClass().getSimpleName());
+		Event stage4finished =  new Stage4Finished(machineFinishedTime,sim.getCurrentTime(), machineNumber,this.getClass().getSimpleName());
 		sim.addToEventQueue(stage4finished);
 		
 		m.state = StateStage3.Idle;
 	}
 
 	@Override
-	public void updateMachines(Simulation sim) {
+	protected void updateMachines(Simulation sim) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void scheduleEvents(Simulation sim) {
+	protected void scheduleEvents(Simulation sim) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void updateStatistics(Simulation sim) {
+	protected void updateStatistics(Simulation sim) {
 		// TODO Auto-generated method stub
 		
 	}

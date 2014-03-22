@@ -3,11 +3,11 @@ package events;
 import machines.MachineStage3;
 import simulation.Simulation;
 
-public class MachineXStage3Step2FinishedBatch extends MachineXEvent {
+public class Stage3Step2Finished extends MachineXEvent {
 
 	private MachineStage3 s3m;
 
-	public MachineXStage3Step2FinishedBatch(int t, int tos, int m,String scheduledBy) {
+	public Stage3Step2Finished(int t, int tos, int m,String scheduledBy) {
 		super(t, tos,m, scheduledBy);
 	}
 
@@ -21,30 +21,30 @@ public class MachineXStage3Step2FinishedBatch extends MachineXEvent {
 		int delay = 0;
 		for(int i =0; i< s3m.batchSize; i++) {
 			if(s3m.machineStuckOnDVD()) {
-				delay += 60*5;
+				delay += s3m.generateRepairTime();
 				System.out.println("\tStage 3 step 2 crashed on a dvd!");
 			}
 		}
 		int processingTimeStep3 = s3m.generateProcessingTimeStep3();
 		int machineFinishedTime = sim.getCurrentTime() + processingTimeStep3 + delay;
-		Event eventStage3Step3Finished = new MachineXStage3Step3FinishedBatch(machineFinishedTime,sim.getCurrentTime(), s3m.machineNumber,this.getClass().getSimpleName());
+		Event eventStage3Step3Finished = new Stage3Step3Finished(machineFinishedTime,sim.getCurrentTime(), s3m.machineNumber,this.getClass().getSimpleName());
 		sim.addToEventQueue(eventStage3Step3Finished);
 	}
 
 	@Override
-	public void updateMachines(Simulation sim) {
+	protected void updateMachines(Simulation sim) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void scheduleEvents(Simulation sim) {
+	protected void scheduleEvents(Simulation sim) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void updateStatistics(Simulation sim) {
+	protected void updateStatistics(Simulation sim) {
 		// TODO Auto-generated method stub
 		
 	}

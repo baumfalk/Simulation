@@ -7,11 +7,11 @@ import simulation.Simulation;
 import states.StateStage3;
 import states.StateStage4;
 
-public class MachineXStage4FinishedDVD extends MachineXEvent {
+public class Stage4Finished extends MachineXEvent {
 
 	private DVD dvd;
 
-	public MachineXStage4FinishedDVD(int t, int tos, int m,String scheduledBy) {
+	public Stage4Finished(int t, int tos, int m,String scheduledBy) {
 		super(t, tos, m, scheduledBy);
 	}
 
@@ -30,11 +30,11 @@ public class MachineXStage4FinishedDVD extends MachineXEvent {
 			MachineStage3 s3m1 = sim.getMachineStage3(machineNumber);
 			MachineStage3 s3m2 = sim.getMachineStage3(3-machineNumber);
 			if(s3m1.state == StateStage3.Blocked) {
-				Event stage3finished =  new MachineXStage3Step3FinishedBatch(sim.getCurrentTime(),sim.getCurrentTime(), s3m1.machineNumber,this.getClass().getSimpleName());
+				Event stage3finished =  new Stage3Step3Finished(sim.getCurrentTime(),sim.getCurrentTime(), s3m1.machineNumber,this.getClass().getSimpleName());
 				sim.addToEventQueue(stage3finished);
 			}
 			if(s3m2.state == StateStage3.Blocked) {
-				Event stage3finished =  new MachineXStage3Step3FinishedBatch(sim.getCurrentTime(),sim.getCurrentTime(), s3m2.machineNumber,this.getClass().getSimpleName());
+				Event stage3finished =  new Stage3Step3Finished(sim.getCurrentTime(),sim.getCurrentTime(), s3m2.machineNumber,this.getClass().getSimpleName());
 				sim.addToEventQueue(stage3finished);
 			}
 		} else {
@@ -48,27 +48,27 @@ public class MachineXStage4FinishedDVD extends MachineXEvent {
 			m.addDVD(m.leftBuffer().removeFromBuffer());
 			int processingTime = m.generateProcessingTime()+delay;
 			int machineFinishedTime = sim.getCurrentTime() + processingTime ; 
-			Event stage4finished =  new MachineXStage4FinishedDVD(machineFinishedTime,sim.getCurrentTime(), machineNumber,this.getClass().getSimpleName());
+			Event stage4finished =  new Stage4Finished(machineFinishedTime,sim.getCurrentTime(), machineNumber,this.getClass().getSimpleName());
 			sim.addToEventQueue(stage4finished);
 		}
 		updateStatistics(sim);
 	}
 
 	@Override
-	public void updateMachines(Simulation sim) {
+	protected void updateMachines(Simulation sim) {
 		
 	}
 
 	@Override
-	public void scheduleEvents(Simulation sim) {
+	protected void scheduleEvents(Simulation sim) {
 		
 	}
 
 	@Override
-	public void updateStatistics(Simulation sim) {
+	protected void updateStatistics(Simulation sim) {
 		if(dvd !=null) {
 			sim.statistics.addToStatistic("Total DVDs processed", 1);
-			sim.statistics.updateAverage("Throughput time per DVD",timeOfOccurence-dvd.getTimeOfEnteringPipeLine() );
+			sim.statistics.updateAverage("Throughput time per DVD",timeOfOccurrence-dvd.getTimeOfEnteringPipeLine() );
 		}
 	}
 

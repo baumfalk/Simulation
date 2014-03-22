@@ -2,6 +2,9 @@ package machines;
 
 import java.util.ArrayList;
 
+import org.apache.commons.math3.distribution.ExponentialDistribution;
+import org.apache.commons.math3.distribution.UniformRealDistribution;
+
 import misc.DVD;
 import states.StateStage3;
 import buffer.Buffer;
@@ -10,11 +13,17 @@ public class MachineStage3 extends Machine {
 
 	public StateStage3 state;
 	public final int batchSize;
+	private ExponentialDistribution distStep1;
+	private ExponentialDistribution distStep2;
+	private UniformRealDistribution distFailure;
 	public MachineStage3(int machineNumber, ArrayList<Buffer> leftBuffers,
 			ArrayList<Buffer> rightBuffers, int maxDVDInMachine) {
 		super(machineNumber, leftBuffers, rightBuffers, maxDVDInMachine);
 		batchSize = maxDVDInMachine;
 		state = StateStage3.Idle;
+		distStep1 = new ExponentialDistribution(10);
+		distStep2 = new ExponentialDistribution(6);
+		distFailure = new UniformRealDistribution(0, 1);
 	}
 
 	@Override
@@ -23,15 +32,27 @@ public class MachineStage3 extends Machine {
 	}
 	
 	public int generateProcessingTimeStep1() {
-		return batchSize * 10;
+		double time = 0;
+		for(int i = 0; i < batchSize; i++) {
+			time += distStep1.sample();
+		}
+		return (int) Math.round(time);
 	}
 	
 	public int generateProcessingTimeStep2() {
-		return batchSize * 6;
+		double time = 0;
+		for(int i = 0; i < batchSize; i++) {
+			time += distStep2.sample();
+		}
+		return (int) Math.round(time);
 	}
 	
 	public boolean machineStuckOnDVD() {
-		return false;
+		return distFailure.sample() <= 0.03;
+	}
+	
+	public int generateRepairTime() {
+		return 5*60;
 	}
 	
 	public int generateProcessingTimeStep3() {

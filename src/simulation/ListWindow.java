@@ -43,7 +43,7 @@ public class ListWindow extends JFrame {
 	public ListWindow(String name) {
 		setTitle("DVD Factory Simulation - " + name);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 320, 484);
+		setBounds(100, 100, 400, 483);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -54,7 +54,7 @@ public class ListWindow extends JFrame {
 		contentPane.add(lblEventList);
 		listModel = new DefaultListModel();
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(20, 36, 274, 399);
+		scrollPane.setBounds(20, 36, 362, 399);
 		JList list = new JList();
 		list.setModel(listModel);
 		

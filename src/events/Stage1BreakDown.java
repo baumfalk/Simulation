@@ -4,23 +4,23 @@ import machines.MachineStage1;
 import simulation.Simulation;
 import exceptions.InvalidStateException;
 
-public class MachineXStage1Breakdown extends MachineXEvent {
+public class Stage1BreakDown extends MachineXEvent {
 	
 	private MachineStage1 m;
 
-	public MachineXStage1Breakdown(int t, int tos, int m, int r,String scheduledBy) {
+	public Stage1BreakDown(int t, int tos, int m, int r,String scheduledBy) {
 		super(t,tos,m, scheduledBy);
 	
 	}
 
 	@Override
-	public void scheduleEvents(Simulation sim) {
+	protected void scheduleEvents(Simulation sim) {
 		m = sim.getMachineStage1(machineNumber);
 		switch(m.getState()) {
 		case Blocked:
 		case Running:
 			int repairTime = m.generateRepairTime();
-			Event repairEvent = new MachineXStage1Repaired(sim.getCurrentTime()+repairTime,sim.getCurrentTime(),machineNumber,this.getClass().getSimpleName());
+			Event repairEvent = new Stage1Repaired(sim.getCurrentTime()+repairTime,sim.getCurrentTime(),machineNumber,this.getClass().getSimpleName());
 			sim.addToEventQueue(repairEvent);
 			break;
 		default:
@@ -38,10 +38,10 @@ public class MachineXStage1Breakdown extends MachineXEvent {
 	}
 
 	@Override
-	public void updateMachines(Simulation sim) {
+	protected void updateMachines(Simulation sim) {
 		switch(m.getState()) {
 		case Blocked:
-			m.lastBreakDownTime = timeOfOccurence;
+			m.lastBreakDownTime = timeOfOccurrence;
 			m.setBrokenAndBlocked();
 			break;
 		case Running:
@@ -61,7 +61,7 @@ public class MachineXStage1Breakdown extends MachineXEvent {
 	}
 	
 	@Override
-	public void updateStatistics(Simulation sim) {
+	protected void updateStatistics(Simulation sim) {
 		// TODO Auto-generated method stub
 	}
 

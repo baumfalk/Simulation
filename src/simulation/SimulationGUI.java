@@ -60,7 +60,7 @@ public class SimulationGUI {
 					eventListWindow = new ListWindow("Event List");
 					eventListWindow.setVisible(true);
 					statisticsWindow = new ListWindow("Statistics");
-					statisticsWindow.setVisible(true);
+				//	statisticsWindow.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -207,7 +207,12 @@ public class SimulationGUI {
 		btnNextEvent.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				nextSimulationState();
+				if(simulation == null) {
+					simulation = new Simulation(2*60*60, 20, 20);
+					updateGUI();
+				} else {
+					nextSimulationState();
+				}
 			}
 		});
 		btnNextEvent.setBounds(208, 11, 97, 23);

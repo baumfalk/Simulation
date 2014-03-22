@@ -3,6 +3,7 @@ package machines;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.apache.commons.math3.distribution.ExponentialDistribution;
 import org.apache.commons.math3.distribution.LogNormalDistribution;
 
 import states.StateStage1;
@@ -13,6 +14,8 @@ public class MachineStage1 extends Machine {
 
 	private StateStage1 state; 
 	private LogNormalDistribution dist;
+	private ExponentialDistribution distBreakdown;
+	private ExponentialDistribution distRepair;
 	public int lastBreakDownTime;
 	public int lastRepairTime;
 	public int processingTimeLeft;
@@ -23,6 +26,8 @@ public class MachineStage1 extends Machine {
 		
 		state = StateStage1.Running;
 		dist = new LogNormalDistribution(3.51, 1.23);
+		distBreakdown = new ExponentialDistribution(8*60*60);
+		distRepair = new ExponentialDistribution(2*60*60);
 	}
 
 	@Override
@@ -33,12 +38,12 @@ public class MachineStage1 extends Machine {
 	
 	public int generateBreakDownTime()
 	{
-		return 8*60*60;
+		return (int) Math.round(0.01*distBreakdown.sample());
 	}
 
 	public int generateRepairTime()
 	{
-		return 2*60*60;
+		return (int) Math.round(0.01*distRepair.sample());
 	}
 
 

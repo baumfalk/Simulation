@@ -9,10 +9,10 @@ import simulation.Simulation;
 import states.StateConveyorBelt;
 import states.StateStage1;
 
-public class MachineXStage2FinishedDVD extends MachineXEvent {
+public class Stage2Finished extends MachineXEvent {
 	
 	
-	public MachineXStage2FinishedDVD(int t, int tos, int m, int p,String scheduledBy) {
+	public Stage2Finished(int t, int tos, int m, int p,String scheduledBy) {
 		super(t, tos,m, scheduledBy);
 	
 		procTime = p;
@@ -29,7 +29,7 @@ public class MachineXStage2FinishedDVD extends MachineXEvent {
 	}
 
 	@Override
-	public void scheduleEvents(Simulation sim) {
+	protected void scheduleEvents(Simulation sim) {
 		// TODO Auto-generated method stub
 		m = sim.getMachineStage2(machineNumber);
 		cb = sim.getConveyorBelt(m.machineNumber);
@@ -40,7 +40,7 @@ public class MachineXStage2FinishedDVD extends MachineXEvent {
 			// schedule new cb event
 			if(cb.getState() != StateConveyorBelt.Blocked)
 			{
-				Event conveyorEvent = new ConveyorBeltXFinishedDVD(sim.getCurrentTime()+cb.generateProcessingTime(),sim.getCurrentTime(), m.machineNumber,this.getClass().getSimpleName());
+				Event conveyorEvent = new CBFinished(sim.getCurrentTime()+cb.generateProcessingTime(),sim.getCurrentTime(), m.machineNumber,this.getClass().getSimpleName());
 				sim.addToEventQueue(conveyorEvent);
 			
 				// schedule new stage 2 event
@@ -49,18 +49,18 @@ public class MachineXStage2FinishedDVD extends MachineXEvent {
 					//schedule new event for this machine
 					int machineProcTime = m.generateProcessingTime(); 
 					int machineFinishedTime = machineProcTime + sim.getCurrentTime();
-					Event eventStage2FinishedDVD = new MachineXStage2FinishedDVD(machineFinishedTime,sim.getCurrentTime(), m.machineNumber, machineProcTime,this.getClass().getSimpleName());
+					Event eventStage2FinishedDVD = new Stage2Finished(machineFinishedTime,sim.getCurrentTime(), m.machineNumber, machineProcTime,this.getClass().getSimpleName());
 					sim.addToEventQueue(eventStage2FinishedDVD);
 				
 					if(s1m1.getState() == StateStage1.Blocked) {
 						//s1m1.setRunning();
-						Event event_s1_m1 = new MachineXStage1FinishedDVD(sim.getCurrentTime(),sim.getCurrentTime(),s1m1.machineNumber,s1m1.totalProcessingTime,this.getClass().getSimpleName());
+						Event event_s1_m1 = new Stage1Finished(sim.getCurrentTime(),sim.getCurrentTime(),s1m1.machineNumber,s1m1.totalProcessingTime,this.getClass().getSimpleName());
 						sim.addToEventQueue(event_s1_m1);
 						System.out.println("\t Reactivating machine at stage 1");
 					}
 					if(s1m2.getState() == StateStage1.Blocked) {
 						//s1m2.setRunning();
-						Event event_s1_m2 = new MachineXStage1FinishedDVD(sim.getCurrentTime(),sim.getCurrentTime(),s1m1.machineNumber,s1m1.totalProcessingTime,this.getClass().getSimpleName());
+						Event event_s1_m2 = new Stage1Finished(sim.getCurrentTime(),sim.getCurrentTime(),s1m1.machineNumber,s1m1.totalProcessingTime,this.getClass().getSimpleName());
 						sim.addToEventQueue(event_s1_m2);
 						System.out.println("\t Reactivating machine at stage 1");
 					}			
@@ -74,7 +74,7 @@ public class MachineXStage2FinishedDVD extends MachineXEvent {
 	}
 
 	@Override
-	public void updateMachines(Simulation sim) {
+	protected void updateMachines(Simulation sim) {
 		switch(m.getState()) {
 		case Blocked:
 			break;
@@ -136,7 +136,7 @@ public class MachineXStage2FinishedDVD extends MachineXEvent {
 	}
 
 	@Override
-	public void updateStatistics(Simulation sim) {
+	protected void updateStatistics(Simulation sim) {
 		// TODO Auto-generated method stub
 	}
 }

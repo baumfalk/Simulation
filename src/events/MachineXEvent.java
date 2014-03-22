@@ -21,6 +21,11 @@ public abstract class MachineXEvent extends Event {
 		updateMachines(sim);		
 	}
 
-	public abstract void updateMachines(Simulation sim);
+	protected abstract void updateMachines(Simulation sim);
 	
+	public String toString() {
+		String s= super.toString();
+		s = " Machine: " + machineNumber + " " + s;
+		return s;
+	}
 }
