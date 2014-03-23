@@ -3,22 +3,22 @@ package machines;
 import java.util.ArrayList;
 
 import misc.DVD;
-import buffer.Buffer;
+import buffer.DVDBuffer;
 
 public abstract class Machine {
 	public final int machineNumber;
 	 // array list since stage 3 can access multiple buffers.
-	protected final ArrayList<Buffer> leftBuffers;
-	protected final ArrayList<Buffer> rightBuffers;
+	protected final ArrayList<DVDBuffer> leftBuffers;
+	protected final ArrayList<DVDBuffer> rightBuffers;
 	
-	protected final Buffer dvdsInMachine;
+	protected final DVDBuffer dvdsInMachine;
 	
-	public Machine(int machineNumber, ArrayList<Buffer> leftBuffers, ArrayList<Buffer> rightBuffers, int maxDVDInMachine)
+	public Machine(int machineNumber, ArrayList<DVDBuffer> leftBuffers, ArrayList<DVDBuffer> rightBuffers, int maxDVDInMachine)
 	{
 		this.machineNumber = machineNumber;
 		this.leftBuffers = leftBuffers;
 		this.rightBuffers = rightBuffers;
-		dvdsInMachine = new Buffer(maxDVDInMachine);
+		dvdsInMachine = new DVDBuffer(maxDVDInMachine);
 	}
 	
 	public boolean machineIsEmpty() {
@@ -39,22 +39,22 @@ public abstract class Machine {
 		return this.dvdsInMachine.peekDVD();
 	}
 	
-	public Buffer leftBuffer(int i)
+	public DVDBuffer leftBuffer(int i)
 	{
 		return this.leftBuffers.get(i);
 	}
 	
-	public Buffer rightBuffer(int i)
+	public DVDBuffer rightBuffer(int i)
 	{
 		return this.rightBuffers.get(i);
 	}
 	
-	public Buffer leftBuffer()
+	public DVDBuffer leftBuffer()
 	{
 		return this.leftBuffer(0);
 	}
 	
-	public Buffer rightBuffer()
+	public DVDBuffer rightBuffer()
 	{
 		return this.rightBuffer(0);
 	}

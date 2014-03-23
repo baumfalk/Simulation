@@ -3,28 +3,27 @@ package buffer;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-import misc.DVD;
 import exceptions.BufferOverflowException;
 import exceptions.BufferUnderflowException;
 
-public class Buffer {
-	private LinkedList<DVD> dvdList;
+public class Buffer<T> {
+	private LinkedList<T> dvdList;
 
 	public final int maxSize;
 	
 	public Buffer(int maxSize)
 	{
 		this.maxSize = maxSize;
-		dvdList = new LinkedList<DVD>();
+		dvdList = new LinkedList<T>();
 	}
 	
-	public void addBatchToBuffer(ArrayList<DVD> batch) {
-		for(DVD dvd : batch) {
+	public void addBatchToBuffer(ArrayList<T> batch) {
+		for(T dvd : batch) {
 			addToBuffer(dvd);
 		}
 	}
 	
-	public void addToBuffer(DVD dvd)
+	public void addToBuffer(T dvd)
 	{
 		if(isFull()) {
 			try {
@@ -38,7 +37,7 @@ public class Buffer {
 		}
 	}
 	
-	public DVD removeFromBuffer() {
+	public T removeFromBuffer() {
 		if(isEmpty()) {
 			try {
 				throw new BufferUnderflowException();
@@ -53,9 +52,9 @@ public class Buffer {
 		
 	}
 	
-	public ArrayList<DVD> emptyBuffer()
+	public ArrayList<T> emptyBuffer()
 	{
-		ArrayList<DVD> list = new ArrayList<DVD>(dvdList);
+		ArrayList<T> list = new ArrayList<T>(dvdList);
 		dvdList.clear();
 		return list;
 	}
@@ -82,11 +81,11 @@ public class Buffer {
 		return dvdList.size() >= maxSize;
 	}
 
-	public ArrayList<DVD> peekBuffer() {
-		return new ArrayList<DVD>(dvdList);
+	public ArrayList<T> peekBuffer() {
+		return new ArrayList<T>(dvdList);
 	}
 
-	public DVD peekDVD() {
+	public T peekDVD() {
 		// TODO Auto-generated method stub
 		return dvdList.peek();
 	}

@@ -6,15 +6,23 @@ import java.util.Arrays;
 import misc.DVD;
 import states.StateConveyorBelt;
 import buffer.Buffer;
+import buffer.DVDBuffer;
 import exceptions.InvalidStateException;
 
 public class ConveyorBelt extends Machine {
 
 	private StateConveyorBelt state;
-	public int beginDelayTime;
-	public ConveyorBelt(int conveyorBeltNumber, Buffer rightBuffer) {
-		super(conveyorBeltNumber, null, new ArrayList<Buffer>(Arrays.asList(rightBuffer)),-1); // infinity
+	private int delayStartTime;
+	
+	private Buffer<Integer> dvdTimeOfEntering;
+	private Buffer<Integer> dvdTimeLeft;
+	
+	
+	public ConveyorBelt(int conveyorBeltNumber, DVDBuffer rightBuffer) {
+		super(conveyorBeltNumber, null, new ArrayList<DVDBuffer>(Arrays.asList(rightBuffer)),-1); // infinity
 		state = StateConveyorBelt.Idle;
+		dvdTimeOfEntering = new Buffer<Integer>(-1);
+		dvdTimeLeft = new Buffer<Integer>(-1);
 	}
 	
 	@Override
@@ -70,21 +78,15 @@ public class ConveyorBelt extends Machine {
 		}
 	}
 
-	public void updateExpectedFinishingTime(int i) {
-		System.out.println("Updating finishing time");
-		for(DVD dvd : this.dvdsInMachine.peekBuffer()) {
-			dvd.expectedLeavingTimeConveyorBelt += i;
-		}
+	public void addDVD(DVD dvdTemp, int currentTime) {
+		addDVD(dvdTemp);
+		dvdTimeOfEntering.addToBuffer(currentTime);
+		dvdTimeLeft.addToBuffer(generateProcessingTime());
 	}
 
-	public ArrayList<DVD> peekBuffer() {
-		// TODO Auto-generated method stub
-		return this.dvdsInMachine.peekBuffer();
+	public void startDelayTimer(int currentTime) {
+		delayStartTime = currentTime;
 	}
 
-	public ArrayList<DVD> getConveyorBeltData() {
-		// TODO Auto-generated method stub
-		return this.dvdsInMachine.peekBuffer();
-	}
 
 }

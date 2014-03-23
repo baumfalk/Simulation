@@ -4,73 +4,66 @@ import machines.MachineStage1;
 import simulation.Simulation;
 import exceptions.InvalidStateException;
 
-public class Stage1BreakDown extends MachineXEvent {
+public class Stage1Breakdown extends MachineXEvent {
 	
-	private MachineStage1 m;
+	private MachineStage1 machineStageOne;
 
-	public Stage1BreakDown(int t, int tos, int m, int r,String scheduledBy) {
-		super(t,tos,m, scheduledBy);
+	public Stage1Breakdown(int timeOfOccurrence, int timeOfScheduling, int machineNumber,String scheduledBy) {
+		super(timeOfOccurrence,timeOfScheduling,machineNumber, scheduledBy);
 	
 	}
 
 	@Override
-	protected void scheduleEvents(Simulation sim) {
-		m = sim.getMachineStage1(machineNumber);
-		switch(m.getState()) {
+	public void execute(Simulation sim) {
+		/*
+		 * 	We want to be able to ask things of the machine throughout all methods
+		 *	of this event.
+		 */
+		machineStageOne = sim.getMachineStage1(machineNumber);
+		
+		/*
+		 * There is one less Stage1BreakdownEvent in the queue now.
+		 */
+		sim.decreaseStage1BreakdownEventCounter(machineNumber);
+		
+		switch(machineStageOne.getState()) {
 		case Blocked:
 		case Running:
-			int repairTime = m.generateRepairTime();
-			Event repairEvent = new Stage1Repaired(sim.getCurrentTime()+repairTime,sim.getCurrentTime(),machineNumber,this.getClass().getSimpleName());
-			sim.addToEventQueue(repairEvent);
+			executeRunningOrBlockedCase(sim);
 			break;
-		case BrokenAndRepairedBeforeDVD:
-			repairTime = m.generateRepairTime();
-			repairEvent = new Stage1Repaired(sim.getCurrentTime()+repairTime,sim.getCurrentTime(),machineNumber,this.getClass().getSimpleName());
-			sim.addToEventQueue(repairEvent);
-			break;
-		default:
-			try {
-				throw new InvalidStateException();
-			} catch (InvalidStateException e) {
-				
-				e.printStackTrace();
-				System.out.println("\t State " + m.getState() + " is invalid for this event!");
-				System.exit(1);
-			}
-			break;
+		case Broken:
+		case BrokenAndDVD:
+		case BrokenAndRepaired:
+			/*
+			 * Cannot happen, since this means that broken was scheduled before it was repaired
+			 */
+			invalidState();
 		}
-				
 	}
 
-	@Override
-	protected void updateMachines(Simulation sim) {
-		switch(m.getState()) {
-		case Blocked:
-			m.lastBreakDownTime = timeOfOccurrence;
-			m.setBrokenAndBlocked();
-			break;
-		case Running:
-			m.setBroken();
-			break;
-		case BrokenAndRepairedBeforeDVD:
-			m.setBroken();
-			break;	
-		default:
-			try {
-				throw new InvalidStateException();
-			} catch (InvalidStateException e) {
-				
-				e.printStackTrace();
-				System.out.println("\t State " + m.getState() + " is invalid for the event " + this.getClass().getSimpleName() + "!");
-				System.exit(1);
-			}
-			break;
-		}	
+	private void executeRunningOrBlockedCase(Simulation sim) {
+		/*
+		 * The machine was blocked/running when it broke down. The following has to happen
+		 * 
+		 * 	1. Set the state of the machine to Broken
+		 * 	2. Set the time of breakdown in the machine
+		 *  3. Schedule a MachineRepairedEvent
+		 */
+		machineStageOne.setBroken();
+		machineStageOne.setTimeOfBreakdown(timeOfOccurrence);
+		
+		sim.scheduleStage1RepairedEvent(machineNumber, machineStageOne.generateRepairTime(), scheduledBy());
 	}
 	
-	@Override
-	protected void updateStatistics(Simulation sim) {
-		// TODO Auto-generated method stub
+	private void invalidState() {
+		try {
+			throw new InvalidStateException();
+		} catch (InvalidStateException e) {
+			
+			e.printStackTrace();
+			System.out.println("\t State " + machineStageOne.getState() + " is invalid for the event " + this.getClass().getSimpleName() + "!");
+			System.out.println("\t It was scheduled at " + this.getTimeOfScheduling());
+			System.exit(1);
+		}
 	}
-
 }

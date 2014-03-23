@@ -10,11 +10,15 @@ import machines.MachineStage3;
 import machines.MachineStage4;
 import misc.DVD;
 import misc.Statistics;
-import buffer.Buffer;
+import buffer.DVDBuffer;
+import events.CBFinished;
 import events.Event;
-import events.Stage1BreakDown;
+import events.Stage1Breakdown;
 import events.Stage1Finished;
 import events.SimulationFinished;
+import events.Stage1Repaired;
+import events.Stage2Finished;
+import exceptions.EventAlreadyInQueueException;
 import exceptions.InvalidTimeError;
 
 public class Simulation {
@@ -33,18 +37,23 @@ public class Simulation {
 	private PriorityQueue<Event> eventQueue;
 	public Statistics statistics;
 
-	private ArrayList<Buffer> layerOneBuffers;
-	public ArrayList<Buffer> layerTwoBuffers;
-	private ArrayList<Buffer> layerThreeBuffers;
+	private ArrayList<DVDBuffer> layerOneBuffers;
+	public ArrayList<DVDBuffer> layerTwoBuffers;
+	private ArrayList<DVDBuffer> layerThreeBuffers;
 	
 	private ArrayList<MachineStage1> stageOneMachines;
 	private ArrayList<MachineStage2> stageTwoMachines;
 	private ArrayList<ConveyorBelt> conveyorBelts;
 	private ArrayList<MachineStage3> stageThreeMachines;
 	private ArrayList<MachineStage4> stageFourMachines;
-
-	//TODO:remove this in final
-	public int DVDsprocessed;
+	private int[] stage1FinishedCounter;
+	private int[] stage2FinishedCounter;
+	private int[] stage1BreakdownCounter;
+	private int[] stage1RepairedCounter;
+	private int[] stage3Step1FinishedCounter;
+	private int[] stage3Step2FinishedCounter;
+	private int[] stage3Step3FinishedCounter;
+	private int[] stage4FinishedCounter;
 
 	public static int hours = 24*60*60;
 	
@@ -73,12 +82,37 @@ public class Simulation {
 		this.batchSize = batchSize;
 		simulationFinished = false;
 		eventQueue = new PriorityQueue<Event>();
-		DVDsprocessed=0;
+		createCounters();
 		createBuffers();
 		createMachines();
 		createStatistics();
 
 		setup();
+	}
+
+
+	private void createCounters() {
+		stage1FinishedCounter = new int[4];
+		stage1BreakdownCounter = new int[4];
+		stage1RepairedCounter = new int[4];
+		for (int i = 0; i < stage1FinishedCounter.length; i++) {
+			stage1FinishedCounter[i] = 0;
+			stage1BreakdownCounter[i] = 0;
+			stage1RepairedCounter[i] = 0;
+		}
+		
+		stage2FinishedCounter = new int[2];
+		stage3Step1FinishedCounter = new int[2];
+		stage3Step2FinishedCounter = new int[2];
+		stage3Step3FinishedCounter = new int[2];
+		stage4FinishedCounter = new int[2];
+		for (int i = 0; i < stage2FinishedCounter.length; i++) {
+			stage2FinishedCounter[i] = 0;
+			stage3Step1FinishedCounter[i] = 0;
+			stage3Step2FinishedCounter[i] = 0;
+			stage3Step3FinishedCounter[i] = 0;
+			stage4FinishedCounter[i] = 0;
+		}
 	}
 	
 	public ArrayList<String> getEventListString()
@@ -120,21 +154,32 @@ public class Simulation {
 		return conveyorBelts.get(conveyorBeltNumber-1);
 	}
 	
-	public void addToEventQueue(Event e) {
-		eventQueue.add(e);
-		System.out.println("Added event " + e.getClass().getSimpleName() + " to the event queue.");
-		System.out.println("Added on " + e.getTimeOfScheduling() + " for time " + e.getTimeOfOccurrence());
+	public void addToEventQueue(Event event) {
+		/*
+		 * It is not possible to add events to the past.
+		 */
+		if(event.getTimeOfOccurrence() < currentTime) {
+			try {
+				throw new InvalidTimeError();
+			} catch (InvalidTimeError e) {
+				e.printStackTrace();
+				System.exit(1);
+			}
+		}
+		eventQueue.add(event);
+		System.out.println("Added event " + event.getClass().getSimpleName() + " to the event queue.");
+		System.out.println("Added on " + event.getTimeOfScheduling() + " for time " + event.getTimeOfOccurrence());
 	}
 
 	private void createBuffers()  {
-		layerOneBuffers = new ArrayList<Buffer>();
-		layerTwoBuffers = new ArrayList<Buffer>();
-		layerThreeBuffers = new ArrayList<Buffer>();
+		layerOneBuffers = new ArrayList<DVDBuffer>();
+		layerTwoBuffers = new ArrayList<DVDBuffer>();
+		layerThreeBuffers = new ArrayList<DVDBuffer>();
 		
 		for(int i =0; i<2;i++) {
-			layerOneBuffers.add(new Buffer(maxBufferSize));
-			layerTwoBuffers.add(new Buffer(batchSize));
-			layerThreeBuffers.add(new Buffer(batchSize));
+			layerOneBuffers.add(new DVDBuffer(maxBufferSize));
+			layerTwoBuffers.add(new DVDBuffer(batchSize));
+			layerThreeBuffers.add(new DVDBuffer(batchSize));
 		}
 	}
 
@@ -182,16 +227,13 @@ public class Simulation {
 			DVD dvd = new DVD(currentTime);
 			m.addDVD(dvd);
 		
-			int machineProcTime = stageOneMachines.get(m.machineNumber-1).generateProcessingTime();
-			int machineFinishedTime = machineProcTime + currentTime;
-			Event machinestage1 = new Stage1Finished(machineFinishedTime, currentTime, m.machineNumber, machineProcTime,this.getClass().getSimpleName());
-			eventQueue.add(machinestage1);
-			
+			int processingTime = m.generateProcessingTime();
+			m.setProcessingTime(processingTime);
+			scheduleStage1FinishedEvent(m.machineNumber, processingTime, this.getClass().getSimpleName());
 			//and breakdown
-			int breakdownTime = currentTime+stageOneMachines.get(m.machineNumber-1).generateBreakDownTime();
-			int repairTime =  Math.round(stageOneMachines.get(m.machineNumber-1).generateRepairTime());
-			Event machinestage1breakdown = new Stage1BreakDown(breakdownTime, currentTime, m.machineNumber, repairTime,this.getClass().getSimpleName());
-			eventQueue.add(machinestage1breakdown);
+			int breakdownTime = m.generateBreakDownTime();
+			scheduleStage1BreakdownEvent(m.machineNumber, breakdownTime, this.getClass().getSimpleName());
+			
 		}
 		// when are we finished with the simulation
 		Event simulationFinished = new SimulationFinished(runTime,currentTime,this.getClass().getSimpleName());
@@ -207,10 +249,10 @@ public class Simulation {
 	public void nextStep()
 	{
 		if(simulationFinished) {
-		//	System.out.println("Simulation is finished!");
 			return;
 		}
 		Event event = eventQueue.remove();
+		currentTime = event.getTimeOfOccurrence();
 		System.out.println("The current time is " + currentTime);
 		System.out.println("The event that will be processed is " + event.getClass().getSimpleName());
 		System.out.println("It was scheduled at " + event.getTimeOfScheduling() + " by " + event.getScheduler());
@@ -232,15 +274,121 @@ public class Simulation {
 	}
 
 
-	public ArrayList<String> getConveyorBeltData(int i) {
-		ConveyorBelt cb = getConveyorBelt(i);
-		ArrayList<DVD> dvdList = cb.getConveyorBeltData();
-		ArrayList<String> list = new ArrayList<String>();
-		int j =0;
-		for(DVD dvd : dvdList) {
-			list.add(j++ +" enter"+dvd.timeOfEnteringConveyorBelt + " expectedLeave " + dvd.expectedLeavingTimeConveyorBelt);
-		}
-		
-		return list;
+	public DVD generateNewDVD() {
+		// TODO Auto-generated method stub
+		return new DVD(currentTime);
 	}
+
+
+	public void scheduleStage1FinishedEvent(int machineNumber, int processingTime, String scheduledBy) {
+		
+		increaseEventCounter(stage1FinishedCounter,machineNumber);
+		
+		/*
+		 * Add a new Stage1FinishedEvent to the event queue
+		 */
+		int schedulingTime = currentTime;
+		int supposedFinishingTime = schedulingTime + processingTime;
+		Event newStage1FinishedEvent = new Stage1Finished(supposedFinishingTime, schedulingTime, machineNumber, scheduledBy);
+		
+		addToEventQueue(newStage1FinishedEvent);
+	}
+
+	public void decreaseStage1FinishedEventCounter(int machineNumber) {
+			decreaseEventCounter(stage1FinishedCounter,machineNumber);
+	}
+
+
+	public void scheduleStage1BreakdownEvent(int machineNumber,	int processingTime, String scheduledBy) {
+		increaseEventCounter(stage1BreakdownCounter,machineNumber);
+		
+		/*
+		 * Add a new Stage1FinishedEvent to the event queue
+		 */
+		int schedulingTime = currentTime;
+		int supposedFinishingTime = schedulingTime + processingTime;
+		Event newStage1BreakdownEvent = new Stage1Breakdown(supposedFinishingTime, schedulingTime, machineNumber, scheduledBy);
+		
+		addToEventQueue(newStage1BreakdownEvent);
+		
+	}
+
+
+	public void decreaseStage1BreakdownEventCounter(int machineNumber) {
+		decreaseEventCounter(stage1BreakdownCounter,machineNumber);
+	}
+
+
+	public void scheduleStage1RepairedEvent(int machineNumber,int processingTime, String scheduledBy) {
+		increaseEventCounter(stage1RepairedCounter,machineNumber);
+		
+		/*
+		 * Add a new Stage1Repaired to the event queue
+		 */
+		int schedulingTime = currentTime;
+		int supposedFinishingTime = schedulingTime + processingTime;
+		Event newStage1RepairedEvent = new Stage1Repaired(supposedFinishingTime, schedulingTime, machineNumber, scheduledBy);
+		
+		addToEventQueue(newStage1RepairedEvent);
+		
+	}
+
+	public void decreaseStage1RepairedEventCounter(int machineNumber) {
+		
+		decreaseEventCounter(stage1RepairedCounter,machineNumber);
+	}
+
+
+	public void scheduleStage2FinishedEvent(int machineNumber, int processingTime, String scheduledBy) {
+		increaseEventCounter(stage2FinishedCounter,machineNumber);
+		
+		/*
+		 * Add a new Stage2Finished Event to the event queue
+		 */
+		int schedulingTime = currentTime;
+		int supposedFinishingTime = schedulingTime + processingTime;
+		Event newStage2FinishedEvent = new Stage2Finished(supposedFinishingTime, schedulingTime, machineNumber, scheduledBy);
+		
+		addToEventQueue(newStage2FinishedEvent);
+		
+	}
+
+	public void decreaseStage2FinishedEventCounter(int machineNumber) {
+		decreaseEventCounter(stage2FinishedCounter,machineNumber);
+	}
+
+	private void increaseEventCounter(int[] counter, int machineNumber) {
+		if(counter[machineNumber-1]!= 0) {
+			try {
+				throw new EventAlreadyInQueueException();
+			} catch (EventAlreadyInQueueException e) {
+				e.printStackTrace();
+				System.exit(1);
+			}
+		}
+		counter[machineNumber-1]++;
+	}
+	
+	private void decreaseEventCounter(int[] counter, int machineNumber) {
+		if(counter[machineNumber-1] != 1) {
+			try {
+				throw new Exception();
+			} catch (Exception e) {
+				e.printStackTrace();
+				System.exit(1);
+			}
+		}
+		counter[machineNumber-1]--;
+	}
+
+
+	public void scheduleCBFinishedEvent(int machineNumber, int processingTime, String scheduledBy) {
+		int schedulingTime = currentTime;
+		int supposedFinishingTime = schedulingTime + processingTime;
+		Event newCBFinishedEvent = new CBFinished(supposedFinishingTime, schedulingTime, machineNumber, scheduledBy);
+		
+		addToEventQueue(newCBFinishedEvent);
+	}
+
+
 }

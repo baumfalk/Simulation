@@ -7,7 +7,7 @@ import org.apache.commons.math3.distribution.ExponentialDistribution;
 import org.apache.commons.math3.distribution.LogNormalDistribution;
 
 import states.StateStage1;
-import buffer.Buffer;
+import buffer.DVDBuffer;
 import exceptions.InvalidStateException;
 
 public class MachineStage1 extends Machine {
@@ -16,15 +16,14 @@ public class MachineStage1 extends Machine {
 	private LogNormalDistribution dist;
 	private ExponentialDistribution distBreakdown;
 	private ExponentialDistribution distRepair;
-	public int lastBreakDownTime;
-	public int lastRepairTime;
-	public int processingTimeLeft;
-	public int totalProcessingTime;
-
-	public boolean eventScheduled;
 	
-	public MachineStage1(int machineNumber,Buffer rightBuffer) {
-		super(machineNumber,null,new ArrayList<Buffer>(Arrays.asList(rightBuffer)),1);
+	public boolean eventScheduled;
+	private int processingTime;
+	private int blockStarted;
+	private int timeOfBreakdown;
+	
+	public MachineStage1(int machineNumber,DVDBuffer rightBuffer) {
+		super(machineNumber,null,new ArrayList<DVDBuffer>(Arrays.asList(rightBuffer)),1);
 		
 		state = StateStage1.Running;
 		dist = new LogNormalDistribution(3.51, 1.23);
@@ -50,7 +49,7 @@ public class MachineStage1 extends Machine {
 
 
 	public void setBroken() {
-		if(state == StateStage1.Running || state == StateStage1.BrokenAndRepairedBeforeDVD)
+		if(state == StateStage1.Running || state == StateStage1.BrokenAndRepaired)
 			state = StateStage1.Broken;
 		else {
 			try {
@@ -63,19 +62,6 @@ public class MachineStage1 extends Machine {
 		}
 	}
 
-	public void setBrokenAndBlocked() {
-		if(state == StateStage1.Blocked)
-			state = StateStage1.BrokenAndBlocked;
-		else {
-			try {
-				throw new InvalidStateException();
-			} catch (InvalidStateException e) {
-				e.printStackTrace();
-				System.out.println("\t Cannot change the state of a machine of stage 1 to BrokenAndBlocked with the state " + state);
-				System.exit(1);
-			}
-		}
-	}
 
 	public StateStage1 getState() {
 
@@ -85,7 +71,7 @@ public class MachineStage1 extends Machine {
 	public void setBrokenAndDVDBeforeRepair() {
 		// TODO Auto-generated method stub
 		if(state == StateStage1.Broken) {
-			state = StateStage1.BrokenAndDVDBeforeRepair;
+			state = StateStage1.BrokenAndDVD;
 			System.out.println("\t Set the state to BrokenAndDVDBeforeRepair" );
 		}
 		else {
@@ -101,7 +87,7 @@ public class MachineStage1 extends Machine {
 	}
 
 	public void setRunning() {
-		if(state == StateStage1.Blocked || state == StateStage1.BrokenAndRepairedBeforeDVD || state == StateStage1.BrokenAndDVDBeforeRepair)
+		if(state == StateStage1.Blocked || state == StateStage1.BrokenAndRepaired || state == StateStage1.BrokenAndDVD || state == StateStage1.Broken)
 			state = StateStage1.Running;
 		else {
 			try {
@@ -116,7 +102,7 @@ public class MachineStage1 extends Machine {
 	}
 
 	public void setBlocked() {
-		if(state == StateStage1.Running || state == StateStage1.BrokenAndBlocked)
+		if(state == StateStage1.Running)
 			state = StateStage1.Blocked;
 		else {
 			try {
@@ -129,10 +115,10 @@ public class MachineStage1 extends Machine {
 		}
 	}
 
-	public void brokenAndRepairedBeforeDVD() {
+	public void setBrokenAndRepaired() {
 		// TODO Auto-generated method stub
 		if(state == StateStage1.Broken)
-			state = StateStage1.BrokenAndRepairedBeforeDVD;
+			state = StateStage1.BrokenAndRepaired;
 		else {
 			try {
 				throw new InvalidStateException();
@@ -143,5 +129,31 @@ public class MachineStage1 extends Machine {
 			}
 		}
 	
-	}	
+	}
+
+	public void setProcessingTime(int processingTime) {
+		this.processingTime = processingTime;
+	}
+
+	public int getBlockStarted() {
+		return blockStarted;
+	}
+
+	public void setBlockStarted(int blockStarted) {
+		this.blockStarted = blockStarted;
+	}
+
+	public int getTimeOfBreakdown() {
+		return timeOfBreakdown;
+	}
+
+	public int getProcessingTime() {
+		// TODO Auto-generated method stub
+		return processingTime;
+	}
+
+	public void setTimeOfBreakdown(int timeOfBreakdown) {
+		// TODO Auto-generated method stub
+		this.timeOfBreakdown = timeOfBreakdown;
+	}
 }

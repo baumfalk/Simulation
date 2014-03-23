@@ -7,7 +7,7 @@ import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.commons.math3.distribution.UniformRealDistribution;
 
 import states.StateStage2;
-import buffer.Buffer;
+import buffer.DVDBuffer;
 import exceptions.InvalidStateException;
 
 public class MachineStage2 extends Machine {
@@ -15,9 +15,10 @@ public class MachineStage2 extends Machine {
 	private StateStage2 state;
 	private NormalDistribution dist;
 	private UniformRealDistribution distFailure;
+	private int idleTime;
 	
-	public MachineStage2(int machineNumber, Buffer leftBuffer) {
-		super(machineNumber,new ArrayList<Buffer>(Arrays.asList(leftBuffer)),null,1);
+	public MachineStage2(int machineNumber, DVDBuffer leftBuffer) {
+		super(machineNumber,new ArrayList<DVDBuffer>(Arrays.asList(leftBuffer)),null,1);
 		state = StateStage2.Idle;
 		
 		double theta = 0.0414757;
@@ -87,5 +88,13 @@ public class MachineStage2 extends Machine {
 				System.exit(1);
 			}
 		}
+	}
+
+	public void setIdleTime(int timeOfOccurrence) {
+		idleTime = timeOfOccurrence;
+	}
+	
+	public int getIdleTime() {
+		return idleTime;
 	}
 }

@@ -5,19 +5,22 @@ import java.util.ArrayList;
 import org.apache.commons.math3.distribution.ExponentialDistribution;
 import org.apache.commons.math3.distribution.UniformRealDistribution;
 
+import exceptions.InvalidStateException;
+
 import misc.DVD;
+import states.StateStage2;
 import states.StateStage3;
-import buffer.Buffer;
+import buffer.DVDBuffer;
 
 public class MachineStage3 extends Machine {
 
-	public StateStage3 state;
+	private StateStage3 state;
 	public final int batchSize;
 	private ExponentialDistribution distStep1;
 	private ExponentialDistribution distStep2;
 	private UniformRealDistribution distFailure;
-	public MachineStage3(int machineNumber, ArrayList<Buffer> leftBuffers,
-			ArrayList<Buffer> rightBuffers, int maxDVDInMachine) {
+	public MachineStage3(int machineNumber, ArrayList<DVDBuffer> leftBuffers,
+			ArrayList<DVDBuffer> rightBuffers, int maxDVDInMachine) {
 		super(machineNumber, leftBuffers, rightBuffers, maxDVDInMachine);
 		batchSize = maxDVDInMachine;
 		state = StateStage3.Idle;
@@ -77,4 +80,50 @@ public class MachineStage3 extends Machine {
 		return this.dvdsInMachine.emptyBuffer();
 	}
 
+	public StateStage3 getState() {
+		// TODO Auto-generated method stub
+		return state;
+	}
+
+	public void setRunning() {
+		if(state == StateStage3.Idle || state == StateStage3.Blocked)
+			state = StateStage3.Running;
+		else {
+			try {
+				throw new InvalidStateException();
+			} catch (InvalidStateException e) {
+				e.printStackTrace();
+				System.out.println("\t Cannot change the state of a machine of stage 3 to Running with the state " + state);
+				System.exit(1);
+			}
+		}
+	}
+
+	public void setIdle() {
+		if(state == StateStage3.Running)
+			state = StateStage3.Idle;
+		else {
+			try {
+				throw new InvalidStateException();
+			} catch (InvalidStateException e) {
+				e.printStackTrace();
+				System.out.println("\t Cannot change the state of a machine of stage 3 to Idle with the state " + state);
+				System.exit(1);
+			}
+		}
+	}
+
+	public void setBlocked() {
+		if(state == StateStage3.Running)
+			state = StateStage3.Blocked;
+		else {
+			try {
+				throw new InvalidStateException();
+			} catch (InvalidStateException e) {
+				e.printStackTrace();
+				System.out.println("\t Cannot change the state of a machine of stage 3 to Blocked with the state " + state);
+				System.exit(1);
+			}
+		}
+	}
 }

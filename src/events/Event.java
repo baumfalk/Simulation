@@ -25,12 +25,7 @@ public abstract class Event implements Comparable<Event> {
 		return scheduler;
 	}
 
-	public void execute(Simulation sim) {
-		scheduleEvents(sim);
-		updateStatistics(sim);
-	}
-	protected abstract void scheduleEvents(Simulation sim);
-	protected abstract void updateStatistics(Simulation sim);
+	public abstract void execute(Simulation sim);
 	
 	
 	@Override

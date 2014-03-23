@@ -6,15 +6,15 @@ import java.util.Arrays;
 import org.apache.commons.math3.distribution.UniformRealDistribution;
 
 import states.StateStage4;
-import buffer.Buffer;
+import buffer.DVDBuffer;
 
 public class MachineStage4 extends Machine {
 
 	public StateStage4 state;
 	private UniformRealDistribution dist;
 	private int dvdsLeft;
-	public MachineStage4(int machineNumber, Buffer leftBuffer) {
-		super(machineNumber,new ArrayList<Buffer>(Arrays.asList(leftBuffer)),null,1);
+	public MachineStage4(int machineNumber, DVDBuffer leftBuffer) {
+		super(machineNumber,new ArrayList<DVDBuffer>(Arrays.asList(leftBuffer)),null,1);
 		state = StateStage4.Idle;
 		dist = new UniformRealDistribution(20, 30);
 	}
