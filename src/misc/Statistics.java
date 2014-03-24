@@ -24,8 +24,15 @@ public class Statistics {
 	}
 	
 	public void addToStatistic(String s, float f) {
-		float newAverage = (getStatistic(s).first+f);
-		updateStatistic(s, newAverage,0,getStatistic(s).third);
+		
+		float newAverage = f;
+		String type = "";
+		if(stats.get(s) != null) {
+			f += getStatistic(s).first; 
+			s = getStatistic(s).third;
+		}
+		
+		updateStatistic(s, newAverage,0,s);
 	}
 	
 	public void updateStatistic(String s, Float f, int i, String type)

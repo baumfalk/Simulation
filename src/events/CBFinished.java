@@ -1,138 +1,99 @@
 package events;
 
-import exceptions.InvalidStateException;
 import machines.ConveyorBelt;
-import machines.MachineStage2;
-import machines.MachineStage3;
+import misc.DVD;
 import simulation.Simulation;
-import states.StateStage2;
-import states.StateStage3;
+import exceptions.InvalidStateException;
 
 public class CBFinished extends MachineXEvent {
 
-	public CBFinished(int t, int tos, int c, String scheduledBy) {
+	public final int dvdID;
+	private ConveyorBelt conveyorBelt;
+	
+	public CBFinished(int t, int tos, int c, int dvdID, String scheduledBy) {
 		super(t,tos, c, scheduledBy);
+		this.dvdID = dvdID;
 	}
-	
-	private ConveyorBelt cb;
-	private MachineStage2 s2m;
-	
-	
-	@Override
-	protected void scheduleEvents(Simulation sim) {
-		cb = sim.getConveyorBelt(machineNumber);
-		s2m = sim.getMachineStage2(machineNumber);
-		switch (cb.getState()) {
-		case Running:
-			// Crate to the right not full, proceed normally
-			if(!cb.rightBuffer().isFull()) {
-				// Since we are running normally, if stage 2 is blocked, we can unblock it.
-				scheduleStage2Event(sim);
-			} else {
-				MachineStage3 s3m1 = sim.getMachineStage3(machineNumber);
-				MachineStage3 s3m2 = sim.getMachineStage3(3-machineNumber);
-				
-				if(s3m1.getState() == StateStage3.Idle) {
-					scheduleStage3Event(sim, s3m1);
-					scheduleStage2Event(sim);
-				} else if(s3m2.getState()  == StateStage3.Idle) {
-					scheduleStage3Event(sim, s3m1);
-					scheduleStage2Event(sim);
-				} 
-			}
-			break;
-		case Blocked:
-			System.out.println(" Blocked!");
-			break;
-		default:
-			invalidStateCase();
-			break;
-		}
-	}
-
-	private void scheduleStage2Event(Simulation sim) {
-		if(s2m.getState() == StateStage2.Blocked) {
-			Event event_m2 = new Stage2Finished(sim.getCurrentTime(),sim.getCurrentTime(),s2m.machineNumber, this.getClass().getSimpleName());
-			sim.addToEventQueue(event_m2);
-		}
-	}
-
-	private void scheduleStage3Event(Simulation sim, MachineStage3 s3m) {
-		int processingTimeStep1 = s3m.generateProcessingTimeStep1();
-		int machineFinishedTime = sim.getCurrentTime() + processingTimeStep1;
-		Event eventStage3Step1Finished = new Stage3Step1Finished(machineFinishedTime,sim.getCurrentTime(), s3m.machineNumber,this.getClass().getSimpleName());
-		sim.addToEventQueue(eventStage3Step1Finished);
-	}
-
-	@Override
-	protected void updateMachines(Simulation sim) {
-		cb = sim.getConveyorBelt(machineNumber);
-		switch (cb.getState()) {
-		case Running:
-			updateMachineRunningCase(sim);
-			break;
-		case Blocked:
-			break;
-		default:
-			invalidStateCase();
-			break;
-		}
-	}
-
-	private void updateMachineRunningCase(Simulation sim) {
-		// Crate to the right not full, proceed normally
-		if(!cb.rightBuffer().isFull()) {
-			doIfRightBufferIsNotFull();
-		} 
-		// Crate to the right full, try to put the crate in stage 3
-		else {
-			doIfRightBufferIsFull(sim);
-		}
-	}
-
-	private void doIfRightBufferIsFull(Simulation sim) {
-		MachineStage3 s3m1 = sim.getMachineStage3(machineNumber);
-		MachineStage3 s3m2 = sim.getMachineStage3(3-machineNumber);
-
-		// the  default machine is free
-		if(s3m1.getState()  == StateStage3.Idle)	{
-			s3m1.addBatch(cb.rightBuffer().emptyBuffer());
-			s3m1.setRunning();
-		}
-		// the default machine is not free, but the other is
-		else if(s3m2.getState() == StateStage3.Idle) {
-			s3m2.addBatch(cb.rightBuffer().emptyBuffer());
-			s3m2.setRunning();
-		} 
-		// neither machine is free
-		else {
-			cb.setBlocked();
-			cb.startDelayTimer(sim.getCurrentTime());
-		}
-	}
-
-	private void doIfRightBufferIsNotFull() {
-		cb.rightBuffer().addToBuffer(cb.removeDVD());
-		if(s2m.getState() == StateStage2.Blocked) {
-			cb.setRunning();
-		}
-		if(cb.machineIsEmpty()) {
-			cb.setIdle();
-		}
-	}
-
-	@Override
-	protected void updateStatistics(Simulation sim) {
 		
+	@Override
+	public void execute(Simulation sim) {
+		/*
+		 * 	We want to be able to ask things of the machine throughout all methods
+		 *	of this event.
+		 */
+		conveyorBelt = sim.getConveyorBelt(machineNumber);
+		
+		/*
+		 * There is one less CBFinished for this DVD in the queue now.
+		 */
+		sim.decreaseConveyorBeltFinishedCounter(machineNumber, dvdID);
+		
+		switch(conveyorBelt.getState()) {
+		case Blocked:
+			break;
+		case Idle:
+			break;
+		
+		case Running:
+			/*
+			 * The conveyor belt is running normally. We need to do the following
+			 * 	1. If the DVD is really at the end of the belt (i.e. it has been five minutes on a running belt)
+			 * 		a) If the buffer/crate to the right is not full
+			 * 			i) Remove the dvd from the belt
+			 * 			ii) Add the dvd to the crate to the right
+			 * 			iii) If the conveyor belt is empty
+			 * 				I) Set the conveyor belt state to Idle
+			 * 				II) Set the idleTime for the conveyor belt
+			 * 		b) If the buffer to the right is full
+			 * 			i) Set the conveyor belt state to Blocked
+			 * 			ii) Set the blockedTime for the conveyor belt.
+			 * 			iii) Update the time left on the belt for all dvd's on the belt.
+			 * 	2. If the DVD is not at the end of the belt (i.e. because of a Blocked some time back)
+			 * 		a) Schedule a new ConveyorBeltFinished event that will occur in x seconds, 
+			 * 		   with x is the time the current DVD has to still be on the belt.
+			 * 		b) Set the time left on the belt for this DVD to 0.
+			 * 		 
+			 */
+			int dvdTimeLeft = conveyorBelt.getDVDOvertime(dvdID);
+			if(dvdTimeLeft < 0) {
+				sim.crash();
+			} else if (dvdTimeLeft == 0) {
+				if(!conveyorBelt.rightBuffer().isFull()) {
+					DVD dvdFromBelt = conveyorBelt.removeDVD();
+					// Error: we cannot have multiple dvd's at the end of the belt.
+					if(dvdFromBelt.id != dvdID) {
+						sim.crash();
+					}
+					
+					conveyorBelt.rightBuffer().addToBuffer(dvdFromBelt);
+					
+					if(conveyorBelt.machineIsEmpty()) {
+						conveyorBelt.setIdle();
+						conveyorBelt.setTimeIdleStarted(timeOfOccurrence);
+					}
+				} else {
+					conveyorBelt.setBlocked();
+					conveyorBelt.setTimeBlockedStarted(timeOfOccurrence);
+				}
+			} else {
+				sim.scheduleCBFinishedEvent(machineNumber, dvdTimeLeft , dvdID, scheduledBy());
+				conveyorBelt.setDVDTimeLeft(dvdID, 0);
+			}
+			 
+			break;
+		
+		}
 	}
+
 	
-	private void invalidStateCase() {
+	
+	private void invalidState() {
 		try {
 			throw new InvalidStateException();
 		} catch (InvalidStateException e) {
 			
 			e.printStackTrace();
-			System.out.println("\t State " + cb.getState() + " is invalid for the event " + this.getClass().getSimpleName() + "!");
+			System.out.println("\t State " + conveyorBelt.getState() + " is invalid for the event " + this.getClass().getSimpleName() + "!");
 			System.out.println("\t It was scheduled at " + this.getTimeOfScheduling());
 			System.exit(1);
 		}

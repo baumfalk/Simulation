@@ -149,7 +149,7 @@ public class Stage1Finished extends MachineXEvent {
 				
 				// Update statistics on idle time of stage 2 machine
 				int totalIdleTime = timeOfOccurrence-machineStageTwo.getIdleTime();
-				sim.statistics.updateAverage("Stage 2 Machine "+ machineTwoNumber + " idle time", totalIdleTime);
+				sim.statistics.addToStatistic("Stage 2 Machine "+ machineTwoNumber + " idle time", totalIdleTime);
 			}
 		} else {
 			// Set the state to Blocked
@@ -158,7 +158,7 @@ public class Stage1Finished extends MachineXEvent {
 			machineStageOne.setProcessingTime(0);
 			
 			// Update the blocked-time statistics for this machine.
-			machineStageOne.setBlockStarted(timeOfOccurrence);
+			machineStageOne.setTimeBlockedStarted(timeOfOccurrence);
 		}
 	}
 	

@@ -1,6 +1,7 @@
 package simulation;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.PriorityQueue;
 
 import machines.ConveyorBelt;
@@ -13,9 +14,9 @@ import misc.Statistics;
 import buffer.DVDBuffer;
 import events.CBFinished;
 import events.Event;
+import events.SimulationFinished;
 import events.Stage1Breakdown;
 import events.Stage1Finished;
-import events.SimulationFinished;
 import events.Stage1Repaired;
 import events.Stage2Finished;
 import exceptions.EventAlreadyInQueueException;
@@ -47,15 +48,17 @@ public class Simulation {
 	private ArrayList<MachineStage3> stageThreeMachines;
 	private ArrayList<MachineStage4> stageFourMachines;
 	private int[] stage1FinishedCounter;
-	private int[] stage2FinishedCounter;
 	private int[] stage1BreakdownCounter;
 	private int[] stage1RepairedCounter;
+	private int[] stage2FinishedCounter;
+	private ArrayList<HashMap<Integer,Integer>> conveyorBeltFinishedCounter; // one 1 per DVD at any given time;
 	private int[] stage3Step1FinishedCounter;
 	private int[] stage3Step2FinishedCounter;
 	private int[] stage3Step3FinishedCounter;
 	private int[] stage4FinishedCounter;
 
 	public static int hours = 24*60*60;
+	private static int DVDCount = 0;
 	
 	public static void main(String [] args) {
 		if (args.length < 3) {
@@ -102,16 +105,19 @@ public class Simulation {
 		}
 		
 		stage2FinishedCounter = new int[2];
+		conveyorBeltFinishedCounter= new ArrayList<HashMap<Integer,Integer>>();
 		stage3Step1FinishedCounter = new int[2];
 		stage3Step2FinishedCounter = new int[2];
 		stage3Step3FinishedCounter = new int[2];
 		stage4FinishedCounter = new int[2];
+		
 		for (int i = 0; i < stage2FinishedCounter.length; i++) {
 			stage2FinishedCounter[i] = 0;
 			stage3Step1FinishedCounter[i] = 0;
 			stage3Step2FinishedCounter[i] = 0;
 			stage3Step3FinishedCounter[i] = 0;
 			stage4FinishedCounter[i] = 0;
+			conveyorBeltFinishedCounter.add(new HashMap<Integer,Integer>());
 		}
 	}
 	
@@ -224,7 +230,7 @@ public class Simulation {
 		for(MachineStage1 m : stageOneMachines) 
 		{
 			// production
-			DVD dvd = new DVD(currentTime);
+			DVD dvd = new DVD(6, currentTime);
 			m.addDVD(dvd);
 		
 			int processingTime = m.generateProcessingTime();
@@ -275,8 +281,8 @@ public class Simulation {
 
 
 	public DVD generateNewDVD() {
-		// TODO Auto-generated method stub
-		return new DVD(currentTime);
+		statistics.addToStatistic("DVDs created", 1);
+		return new DVD(++DVDCount, currentTime);
 	}
 
 
@@ -371,23 +377,51 @@ public class Simulation {
 	
 	private void decreaseEventCounter(int[] counter, int machineNumber) {
 		if(counter[machineNumber-1] != 1) {
-			try {
-				throw new Exception();
-			} catch (Exception e) {
-				e.printStackTrace();
-				System.exit(1);
-			}
+			crash();
 		}
 		counter[machineNumber-1]--;
 	}
 
 
-	public void scheduleCBFinishedEvent(int machineNumber, int processingTime, String scheduledBy) {
+	public void scheduleCBFinishedEvent(int machineNumber, int processingTime, int dvdID, String scheduledBy) {
+		if(conveyorBeltFinishedCounter.get(machineNumber-1).get(dvdID)!=0) {
+			try {
+				throw new EventAlreadyInQueueException();
+			} catch (EventAlreadyInQueueException e) {
+				e.printStackTrace();
+				System.exit(1);
+			}
+		}
+		
+		int newValue = conveyorBeltFinishedCounter.get(machineNumber-1).get(dvdID) +1;
+		
+		conveyorBeltFinishedCounter.get(machineNumber-1).put(dvdID,newValue);
+		
 		int schedulingTime = currentTime;
 		int supposedFinishingTime = schedulingTime + processingTime;
-		Event newCBFinishedEvent = new CBFinished(supposedFinishingTime, schedulingTime, machineNumber, scheduledBy);
+		Event newCBFinishedEvent = new CBFinished(supposedFinishingTime, schedulingTime, machineNumber, dvdID, scheduledBy);
 		
 		addToEventQueue(newCBFinishedEvent);
+	}
+	
+	public void decreaseConveyorBeltFinishedCounter(int machineNumber, int dvdID) {
+		if(conveyorBeltFinishedCounter.get(machineNumber-1).get(dvdID) != 1) {
+			crash();
+		}
+		
+		int newValue = conveyorBeltFinishedCounter.get(machineNumber-1).get(dvdID) - 1;
+		
+		conveyorBeltFinishedCounter.get(machineNumber-1).put(dvdID,newValue);
+	}
+
+
+	public void crash() {
+		try {
+			throw new Exception();
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
 	}
 
 

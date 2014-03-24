@@ -122,11 +122,4 @@ public class Stage3Step3Finished extends MachineXEvent {
 		Event stage4finished =  new Stage4Finished(machineFinishedTime,sim.getCurrentTime(), machineNumber,this.getClass().getSimpleName());
 		sim.addToEventQueue(stage4finished);
 	}
-
-	@Override
-	protected void updateStatistics(Simulation sim) {
-		// TODO Auto-generated method stub
-		
-	}
-	
 }

@@ -31,6 +31,13 @@ public class MachineStage3 extends Machine {
 
 	@Override
 	public int generateProcessingTime() {
+		try {
+			throw new Exception();
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
+		
 		return -1; // do not use
 	}
 	

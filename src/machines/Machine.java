@@ -12,6 +12,8 @@ public abstract class Machine {
 	protected final ArrayList<DVDBuffer> rightBuffers;
 	
 	protected final DVDBuffer dvdsInMachine;
+	private int idleTime;
+	private int blockedTime;
 	
 	public Machine(int machineNumber, ArrayList<DVDBuffer> leftBuffers, ArrayList<DVDBuffer> rightBuffers, int maxDVDInMachine)
 	{
@@ -60,4 +62,20 @@ public abstract class Machine {
 	}
 	
 	public abstract int generateProcessingTime();
+	
+	public void setTimeIdleStarted(int timeOfOccurrence) {
+		idleTime = timeOfOccurrence;
+	}
+	
+	public int getIdleTime() {
+		return idleTime;
+	}
+
+	public void setTimeBlockedStarted(int timeOfOccurrence) {
+		blockedTime = timeOfOccurrence;
+	}
+	
+	public int getBlockedTime() {
+		return blockedTime;
+	}
 }

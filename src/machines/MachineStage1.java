@@ -135,18 +135,6 @@ public class MachineStage1 extends Machine {
 		this.processingTime = processingTime;
 	}
 
-	public int getBlockStarted() {
-		return blockStarted;
-	}
-
-	public void setBlockStarted(int blockStarted) {
-		this.blockStarted = blockStarted;
-	}
-
-	public int getTimeOfBreakdown() {
-		return timeOfBreakdown;
-	}
-
 	public int getProcessingTime() {
 		// TODO Auto-generated method stub
 		return processingTime;
@@ -155,5 +143,9 @@ public class MachineStage1 extends Machine {
 	public void setTimeOfBreakdown(int timeOfBreakdown) {
 		// TODO Auto-generated method stub
 		this.timeOfBreakdown = timeOfBreakdown;
+	}
+
+	public int getTimeOfBreakdown() {
+		return timeOfBreakdown;
 	}
 }

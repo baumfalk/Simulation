@@ -16,6 +16,7 @@ public class MachineStage2 extends Machine {
 	private NormalDistribution dist;
 	private UniformRealDistribution distFailure;
 	private int idleTime;
+	private int blockedTime;
 	
 	public MachineStage2(int machineNumber, DVDBuffer leftBuffer) {
 		super(machineNumber,new ArrayList<DVDBuffer>(Arrays.asList(leftBuffer)),null,1);
@@ -90,11 +91,20 @@ public class MachineStage2 extends Machine {
 		}
 	}
 
-	public void setIdleTime(int timeOfOccurrence) {
+	public void setTimeIdleStarted(int timeOfOccurrence) {
 		idleTime = timeOfOccurrence;
 	}
 	
 	public int getIdleTime() {
 		return idleTime;
 	}
+
+	public void setTimeBlockedStarted(int timeOfOccurrence) {
+		blockedTime = timeOfOccurrence;
+	}
+	
+	public int getBlockedTime() {
+		return blockedTime;
+	}
+
 }

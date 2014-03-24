@@ -26,23 +26,4 @@ public class Stage3Step1Finished extends MachineXEvent {
 		Event eventStage3Step2Finished = new Stage3Step2Finished(machineFinishedTime,sim.getCurrentTime(), s3m.machineNumber,this.getClass().getSimpleName());
 		sim.addToEventQueue(eventStage3Step2Finished);
 	}
-
-	@Override
-	protected void updateMachines(Simulation sim) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	protected void scheduleEvents(Simulation sim) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	protected void updateStatistics(Simulation sim) {
-		// TODO Auto-generated method stub
-		
-	}
-
 }

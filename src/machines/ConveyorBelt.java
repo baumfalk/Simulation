@@ -2,6 +2,7 @@ package machines;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 import misc.DVD;
 import states.StateConveyorBelt;
@@ -14,15 +15,18 @@ public class ConveyorBelt extends Machine {
 	private StateConveyorBelt state;
 	private int delayStartTime;
 	
+	
+	private HashMap<Integer, Integer> dvdOvertimeLeft;
 	private Buffer<Integer> dvdTimeOfEntering;
-	private Buffer<Integer> dvdTimeLeft;
+
+	private int idleTime;
 	
 	
 	public ConveyorBelt(int conveyorBeltNumber, DVDBuffer rightBuffer) {
 		super(conveyorBeltNumber, null, new ArrayList<DVDBuffer>(Arrays.asList(rightBuffer)),-1); // infinity
 		state = StateConveyorBelt.Idle;
 		dvdTimeOfEntering = new Buffer<Integer>(-1);
-		dvdTimeLeft = new Buffer<Integer>(-1);
+		dvdOvertimeLeft = new HashMap<Integer,Integer>();
 	}
 	
 	@Override
@@ -81,11 +85,29 @@ public class ConveyorBelt extends Machine {
 	public void addDVD(DVD dvdTemp, int currentTime) {
 		addDVD(dvdTemp);
 		dvdTimeOfEntering.addToBuffer(currentTime);
-		dvdTimeLeft.addToBuffer(generateProcessingTime());
+		dvdOvertimeLeft.put(dvdTemp.id, 0); // no Overtime by default
 	}
 
 	public void startDelayTimer(int currentTime) {
 		delayStartTime = currentTime;
+	}
+
+	public int getIdleTime() {
+		return idleTime;
+	}
+	
+	public void setTimeIdleStarted(int idleTime) {
+		this.idleTime = idleTime;
+	}
+
+	public void addToDVDOvertime(int dvdID, int overtime) {
+		int newValue =  dvdOvertimeLeft.get(dvdID) + overtime;
+		dvdOvertimeLeft.put(dvdID, newValue);
+	}
+	
+	public int getDVDOvertime(int dvdID) {
+		// TODO Auto-generated method stub
+		return dvdOvertimeLeft.get(dvdID);
 	}
 
 
