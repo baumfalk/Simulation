@@ -87,15 +87,15 @@ public class SimulationGUI {
 		for(int i=1;i<=2;i++) {
 			MachineStage2 m2 = simulation.getMachineStage2(i);
 			stage2Labels.get(i-1).setText(m2.getState().name());
-			buffersOne.get(i-1).setText(m2.leftBuffer().currentDVDCount()+"");
+			buffersOne.get(i-1).setText(m2.leftBuffer().getNumberOfDVDs()+"");
 			
 			ConveyorBelt cb = simulation.getConveyorBelt(i);
 			conveyorBeltLabels.get(i-1).setText(cb.getState().name());
-			buffersTwo.get(i-1).setText(cb.rightBuffer().currentDVDCount()+"");
+			buffersTwo.get(i-1).setText(cb.rightBuffer().getNumberOfDVDs()+"");
 			
 			MachineStage3 m3 = simulation.getMachineStage3(i);
 			stage3Labels.get(i-1).setText(m3.getState().name());
-			buffersThree.get(i-1).setText(m3.rightBuffer(i).currentDVDCount()+"");
+			buffersThree.get(i-1).setText(m3.rightBuffer(i).getNumberOfDVDs()+"");
 			
 			MachineStage4 m4 = simulation.getMachineStage4(i);
 			stage4Labels.get(i-1).setText(m4.state.name());

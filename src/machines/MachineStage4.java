@@ -25,17 +25,25 @@ public class MachineStage4 extends Machine {
 		return dvdsLeft == 0;
 	}
 	
-	public void decreaseDVDsLeft()
+	public void decreaseToner()
 	{
 		dvdsLeft--;
 	}
 	
+	public int renewCartridgeIfNecessary() {
+		int delay = 0;
+		if(cartridgeIsEmpty()) {
+			delay = generateCartridgeRenewalTime();
+			renewCartridge();
+		}
+		return delay;
+	}
 	
-	public void renewCartridge() {
+	private void renewCartridge() {
 		dvdsLeft = 200; // todo fix this
 	}
 	
-	public int generateCartridgeRenewalTime() {
+	private int generateCartridgeRenewalTime() {
 		return 15*60; // todo fix this
 	}
 

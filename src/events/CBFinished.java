@@ -39,11 +39,8 @@ public class CBFinished extends MachineXEvent {
 			 * 
 			 * We cannot do anything now, except for a sanity check that this dvd is not the first dvd in the queue
 			 */
-			
-			if(conveyorBelt.peekDVD().id == dvdID) {
-				sim.crash();
-			}
-			
+			sim.sanityCheck(conveyorBelt.peekDVD().id != dvdID);
+
 			break;
 			/*
 			 * This should never happen, since this means that either an ConveyorBeltFinished event was scheduled
@@ -89,15 +86,12 @@ public class CBFinished extends MachineXEvent {
 		 * 					- Update statistics on idle time of the second stage 3 machine
 		 * 		b) If the buffer to the right is full
 		 * 			i) If the first machine from stage 3 is idle
-		 * 				I) Empty the buffer into the first machine from stage 3
+		 * 				I) Empty the whole buffer into the first machine from stage 3
 		 * 				II) Set the first machine from stage 3 to Running
 		 * 				III) Schedule new Stage3Step1FinishedEvent
 		 * 				IV) Update statistics on idle time of the stage 3 machine
 		 * 			ii) Else if the second machine from stage 3 is idle
-		 * 				I) Empty the buffer into the second machine from stage 3
-		 * 				II) Set the second machine from stage 3 to Running
-		 * 				III) Schedule new Stage3Step1FinishedEvent
-		 * 				IV) Update statistics on idle time of the second stage 3 machine
+		 * 				I) do the same as with i), but then for the second machine.
 		 * 			iii) If both machines are busy
 		 * 				I) Set the conveyor belt state to Blocked
 		 * 				II) Set the blockedTime for the conveyor belt.
@@ -109,22 +103,10 @@ public class CBFinished extends MachineXEvent {
 		 * 		 
 		 */
 		int dvdTimeLeft = conveyorBelt.getDVDOvertime(dvdID);
-		if(dvdTimeLeft < 0) {
-			sim.crash();
-		} else if (dvdTimeLeft == 0) {
+		sim.sanityCheck(dvdTimeLeft >= 0);
+		if (dvdTimeLeft == 0) {
 			if(!conveyorBelt.rightBuffer().isFull()) {
-				DVD dvdFromBelt = conveyorBelt.removeDVD();
-				// Error: we cannot have multiple dvd's at the end of the belt.
-				if(dvdFromBelt.id != dvdID) {
-					sim.crash();
-				}
-				
-				conveyorBelt.rightBuffer().addToBuffer(dvdFromBelt);
-				
-				if(conveyorBelt.machineIsEmpty()) {
-					conveyorBelt.setIdle();
-					conveyorBelt.setTimeIdleStarted(timeOfOccurrence);
-				}
+				removeDVDFromBelt(sim);
 				
 				if(conveyorBelt.rightBuffer().isFull()) {
 					MachineStage3 firstMachineStage3 = sim.getMachineStage3(machineNumber);
@@ -137,13 +119,13 @@ public class CBFinished extends MachineXEvent {
 					}
 				}
 			} else {
-				MachineStage3 firstMachineStage3 = sim.getMachineStage3(machineNumber);
-				MachineStage3 secondMachineStage3 = sim.getMachineStage3(3-machineNumber);
-				if(firstMachineStage3.getState() == StateStage3.Idle) {
-					scheduleStage3Step1Event(sim, firstMachineStage3);
+				MachineStage3 nearestMachineStage3 = sim.getMachineStage3(machineNumber);
+				MachineStage3 farthestMachineStage3 = sim.getMachineStage3(3-machineNumber);
+				if(nearestMachineStage3.getState() == StateStage3.Idle) {
+					scheduleStage3Step1Event(sim, nearestMachineStage3);
 				}
-				else if(secondMachineStage3.getState() == StateStage3.Idle) {
-					scheduleStage3Step1Event(sim, secondMachineStage3);
+				else if(farthestMachineStage3.getState() == StateStage3.Idle) {
+					scheduleStage3Step1Event(sim, farthestMachineStage3);
 				} else {
 					conveyorBelt.setBlocked();
 					conveyorBelt.setTimeBlockedStarted(timeOfOccurrence);
@@ -155,12 +137,24 @@ public class CBFinished extends MachineXEvent {
 		}
 	}
 
-	private void scheduleStage3Step1Event(Simulation sim,
-			MachineStage3 machineStage3) {
-		// sanity check: is the machine of stage 3 empty?
-		if(!machineStage3.machineIsEmpty()) {
-			sim.crash();
+	private void removeDVDFromBelt(Simulation sim) {
+		DVD dvdFromBelt = conveyorBelt.removeDVD();
+		// Sanity check: we cannot have multiple dvd's at the end of the belt,
+		// so the dvd at the end needs to be this ddvd.
+		sim.sanityCheck(dvdFromBelt.id == dvdID);
+		
+		conveyorBelt.rightBuffer().addToBuffer(dvdFromBelt);
+		
+		if(conveyorBelt.machineIsEmpty()) {
+			conveyorBelt.setIdle();
+			conveyorBelt.setTimeIdleStarted(timeOfOccurrence);
 		}
+	}
+
+	private void scheduleStage3Step1Event(Simulation sim, MachineStage3 machineStage3) {
+		// sanity check: is the machine of stage 3 empty?
+		sim.sanityCheck(machineStage3.machineIsEmpty());
+	
 		machineStage3.addBatch(conveyorBelt.rightBuffer().emptyBuffer());
 		machineStage3.setRunning();
 		

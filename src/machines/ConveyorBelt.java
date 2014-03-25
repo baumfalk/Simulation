@@ -108,4 +108,9 @@ public class ConveyorBelt extends Machine {
 		return dvdTimeOfEntering.get(dvdID);
 	}
 
+	public int getNumberOfDVDsOnBelt() {
+		// TODO Auto-generated method stub
+		return dvdsInMachine.getNumberOfDVDs();
+	}
+
 }

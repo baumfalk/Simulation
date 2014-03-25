@@ -63,7 +63,7 @@ public class Buffer<T> {
 		return dvdList.size() == 0;
 	}
 	
-	public int currentDVDCount()
+	public int getNumberOfDVDs()
 	{
 		return dvdList.size();
 	}
@@ -86,7 +86,6 @@ public class Buffer<T> {
 	}
 
 	public T peekDVD() {
-		// TODO Auto-generated method stub
 		return dvdList.peek();
 	}
 }

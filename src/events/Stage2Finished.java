@@ -104,11 +104,11 @@ public class Stage2Finished extends MachineXEvent {
 				int processingTime = machineStageTwo.generateProcessingTime();
 				sim.scheduleStage2FinishedEvent(machineNumber, processingTime, scheduledBy());
 				
-				int firstMachineStage1Number = (machineNumber*2)-1;
-				int secondMachineStage1Number = firstMachineStage1Number + 1;
+				int nearestMachineStage1Number = (machineNumber*2)-1;
+				int farthestMachineStage1Number = nearestMachineStage1Number + 1;
 				
-				doIfMachineStage1IsBlocked(sim, firstMachineStage1Number); 
-				doIfMachineStage1IsBlocked(sim, secondMachineStage1Number);
+				doIfMachineStage1IsBlocked(sim, nearestMachineStage1Number); 
+				doIfMachineStage1IsBlocked(sim, farthestMachineStage1Number);
 			}
 		}
 	}

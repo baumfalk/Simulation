@@ -101,10 +101,10 @@ public class Stage1Finished extends MachineXEvent {
 		 * and it did not break down in the meantime. We can do the following
 		 * 
 		 *  1) if the buffer to the right is not full, we can
-		 *  	a) Add the old DVD to the buffer on the right 
-		 *  	b) Schedule a new Stage1FinishedEvent
-		 *  	c) Set the processing time in this machine
-		 *  	d) Take a new DVD and give it to this machine
+		 *  	a) Add the old DVD to the buffer on the right
+		 *  	b) Take a new DVD and give it to this machine 
+		 *  	c) Schedule a new Stage1FinishedEvent
+		 *  	d) Set the processing time in this machine
 		 *  	e) If the machine from stage 2 was idle, we can
 		 *  		i) Give a dvd (the old dvd) from the buffer to the machine in stage 2
 		 *  		ii) Schedule a new Stage2FinishedEvent with time = currentTime 
@@ -122,6 +122,10 @@ public class Stage1Finished extends MachineXEvent {
 			machineStageOne.rightBuffer().addToBuffer(oldDVD);
 			oldDVD = null; // for safety purposes.
 			
+			// Take a new DVD and give it to this machine
+			DVD newDVD = sim.generateNewDVD();
+			machineStageOne.addDVD(newDVD);
+			
 			// Schedule a new Stage1FinishedEvent
 			int processingTimeStage1Machine = machineStageOne.generateProcessingTime();
 			sim.scheduleStage1FinishedEvent(machineNumber, processingTimeStage1Machine, scheduledBy());
@@ -129,20 +133,18 @@ public class Stage1Finished extends MachineXEvent {
 			// Set the processing time in this machine
 			machineStageOne.setProcessingTime(processingTimeStage1Machine);
 			
-			// Take a new DVD and give it to this machine
-			DVD newDVD = sim.generateNewDVD();
-			machineStageOne.addDVD(newDVD);
+			
 			int machineTwoNumber = 1+(machineNumber-1)/2;
 			machineStageTwo = sim.getMachineStage2(machineTwoNumber);
 			
 			if(machineStageTwo.getState() == StateStage2.Idle) {
 				// Give a dvd (the old dvd) from the buffer to the machine in stage 2
-				int processingTimeStage2Machine = machineStageTwo.generateProcessingTime();
-				sim.scheduleStage2FinishedEvent(machineTwoNumber, processingTimeStage2Machine, scheduledBy());
-				
-				// Schedule a new Stage2FinishedEvent with time = currentTime 
 				oldDVD = machineStageOne.rightBuffer().removeFromBuffer();
 				machineStageTwo.addDVD(oldDVD);
+		
+				// Schedule a new Stage2FinishedEvent with time = currentTime 
+				int processingTimeStage2Machine = machineStageTwo.generateProcessingTime();
+				sim.scheduleStage2FinishedEvent(machineTwoNumber, processingTimeStage2Machine, scheduledBy());
 				
 				//Set the state of the machine in stage 2 to Running
 				machineStageTwo.setRunning();

@@ -234,7 +234,7 @@ public class Simulation {
 		for(MachineStage1 m : stageOneMachines) 
 		{
 			// production
-			DVD dvd = new DVD(6, currentTime);
+			DVD dvd = new DVD(++DVDCount, currentTime);
 			m.addDVD(dvd);
 		
 			int processingTime = m.generateProcessingTime();
@@ -291,9 +291,8 @@ public class Simulation {
 
 
 	public void scheduleStage1FinishedEvent(int machineNumber, int processingTime, String scheduledBy) {
-		
 		increaseEventCounter(stage1FinishedCounter,machineNumber);
-		
+		sanityCheck(!getMachineStage1(machineNumber).machineIsEmpty());
 		/*
 		 * Add a new Stage1FinishedEvent to the event queue
 		 */
@@ -331,7 +330,7 @@ public class Simulation {
 
 	public void scheduleStage1RepairedEvent(int machineNumber,int processingTime, String scheduledBy) {
 		increaseEventCounter(stage1RepairedCounter,machineNumber);
-		
+
 		/*
 		 * Add a new Stage1Repaired to the event queue
 		 */
@@ -351,7 +350,7 @@ public class Simulation {
 
 	public void scheduleStage2FinishedEvent(int machineNumber, int processingTime, String scheduledBy) {
 		increaseEventCounter(stage2FinishedCounter,machineNumber);
-		
+		sanityCheck(!getMachineStage2(machineNumber).machineIsEmpty());
 		/*
 		 * Add a new Stage2Finished Event to the event queue
 		 */
@@ -369,7 +368,7 @@ public class Simulation {
 
 	public void scheduleStage3Step1FinishedEvent(int machineNumber, int processingTime, String scheduledBy) {
 		increaseEventCounter(stage3Step1FinishedCounter,machineNumber);
-		
+		sanityCheck(!getMachineStage3(machineNumber).machineIsEmpty());
 		/*
 		 * Add a new Stage3Step1Finished Event to the event queue
 		 */
@@ -386,7 +385,7 @@ public class Simulation {
 	
 	public void scheduleStage3Step2FinishedEvent(int machineNumber, int processingTime, String scheduledBy) {
 		increaseEventCounter(stage3Step2FinishedCounter,machineNumber);
-		
+		sanityCheck(!getMachineStage3(machineNumber).machineIsEmpty());
 		/*
 		 * Add a new Stage3Step1Finished Event to the event queue
 		 */
@@ -403,7 +402,7 @@ public class Simulation {
 	
 	public void scheduleStage3Step3FinishedEvent(int machineNumber, int processingTime, String scheduledBy) {
 		increaseEventCounter(stage3Step3FinishedCounter,machineNumber);
-		
+		sanityCheck(!getMachineStage3(machineNumber).machineIsEmpty());
 		/*
 		 * Add a new Stage3Step1Finished Event to the event queue
 		 */
@@ -420,7 +419,7 @@ public class Simulation {
 	
 	public void scheduleStage4Finished(int machineNumber,int processingTime, String scheduledBy) {
 		increaseEventCounter(stage4FinishedCounter,machineNumber);
-		
+		sanityCheck(!getMachineStage4(machineNumber).machineIsEmpty());
 		/*
 		 * Add a new Stage4Finished Event to the event queue
 		 */
@@ -428,6 +427,8 @@ public class Simulation {
 		int supposedFinishingTime = schedulingTime + processingTime;
 		Event newStage4FinishedEvent = new Stage4Finished(supposedFinishingTime, schedulingTime, machineNumber, scheduledBy);
 		
+		// one dvd printed, so less toner
+		getMachineStage4(machineNumber).decreaseToner();
 		addToEventQueue(newStage4FinishedEvent);
 	}
 
@@ -491,7 +492,11 @@ public class Simulation {
 	}
 
 
-	public void crash() {
+	public void sanityCheck(boolean validity) {
+		if(!validity)
+			crash();
+	}
+	private void crash() {
 		try {
 			throw new Exception();
 		} catch (Exception e) {

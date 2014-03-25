@@ -59,13 +59,12 @@ public class Stage3Step3Finished extends MachineXEvent {
 		 * 	1. If the first machine of stage 4 is Idle (i.e. the crate is empty)
 		 * 		a) Empty this machine into the crate next to the first machine of stage 4
 		 * 		b) Set the state of the first machine of stage 4 to Running
-		 * 		c) Update the statistics concerning idle time of the first machine of stage 4
-		 * 		d) If the cartridge of the first machine of stage 4 needs to be replaced
-		 * 			i) Calculate the time needed for this
-		 * 			ii) Replace cartridge
-		 * 		e) Calculate the processing time for the stage 4 event
-		 * 		f) Schedule a new Stage4Finished event with the processing time and the cartridge renewal time
-		 * 		g) If the first conveyor belt is Blocked
+		 * 		c) Add the first dvd from the crate to the stage 4 machine.
+		 * 		d) Update the statistics concerning idle time of the first machine of stage 4
+		 * 		e) Renew cartridge if necessary and get the delay for this
+		 * 		f) Calculate the processing time for the stage 4 event
+		 * 		g) Schedule a new Stage4Finished event with the processing time and the cartridge renewal time
+		 * 		h) If the first conveyor belt is Blocked
 		 * 			i) Set the first conveyor belt to Running
 		 * 			ii) Calculate the overtime = current time - time that the first conveyor belt got blocked
 		 * 			iii) for all DVD's on the belt
@@ -76,10 +75,10 @@ public class Stage3Step3Finished extends MachineXEvent {
 		 * 					- schedule a ConveyorBeltFinished event for this DVD in overtime seconds.
 		 * 					  The original  ConveyorBeltFinished event already went by, so we need to reschedule
 		 * 				II) else if the time the dvd was put on the belt + processing time > current time
-		 * 					- update the overtime for this DVD on the overtime we calculated by step 1.g.ii .
+		 * 					- update the overtime for this DVD on the overtime we calculated by step 1.h.ii .
 		 * 				
-		 * 		h) If the second conveyor belt is blocked
-		 * 			i) Do the same as step g, but then for the second conveyor belt
+		 * 		i) If the second conveyor belt is blocked
+		 * 			i) Do the same as step h, but then for the second conveyor belt
 		 * 	2. Else if the second machine of stage 4 is Idle (i.e. the crate is empty)
 		 * 		a) Do the same as with step 1, but then for the second machine
 		 * 	3. Else if no machine of stage 4 is Idle
@@ -87,34 +86,31 @@ public class Stage3Step3Finished extends MachineXEvent {
 		 * 		b) Set the blocked time for the machine
 		 */
 		
-		MachineStage4 firstMachineStageFour = sim.getMachineStage4(machineNumber);
-		MachineStage4 secondMachineStageFour = sim.getMachineStage4(3-machineNumber);
-		ConveyorBelt firstConveyorBelt = sim.getConveyorBelt(machineNumber);
-		ConveyorBelt secondConveyorBelt = sim.getConveyorBelt(3-machineNumber);
-		if(firstMachineStageFour.getState() == StateStage4.Idle) {
-			scheduleStage4Event(sim, firstMachineStageFour);
+		MachineStage4 nearestMachineStageFour = sim.getMachineStage4(machineNumber);
+		MachineStage4 farthestMachineStageFour = sim.getMachineStage4(3-machineNumber);
+		ConveyorBelt nearestConveyorBelt = sim.getConveyorBelt(machineNumber);
+		ConveyorBelt farthestConveyorBelt = sim.getConveyorBelt(3-machineNumber);
+		if(nearestMachineStageFour.getState() == StateStage4.Idle) {
+			scheduleStage4Event(sim, nearestMachineStageFour);
 			
-			scheduleCBEventIfCBIdle(sim, firstConveyorBelt);
-			scheduleCBEventIfCBIdle(sim, secondConveyorBelt);
+			scheduleCBEventIfCBIdle(sim, nearestConveyorBelt);
+			scheduleCBEventIfCBIdle(sim, farthestConveyorBelt);
 
-		} else if(secondMachineStageFour.getState() == StateStage4.Idle) {
-			scheduleStage4Event(sim, secondMachineStageFour);
+		} else if(farthestMachineStageFour.getState() == StateStage4.Idle) {
+			scheduleStage4Event(sim, farthestMachineStageFour);
 			
-			scheduleCBEventIfCBIdle(sim, firstConveyorBelt);
-			scheduleCBEventIfCBIdle(sim, secondConveyorBelt);
+			scheduleCBEventIfCBIdle(sim, nearestConveyorBelt);
+			scheduleCBEventIfCBIdle(sim, farthestConveyorBelt);
 		} else {
 			machineStageThree.setBlocked();
 			machineStageThree.setTimeBlockedStarted(timeOfOccurrence);
 		}
 	}
 
-	private void scheduleCBEventIfCBIdle(Simulation sim,
-			ConveyorBelt conveyorBelt) {
+	private void scheduleCBEventIfCBIdle(Simulation sim,ConveyorBelt conveyorBelt) {
 		if(conveyorBelt.getState() == StateConveyorBelt.Idle) {
 			// sanity check: belt empty
-			if(!conveyorBelt.machineIsEmpty()) {
-				sim.crash();
-			}
+			sim.sanityCheck(conveyorBelt.machineIsEmpty());
 			
 			conveyorBelt.setRunning();
 			int overtime = timeOfOccurrence - conveyorBelt.getBlockedTime();
@@ -133,32 +129,30 @@ public class Stage3Step3Finished extends MachineXEvent {
 
 	private void scheduleStage4Event(Simulation sim, MachineStage4 machineStageFour) {
 		// sanity check: the buffer has to be empty
-		if(!machineStageFour.leftBuffer().isEmpty()) {
-			sim.crash();
-		}
+		sim.sanityCheck(machineStageFour.leftBuffer().isEmpty()) ;
+		
 		ArrayList<DVD> outputFromMachine = machineStageThree.removeBatch();
 		
 		machineStageFour.leftBuffer().addBatchToBuffer(outputFromMachine);
 		
 		// sanity check: the buffer is now full
-		if(!machineStageFour.leftBuffer().isFull()) {
-			sim.crash();
-		}
+		sim.sanityCheck(machineStageFour.leftBuffer().isFull());
 
 		machineStageFour.setRunning();
+		
+		machineStageFour.addDVD(machineStageFour.leftBuffer().removeFromBuffer());
 		
 		// Update statistics on idle time of stage 4 machine
 		int totalIdleTime = timeOfOccurrence-machineStageFour.getIdleTime();
 		sim.statistics.addToStatistic("Stage 4 Machine "+ machineStageFour.machineNumber + " idle time", totalIdleTime);
 		
-		int delay = 0;
-		if(machineStageFour.cartridgeIsEmpty()) {
-			delay = machineStageFour.generateCartridgeRenewalTime();
-			machineStageFour.renewCartridge();
-		}
+		int delay = machineStageFour.renewCartridgeIfNecessary();
 		int processingTimeStageFour = machineStageFour.generateProcessingTime() + delay;
+
 		sim.scheduleStage4Finished(machineStageFour.machineNumber, processingTimeStageFour, scheduledBy());
 	}
+
+	
 	
 	private void invalidState() {
 		try {
