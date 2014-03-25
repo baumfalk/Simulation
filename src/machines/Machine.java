@@ -43,22 +43,22 @@ public abstract class Machine {
 	
 	public DVDBuffer leftBuffer(int i)
 	{
-		return this.leftBuffers.get(i);
+		return this.leftBuffers.get(i-1);
 	}
 	
 	public DVDBuffer rightBuffer(int i)
 	{
-		return this.rightBuffers.get(i);
+		return this.rightBuffers.get(i-1);
 	}
 	
 	public DVDBuffer leftBuffer()
 	{
-		return this.leftBuffer(0);
+		return this.leftBuffer(1);
 	}
 	
 	public DVDBuffer rightBuffer()
 	{
-		return this.rightBuffer(0);
+		return this.rightBuffer(1);
 	}
 	
 	public abstract int generateProcessingTime();

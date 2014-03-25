@@ -19,7 +19,6 @@ public class MachineStage1 extends Machine {
 	
 	public boolean eventScheduled;
 	private int processingTime;
-	private int blockStarted;
 	private int timeOfBreakdown;
 	
 	public MachineStage1(int machineNumber,DVDBuffer rightBuffer) {

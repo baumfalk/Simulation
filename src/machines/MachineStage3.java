@@ -2,15 +2,14 @@ package machines;
 
 import java.util.ArrayList;
 
+import misc.DVD;
+
 import org.apache.commons.math3.distribution.ExponentialDistribution;
 import org.apache.commons.math3.distribution.UniformRealDistribution;
 
-import exceptions.InvalidStateException;
-
-import misc.DVD;
-import states.StateStage2;
 import states.StateStage3;
 import buffer.DVDBuffer;
+import exceptions.InvalidStateException;
 
 public class MachineStage3 extends Machine {
 

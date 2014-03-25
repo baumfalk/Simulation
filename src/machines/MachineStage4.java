@@ -7,6 +7,7 @@ import org.apache.commons.math3.distribution.UniformRealDistribution;
 
 import states.StateStage4;
 import buffer.DVDBuffer;
+import exceptions.InvalidStateException;
 
 public class MachineStage4 extends Machine {
 
@@ -19,9 +20,9 @@ public class MachineStage4 extends Machine {
 		dist = new UniformRealDistribution(20, 30);
 	}
 	
-	public int dvdLeft()
+	public boolean cartridgeIsEmpty()
 	{
-		return dvdsLeft;
+		return dvdsLeft == 0;
 	}
 	
 	public void decreaseDVDsLeft()
@@ -30,7 +31,7 @@ public class MachineStage4 extends Machine {
 	}
 	
 	
-	public void generateCartridgeRenewal() {
+	public void renewCartridge() {
 		dvdsLeft = 200; // todo fix this
 	}
 	
@@ -43,4 +44,35 @@ public class MachineStage4 extends Machine {
 		return (int) Math.round(dist.sample());
 	}
 
+	public StateStage4 getState() {
+		return state;
+	}
+
+	public void setRunning() {
+		if(state == StateStage4.Idle)
+			state = StateStage4.Running;
+		else {
+			try {
+				throw new InvalidStateException();
+			} catch (InvalidStateException e) {
+				e.printStackTrace();
+				System.out.println("\t Cannot change the state of a machine of stage 4 to Running with the state " + state);
+				System.exit(1);
+			}
+		}
+	}
+
+	public void setIdle() {
+		if(state == StateStage4.Running)
+			state = StateStage4.Idle;
+		else {
+			try {
+				throw new InvalidStateException();
+			} catch (InvalidStateException e) {
+				e.printStackTrace();
+				System.out.println("\t Cannot change the state of a machine of stage 4 to Idle with the state " + state);
+				System.exit(1);
+			}
+		}
+	}
 }

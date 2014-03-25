@@ -22,6 +22,7 @@ import events.Stage2Finished;
 import events.Stage3Step1Finished;
 import events.Stage3Step2Finished;
 import events.Stage3Step3Finished;
+import events.Stage4Finished;
 import exceptions.EventAlreadyInQueueException;
 import exceptions.InvalidTimeError;
 
@@ -417,6 +418,23 @@ public class Simulation {
 		decreaseEventCounter(stage3Step3FinishedCounter,machineNumber);
 	}
 	
+	public void scheduleStage4Finished(int machineNumber,int processingTime, String scheduledBy) {
+		increaseEventCounter(stage4FinishedCounter,machineNumber);
+		
+		/*
+		 * Add a new Stage4Finished Event to the event queue
+		 */
+		int schedulingTime = currentTime;
+		int supposedFinishingTime = schedulingTime + processingTime;
+		Event newStage4FinishedEvent = new Stage4Finished(supposedFinishingTime, schedulingTime, machineNumber, scheduledBy);
+		
+		addToEventQueue(newStage4FinishedEvent);
+	}
+
+	public void decreaseStage4FinishedEventCounter(int machineNumber) {
+		decreaseEventCounter(stage4FinishedCounter,machineNumber);
+	}
+
 	private void increaseEventCounter(int[] counter, int machineNumber) {
 		if(counter[machineNumber-1]!= 0) {
 			try {
