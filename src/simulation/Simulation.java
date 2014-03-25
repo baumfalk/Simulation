@@ -62,7 +62,7 @@ public class Simulation {
 	private int[] stage3Step3FinishedCounter;
 	private int[] stage4FinishedCounter;
 
-	private static int DVDCount = 0;
+	public static int DVDCount = 0;
 	
 	public static void main(String [] args) {
 		if (args.length < 3) {
@@ -234,7 +234,7 @@ public class Simulation {
 		for(MachineStage1 m : stageOneMachines) 
 		{
 			// production
-			DVD dvd = new DVD(++DVDCount, currentTime);
+			DVD dvd = generateNewDVD();
 			m.addDVD(dvd);
 		
 			int processingTime = m.generateProcessingTime();

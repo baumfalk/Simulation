@@ -94,18 +94,10 @@ public class Stage4Finished extends MachineXEvent {
 			int totalIdleTime = timeOfOccurrence-machineStageThree.getIdleTime();
 			sim.statistics.addToStatistic("Stage 3 Machine "+ machineStageFour.machineNumber + " blocked time", totalIdleTime);
 			
-			sim.scheduleStage3Step3FinishedEvent(machineNumber, 0, scheduledBy());
+			sim.scheduleStage3Step3FinishedEvent(machineStageThree.machineNumber, 0, scheduledBy());
 		}
 	}
 
-	
-	private void updateStatistics(Simulation sim) {
-		if(dvd !=null) {
-			sim.statistics.addToStatistic("Total DVDs processed", 1);
-			sim.statistics.updateAverage("Throughput time per DVD",timeOfOccurrence-dvd.timeOfEnteringPipeLine);
-		}
-	}
-	
 	private void invalidState() {
 		try {
 			throw new InvalidStateException();

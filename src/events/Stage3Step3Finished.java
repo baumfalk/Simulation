@@ -3,11 +3,13 @@ package events;
 import java.util.ArrayList;
 
 import machines.ConveyorBelt;
+import machines.MachineStage2;
 import machines.MachineStage3;
 import machines.MachineStage4;
 import misc.DVD;
 import simulation.Simulation;
 import states.StateConveyorBelt;
+import states.StateStage2;
 import states.StateStage4;
 import exceptions.InvalidStateException;
 
@@ -56,69 +58,110 @@ public class Stage3Step3Finished extends MachineXEvent {
 	private void executeRunningCase(Simulation sim) {
 		/*
 		 * We finished a whole batch of DVD's We need to do the following
-		 * 	1. If the first machine of stage 4 is Idle (i.e. the crate is empty)
-		 * 		a) Empty this machine into the crate next to the first machine of stage 4
-		 * 		b) Set the state of the first machine of stage 4 to Running
-		 * 		c) Add the first dvd from the crate to the stage 4 machine.
-		 * 		d) Update the statistics concerning idle time of the first machine of stage 4
+		 * 	1. If the nearest machine of stage 4 is Idle (i.e. the crate is empty)
+		 * 		a) Empty this machine into the crate next to the nearest machine of stage 4
+		 * 		b) Set the state of the nearest machine of stage 4 to Running
+		 * 		c) Add the nearest dvd from the crate to the stage 4 machine.
+		 * 		d) Update the statistics concerning idle time of the nearest machine of stage 4
 		 * 		e) Renew cartridge if necessary and get the delay for this
 		 * 		f) Calculate the processing time for the stage 4 event
 		 * 		g) Schedule a new Stage4Finished event with the processing time and the cartridge renewal time
-		 * 		h) If the first conveyor belt is Blocked
-		 * 			i) Set the first conveyor belt to Running
-		 * 			ii) Calculate the overtime = current time - time that the first conveyor belt got blocked
-		 * 			iii) for all DVD's on the belt
-		 * 				I) if the time the dvd was put on the belt + processing time <= current time
-		 *  				(note that we can use <= and not just <, since we force in our event ordering that CBFinished events
-		 *  				 that happen on the same time as Stage3Step3Finished events are always executed
-		 *  				 before the Stage3Step3Finished events)
-		 * 					- schedule a ConveyorBeltFinished event for this DVD in overtime seconds.
-		 * 					  The original  ConveyorBeltFinished event already went by, so we need to reschedule
-		 * 				II) else if the time the dvd was put on the belt + processing time > current time
-		 * 					- update the overtime for this DVD on the overtime we calculated by step 1.h.ii .
+		 * 		
+		 * 		h) If the nearest left buffer is full
+		 * 			i) Empty the buffer into this machine
+		 * 			ii) Schedule a new Stage3Step1FinishedEvent
+		 * 			iii) If the nearest conveyor belt is Blocked
+		 * 				I) Set the nearest conveyor belt to Running
+		 * 				II) Calculate the overtime = current time - time that the nearest conveyor belt got blocked
+		 * 				III) for all DVD's on the belt
+		 * 					- if the time the dvd was put on the belt + processing time <= current time
+		 *  				  (note that we can use <= and not just <, since we force in our event ordering that CBFinished events
+		 *  				  that happen on the same time as Stage3Step3Finished events are always executed
+		 *  				  before the Stage3Step3Finished events)
+		 * 						* schedule a ConveyorBeltFinished event for this DVD in overtime seconds.
+		 * 					  	  The original  ConveyorBeltFinished event already went by, so we need to reschedule
+		 * 					- else if the time the dvd was put on the belt + processing time > current time
+		 * 						* update the overtime for this DVD on the overtime we calculated by step 1.h.ii .
 		 * 				
-		 * 		i) If the second conveyor belt is blocked
-		 * 			i) Do the same as step h, but then for the second conveyor belt
-		 * 	2. Else if the second machine of stage 4 is Idle (i.e. the crate is empty)
-		 * 		a) Do the same as with step 1, but then for the second machine
+		 * 		l) Else if the farthest left buffer is full
+		 * 			i) Do the the same thing as with j, but then for the farthest buffer.
+		 * 		m) If both buffers are empty
+		 * 			i) Set the machine on Idle
+		 * 			ii) Update the idle time for this machine
+		 * 	2. Else if the farthest machine of stage 4 is Idle (i.e. the crate is empty)
+		 * 		a) Do the same as with step 1, but then for the farthest machine
 		 * 	3. Else if no machine of stage 4 is Idle
 		 * 		a) Set this machine to Blocked
 		 * 		b) Set the blocked time for the machine
 		 */
 		
-		MachineStage4 nearestMachineStageFour = sim.getMachineStage4(machineNumber);
-		MachineStage4 farthestMachineStageFour = sim.getMachineStage4(3-machineNumber);
-		ConveyorBelt nearestConveyorBelt = sim.getConveyorBelt(machineNumber);
-		ConveyorBelt farthestConveyorBelt = sim.getConveyorBelt(3-machineNumber);
+		int nearestNumber = machineNumber;
+		int farthestNumber = 3 - machineNumber;
+		MachineStage4 nearestMachineStageFour = sim.getMachineStage4(nearestNumber);
+		MachineStage4 farthestMachineStageFour = sim.getMachineStage4(farthestNumber);
+	
+		
 		if(nearestMachineStageFour.getState() == StateStage4.Idle) {
 			scheduleStage4Event(sim, nearestMachineStageFour);
 			
-			scheduleCBEventIfCBIdle(sim, nearestConveyorBelt);
-			scheduleCBEventIfCBIdle(sim, farthestConveyorBelt);
+			handleFullLeftBuffer(sim, nearestNumber, farthestNumber);
+			
 
 		} else if(farthestMachineStageFour.getState() == StateStage4.Idle) {
 			scheduleStage4Event(sim, farthestMachineStageFour);
 			
-			scheduleCBEventIfCBIdle(sim, nearestConveyorBelt);
-			scheduleCBEventIfCBIdle(sim, farthestConveyorBelt);
+			handleFullLeftBuffer(sim, nearestNumber, farthestNumber);
 		} else {
 			machineStageThree.setBlocked();
 			machineStageThree.setTimeBlockedStarted(timeOfOccurrence);
 		}
 	}
 
-	private void scheduleCBEventIfCBIdle(Simulation sim,ConveyorBelt conveyorBelt) {
-		if(conveyorBelt.getState() == StateConveyorBelt.Idle) {
-			// sanity check: belt empty
-			sim.sanityCheck(conveyorBelt.machineIsEmpty());
-			
+	private void handleFullLeftBuffer(Simulation sim, int nearestNumber,
+			int farthestNumber) {
+		if(machineStageThree.leftBuffer(nearestNumber).isFull()) {
+			scheduleStageThreeStepOneEvent(sim, nearestNumber);
+		} else if(machineStageThree.leftBuffer(farthestNumber).isFull()) {
+			scheduleStageThreeStepOneEvent(sim, farthestNumber);
+		} else {
+			machineStageThree.setIdle();
+			machineStageThree.setTimeIdleStarted(timeOfOccurrence);
+		}
+	}
+
+	private void scheduleStageThreeStepOneEvent(Simulation sim,	int nearestNumber) {
+		machineStageThree.addBatch(machineStageThree.leftBuffer(nearestNumber).emptyBuffer());
+		
+		int processingTime = machineStageThree.generateProcessingTimeStep1();
+		sim.scheduleStage3Step1FinishedEvent(machineNumber, processingTime, scheduledBy());
+		ConveyorBelt nearestConveyorBelt = sim.getConveyorBelt(nearestNumber);
+		scheduleCBEventIfCBBlocked(sim, nearestConveyorBelt);
+	}
+
+	private void scheduleCBEventIfCBBlocked(Simulation sim,ConveyorBelt conveyorBelt) {
+		if(conveyorBelt.getState() == StateConveyorBelt.Blocked) {
+			MachineStage2 machineStageTwo = sim.getMachineStage2(conveyorBelt.machineNumber);
+			// sanity check: belt not empty
+			sim.sanityCheck(!conveyorBelt.machineIsEmpty());
+			sim.sanityCheck(machineStageTwo.getState() == StateStage2.Blocked );
 			conveyorBelt.setRunning();
+			
+			// Update statistics on idle time of the conveyor belt
+			int totalBlockedTimeConveyorBelt = timeOfOccurrence-conveyorBelt.getBlockedTime();
+			sim.statistics.addToStatistic("Conveyor Belt Machine "+ conveyorBelt.machineNumber + " blocked time", totalBlockedTimeConveyorBelt);
+			
+			
+			int totalBlockedTimeStage2 = timeOfOccurrence-machineStageTwo.getBlockedTime();
+			sim.statistics.addToStatistic("Stage2 Machine "+ machineStageTwo.machineNumber + " blocked time", totalBlockedTimeStage2);
+			
+			machineStageTwo.setRunning();
+			sim.scheduleStage2FinishedEvent(conveyorBelt.machineNumber, 0, scheduledBy());
 			int overtime = timeOfOccurrence - conveyorBelt.getBlockedTime();
 			
 			for(DVD dvd : conveyorBelt.getDVDsOnBelt()) {
 				int dvdOfBeltTime = conveyorBelt.getDVDTimeOfEnteringBelt(dvd.id) + conveyorBelt.generateProcessingTime();
 				if(dvdOfBeltTime <= timeOfOccurrence) {
-					sim.scheduleCBFinishedEvent(machineNumber, overtime, dvd.id, scheduledBy());
+					sim.scheduleCBFinishedEvent(conveyorBelt.machineNumber, overtime, dvd.id, scheduledBy());
 				} else {
 					int newOvertime = conveyorBelt.getDVDOvertime(dvd.id) + overtime; 
 					conveyorBelt.setDVDOvertime(dvd.id, newOvertime);

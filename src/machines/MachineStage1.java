@@ -33,7 +33,7 @@ public class MachineStage1 extends Machine {
 	@Override
 	public int generateProcessingTime() {
 		// TODO Randomize
-		return (int) Math.round(dist.sample());
+		return 1;//(int) Math.round(dist.sample());
 	}
 	
 	public int generateBreakDownTime()
@@ -48,7 +48,7 @@ public class MachineStage1 extends Machine {
 
 
 	public void setBroken() {
-		if(state == StateStage1.Running || state == StateStage1.BrokenAndRepaired)
+		if(state == StateStage1.Running || state == StateStage1.Blocked ||  state == StateStage1.BrokenAndRepaired)
 			state = StateStage1.Broken;
 		else {
 			try {

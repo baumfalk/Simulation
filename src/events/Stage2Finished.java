@@ -92,7 +92,7 @@ public class Stage2Finished extends MachineXEvent {
 			}
 			DVD oldDVD = machineStageTwo.removeDVD();
 			conveyorBelt.addDVD(oldDVD, timeOfOccurrence);
-			sim.scheduleCBFinishedEvent(machineNumber, conveyorBelt.generateProcessingTime(), oldDVD.id, scheduledBy());
+			sim.scheduleCBFinishedEvent(conveyorBelt.machineNumber, conveyorBelt.generateProcessingTime(), oldDVD.id, scheduledBy());
 			
 			if(machineStageTwo.leftBuffer().isEmpty()) {
 				machineStageTwo.setIdle();

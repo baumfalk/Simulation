@@ -24,6 +24,7 @@ import machines.MachineStage1;
 import machines.MachineStage2;
 import machines.MachineStage3;
 import machines.MachineStage4;
+import javax.swing.JTextArea;
 
 public class SimulationGUI {
 
@@ -46,6 +47,7 @@ public class SimulationGUI {
 	private ActionListener listener;
 	private JLabel lblTime;
 	private JButton btnPause;
+	private JTextArea txtHours;
 	
 	/**
 	 * Launch the application.
@@ -152,7 +154,7 @@ public class SimulationGUI {
 	private void initButtons() {
 		
 		lblTime = new JLabel("Time:");
-		lblTime.setBounds(853, 15, 112, 14);
+		lblTime.setBounds(925, 15, 112, 14);
 		frmDvdFactorySimulation.getContentPane().add(lblTime);
 		listener = new ActionListener() {
 		    @Override 
@@ -194,7 +196,8 @@ public class SimulationGUI {
 		btnStart.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				simulation = new Simulation(2*60*60, 20, 20);
+				int numberOfHours = Integer.parseInt(txtHours.getText());
+				simulation = new Simulation(numberOfHours*60*60, 20, 20);
 				updateGUI();
 				timer.start();
 				btnPause.setText("Pause");
@@ -211,7 +214,8 @@ public class SimulationGUI {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				if(simulation == null) {
-					simulation = new Simulation(2*60*60, 20, 20);
+					int numberOfHours = Integer.parseInt(txtHours.getText());
+					simulation = new Simulation(numberOfHours*60*60, 20, 20);
 					updateGUI();
 				} else {
 					nextSimulationState();
@@ -263,6 +267,9 @@ public class SimulationGUI {
 		lblState.setBounds(752, 15, 35, 14);
 		frmDvdFactorySimulation.getContentPane().add(lblState);
 		
+		txtHours = new JTextArea("1");
+		txtHours.setBounds(853, 10, 60, 14);
+		frmDvdFactorySimulation.getContentPane().add(txtHours);
 	
 	}
 	
@@ -386,8 +393,10 @@ public class SimulationGUI {
 	
 	private void setTimerTime(int time) {
 		timer.setDelay(time);
-		timer.restart();
-		if(!btnPause.getText().equals("Pause"))
-			timer.stop();
+		if(timer.isRunning()) {
+			timer.restart();
+			if(!btnPause.getText().equals("Pause"))
+				timer.stop();
+		}
 	}
 }

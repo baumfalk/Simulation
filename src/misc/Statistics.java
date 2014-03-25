@@ -28,11 +28,11 @@ public class Statistics {
 		float newAverage = f;
 		String type = "";
 		if(stats.get(s) != null) {
-			f += getStatistic(s).first; 
-			s = getStatistic(s).third;
+			newAverage += getStatistic(s).first; 
+			type = getStatistic(s).third;
 		}
 		
-		updateStatistic(s, newAverage,0,s);
+		updateStatistic(s, newAverage,0,type);
 	}
 	
 	public void updateStatistic(String s, Float f, int i, String type)

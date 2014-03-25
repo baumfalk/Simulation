@@ -74,24 +74,21 @@ public class CBFinished extends MachineXEvent {
 		 * 				I) Set the conveyor belt state to Idle
 		 * 				II) Set the idleTime for the conveyor belt
 		 * 			iv) If the buffer is now full
-		 * 				I) If the first machine from stage 3 is idle
-		 * 					- Empty the buffer into the first machine from stage 3
-		 * 					- Set the first machine from stage 3 to Running
+		 * 				I) If the nearest machine from stage 3 is idle
+		 * 					- Empty the buffer into the nearest machine from stage 3
+		 * 					- Set the nearest machine from stage 3 to Running
 		 * 					- Schedule new Stage3Step1FinishedEvent
 		 * 					- Update statistics on idle time of the stage 3 machine
-		 * 				II) If the second machine from stage 3 is idle
-		 * 					- Empty the buffer into the second machine from stage 3
-		 * 					- Set the second machine from stage 3 to Running
-		 * 					- Schedule new Stage3Step1FinishedEvent
-		 * 					- Update statistics on idle time of the second stage 3 machine
+		 * 				II) If the farthest machine from stage 3 is idle
+		 * 					- do the same as I) but then for the farthest machine.
 		 * 		b) If the buffer to the right is full
-		 * 			i) If the first machine from stage 3 is idle
-		 * 				I) Empty the whole buffer into the first machine from stage 3
-		 * 				II) Set the first machine from stage 3 to Running
+		 * 			i) If the nearest machine from stage 3 is idle
+		 * 				I) Empty the whole buffer into the nearest machine from stage 3
+		 * 				II) Set the nearest machine from stage 3 to Running
 		 * 				III) Schedule new Stage3Step1FinishedEvent
 		 * 				IV) Update statistics on idle time of the stage 3 machine
-		 * 			ii) Else if the second machine from stage 3 is idle
-		 * 				I) do the same as with i), but then for the second machine.
+		 * 			ii) Else if the farthest machine from stage 3 is idle
+		 * 				I) do the same as with i), but then for the farthest machine.
 		 * 			iii) If both machines are busy
 		 * 				I) Set the conveyor belt state to Blocked
 		 * 				II) Set the blockedTime for the conveyor belt.
@@ -109,13 +106,13 @@ public class CBFinished extends MachineXEvent {
 				removeDVDFromBelt(sim);
 				
 				if(conveyorBelt.rightBuffer().isFull()) {
-					MachineStage3 firstMachineStage3 = sim.getMachineStage3(machineNumber);
-					MachineStage3 secondMachineStage3 = sim.getMachineStage3(3-machineNumber);
-					if(firstMachineStage3.getState() == StateStage3.Idle) {
-						scheduleStage3Step1Event(sim, firstMachineStage3);
+					MachineStage3 nearestMachineStage3 = sim.getMachineStage3(machineNumber);
+					MachineStage3 farthestMachineStage3 = sim.getMachineStage3(3-machineNumber);
+					if(nearestMachineStage3.getState() == StateStage3.Idle) {
+						scheduleStage3Step1Event(sim, nearestMachineStage3);
 					}
-					else if(secondMachineStage3.getState() == StateStage3.Idle) {
-						scheduleStage3Step1Event(sim, secondMachineStage3);
+					else if(farthestMachineStage3.getState() == StateStage3.Idle) {
+						scheduleStage3Step1Event(sim, farthestMachineStage3);
 					}
 				}
 			} else {
@@ -159,7 +156,7 @@ public class CBFinished extends MachineXEvent {
 		machineStage3.setRunning();
 		
 		int processingTimeStage3Step1Machine = machineStage3.generateProcessingTimeStep1();
-		sim.scheduleStage3Step1FinishedEvent(machineNumber,processingTimeStage3Step1Machine,scheduledBy());
+		sim.scheduleStage3Step1FinishedEvent(machineStage3.machineNumber,processingTimeStage3Step1Machine,scheduledBy());
 		
 		// Update statistics on idle time of stage 3 machine
 		int totalIdleTime = timeOfOccurrence-machineStage3.getIdleTime();
@@ -178,5 +175,10 @@ public class CBFinished extends MachineXEvent {
 			System.out.println("\t It was scheduled at " + this.getTimeOfScheduling());
 			System.exit(1);
 		}
+	}
+	
+	@Override
+	public String scheduledBy() {
+		return super.scheduledBy() + " dvd: " + dvdID;
 	}
 }
