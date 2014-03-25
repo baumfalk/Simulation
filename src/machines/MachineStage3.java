@@ -62,7 +62,7 @@ public class MachineStage3 extends Machine {
 	}
 	
 	public int generateRepairTime() {
-		return 5*60;
+		return 5*60;//TODO: randomize
 	}
 	
 	public int generateProcessingTimeStep3() {
@@ -71,9 +71,7 @@ public class MachineStage3 extends Machine {
 	
 	public void addBatch(ArrayList<DVD> batch) {
 		
-		System.out.println(this.dvdsInMachine.currentDVDCount());
 		this.dvdsInMachine.addBatchToBuffer(batch);
-		System.out.println("\t added batch to stage 3 machine " + machineNumber);
 	}
 	
 	public ArrayList<DVD> peekBatch()
@@ -81,14 +79,11 @@ public class MachineStage3 extends Machine {
 		return this.dvdsInMachine.peekBuffer();
 	}
 	
-	
-	
 	public ArrayList<DVD> removeBatch() {
 		return this.dvdsInMachine.emptyBuffer();
 	}
 
 	public StateStage3 getState() {
-		// TODO Auto-generated method stub
 		return state;
 	}
 

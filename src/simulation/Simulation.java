@@ -19,6 +19,9 @@ import events.Stage1Breakdown;
 import events.Stage1Finished;
 import events.Stage1Repaired;
 import events.Stage2Finished;
+import events.Stage3Step1Finished;
+import events.Stage3Step2Finished;
+import events.Stage3Step3Finished;
 import exceptions.EventAlreadyInQueueException;
 import exceptions.InvalidTimeError;
 
@@ -47,6 +50,7 @@ public class Simulation {
 	private ArrayList<ConveyorBelt> conveyorBelts;
 	private ArrayList<MachineStage3> stageThreeMachines;
 	private ArrayList<MachineStage4> stageFourMachines;
+	
 	private int[] stage1FinishedCounter;
 	private int[] stage1BreakdownCounter;
 	private int[] stage1RepairedCounter;
@@ -57,7 +61,6 @@ public class Simulation {
 	private int[] stage3Step3FinishedCounter;
 	private int[] stage4FinishedCounter;
 
-	public static int hours = 24*60*60;
 	private static int DVDCount = 0;
 	
 	public static void main(String [] args) {
@@ -68,7 +71,7 @@ public class Simulation {
 		int runTime = Integer.parseInt(args[0]);
 		int maxBufferSize = Integer.parseInt(args[1]);
 		int batchSize = Integer.parseInt(args[2]);
-		runTime =60*60*24*30*6;
+
 		System.out.println("Starting a simulation with");
 		System.out.println("\t running time: " + runTime);
 		System.out.println("\t maximum buffer size: " + maxBufferSize);
@@ -363,6 +366,57 @@ public class Simulation {
 		decreaseEventCounter(stage2FinishedCounter,machineNumber);
 	}
 
+	public void scheduleStage3Step1FinishedEvent(int machineNumber, int processingTime, String scheduledBy) {
+		increaseEventCounter(stage3Step1FinishedCounter,machineNumber);
+		
+		/*
+		 * Add a new Stage3Step1Finished Event to the event queue
+		 */
+		int schedulingTime = currentTime;
+		int supposedFinishingTime = schedulingTime + processingTime;
+		Event newStage3Step1FinishedEvent = new Stage3Step1Finished(supposedFinishingTime, schedulingTime, machineNumber, scheduledBy);
+		
+		addToEventQueue(newStage3Step1FinishedEvent);
+	}
+
+	public void decreaseStage3Step1FinishedEventCounter(int machineNumber) {
+		decreaseEventCounter(stage3Step1FinishedCounter,machineNumber);
+	}
+	
+	public void scheduleStage3Step2FinishedEvent(int machineNumber, int processingTime, String scheduledBy) {
+		increaseEventCounter(stage3Step2FinishedCounter,machineNumber);
+		
+		/*
+		 * Add a new Stage3Step1Finished Event to the event queue
+		 */
+		int schedulingTime = currentTime;
+		int supposedFinishingTime = schedulingTime + processingTime;
+		Event newStage3Step2FinishedEvent = new Stage3Step2Finished(supposedFinishingTime, schedulingTime, machineNumber, scheduledBy);
+		
+		addToEventQueue(newStage3Step2FinishedEvent);
+	}
+
+	public void decreaseStage3Step2FinishedEventCounter(int machineNumber) {
+		decreaseEventCounter(stage3Step2FinishedCounter,machineNumber);
+	}
+	
+	public void scheduleStage3Step3FinishedEvent(int machineNumber, int processingTime, String scheduledBy) {
+		increaseEventCounter(stage3Step3FinishedCounter,machineNumber);
+		
+		/*
+		 * Add a new Stage3Step1Finished Event to the event queue
+		 */
+		int schedulingTime = currentTime;
+		int supposedFinishingTime = schedulingTime + processingTime;
+		Event newStage3Step3FinishedEvent = new Stage3Step3Finished(supposedFinishingTime, schedulingTime, machineNumber, scheduledBy);
+		
+		addToEventQueue(newStage3Step3FinishedEvent);
+	}
+
+	public void decreaseStage3Step3FinishedEventCounter(int machineNumber) {
+		decreaseEventCounter(stage3Step3FinishedCounter,machineNumber);
+	}
+	
 	private void increaseEventCounter(int[] counter, int machineNumber) {
 		if(counter[machineNumber-1]!= 0) {
 			try {
@@ -384,6 +438,10 @@ public class Simulation {
 
 
 	public void scheduleCBFinishedEvent(int machineNumber, int processingTime, int dvdID, String scheduledBy) {
+		// add if needed
+		if(conveyorBeltFinishedCounter.get(machineNumber-1).get(dvdID) == null) {
+			conveyorBeltFinishedCounter.get(machineNumber-1).put(dvdID,0);
+		}
 		if(conveyorBeltFinishedCounter.get(machineNumber-1).get(dvdID)!=0) {
 			try {
 				throw new EventAlreadyInQueueException();

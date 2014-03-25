@@ -109,6 +109,12 @@ public class ConveyorBelt extends Machine {
 		// TODO Auto-generated method stub
 		return dvdOvertimeLeft.get(dvdID);
 	}
+	
+	public void setDVDOvertime(int dvdID, int newValue) {
+		dvdOvertimeLeft.put(dvdID, newValue);
+
+	}
+
 
 
 }

@@ -30,11 +30,24 @@ public abstract class Event implements Comparable<Event> {
 	
 	@Override
 	public int compareTo(Event event) {
+	
 		int output = 0;
 		if(this.getTimeOfOccurrence() < event.getTimeOfOccurrence())
 			output = -1;
-		else if(this.getTimeOfOccurrence() == event.getTimeOfOccurrence())
-			output = 0;
+		else if(this.getTimeOfOccurrence() == event.getTimeOfOccurrence()) {
+			/*
+			 *  compare CBFinished to Stage3Step3Finished.
+			 *  this is because we always want all CBFinished for the same time as as stage3step3
+			 *  to occur before the Stage3Step3Finished, since else we need to look into the future.
+			 */
+			if (this instanceof CBFinished && event instanceof Stage3Step3Finished) {
+				output = -1;
+			} else if (this instanceof Stage3Step3Finished && event instanceof CBFinished) {
+				output = 1;
+			}
+			else
+				output = 0;
+		}
 		else output = 1;
 		return output;
 	}

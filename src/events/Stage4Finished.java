@@ -57,17 +57,7 @@ public class Stage4Finished extends MachineXEvent {
 		updateStatistics(sim);
 	}
 
-	@Override
-	protected void updateMachines(Simulation sim) {
-		
-	}
-
-	@Override
-	protected void scheduleEvents(Simulation sim) {
-		
-	}
-
-	@Override
+	
 	protected void updateStatistics(Simulation sim) {
 		if(dvd !=null) {
 			sim.statistics.addToStatistic("Total DVDs processed", 1);
