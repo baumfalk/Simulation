@@ -131,7 +131,10 @@ public class Simulation {
 		Event[] eventList = new Event[eventQueue.size()];
 		eventQueue.toArray(eventList) ;
 		Arrays.sort(eventList);
-		for(int i =0; i < eventQueue.size();i++) {		
+		for(int i =0; i < eventQueue.size();i++) {
+			if(eventList[i] instanceof CBFinished)
+				listString.add(((CBFinished) eventList[i]).toString(this));
+			else
 			listString.add(eventList[i].toString());
 		}
 		return listString;
@@ -457,6 +460,7 @@ public class Simulation {
 
 
 	public void scheduleCBFinishedEvent(int machineNumber, int processingTime, int dvdID, String scheduledBy) {
+		
 		// add if needed
 		if(conveyorBeltFinishedCounter.get(machineNumber-1).get(dvdID) == null) {
 			conveyorBeltFinishedCounter.get(machineNumber-1).put(dvdID,0);

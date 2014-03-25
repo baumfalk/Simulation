@@ -141,7 +141,7 @@ public class Stage1Finished extends MachineXEvent {
 				// Give a dvd (the old dvd) from the buffer to the machine in stage 2
 				oldDVD = machineStageOne.rightBuffer().removeFromBuffer();
 				machineStageTwo.addDVD(oldDVD);
-		
+				
 				// Schedule a new Stage2FinishedEvent with time = currentTime 
 				int processingTimeStage2Machine = machineStageTwo.generateProcessingTime();
 				sim.scheduleStage2FinishedEvent(machineTwoNumber, processingTimeStage2Machine, scheduledBy());

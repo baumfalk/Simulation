@@ -181,4 +181,12 @@ public class CBFinished extends MachineXEvent {
 	public String scheduledBy() {
 		return super.scheduledBy() + " dvd: " + dvdID;
 	}
+	
+	public String toString(Simulation sim) {
+		conveyorBelt = sim.getConveyorBelt(machineNumber);
+		int overtime = conveyorBelt.getDVDOvertime(dvdID);
+		int timeOfEnteringBelt =  conveyorBelt.getDVDTimeOfEnteringBelt(dvdID);
+		
+		return super.toString() + " dvd: " + dvdID + " added on " + timeOfEnteringBelt + " overtime: " + overtime;
+	}
 }

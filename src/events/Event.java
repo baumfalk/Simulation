@@ -40,21 +40,25 @@ public abstract class Event implements Comparable<Event> {
 			 *  this is because we always want all CBFinished for the same time as as stage3step3
 			 *  to occur before the Stage3Step3Finished, since else we need to look into the future.
 			 */
-			if (this instanceof CBFinished && event instanceof Stage3Step3Finished) {
+			 if (this instanceof CBFinished && event instanceof Stage3Step3Finished) {
 				output = -1;
-			} else if (this instanceof Stage3Step3Finished && event instanceof CBFinished) {
+			}  else if (this instanceof Stage3Step3Finished && event instanceof CBFinished) {
 				output = 1;
 			}
-			else
-				output = 0;
+			else  {
+				output = this.getClass().getSimpleName().compareTo(event.getClass().getSimpleName());
+				if(this instanceof MachineXEvent && event instanceof MachineXEvent && output == 0)
+					output = ( ((MachineXEvent) this).getTimeOfScheduling() < ((MachineXEvent) event).getTimeOfScheduling()) ? -1 : 1;
+			}
 		}
 		else output = 1;
+		
 		return output;
 	}
 	
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append(this.getClass().getSimpleName() + " scheduled:" + timeOfScheduling + " occurrence:" + timeOfOccurrence);
+		sb.append( "Time:" + timeOfOccurrence + " "+ this.getClass().getSimpleName() + " scheduled:" + timeOfScheduling );
 		return sb.toString();
 	}
 	

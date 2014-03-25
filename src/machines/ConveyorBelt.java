@@ -91,7 +91,6 @@ public class ConveyorBelt extends Machine {
 	}
 	
 	public int getDVDOvertime(int dvdID) {
-		// TODO Auto-generated method stub
 		return dvdOvertimeLeft.get(dvdID);
 	}
 	
@@ -102,6 +101,17 @@ public class ConveyorBelt extends Machine {
 
 	public ArrayList<DVD> getDVDsOnBelt() {
 		return this.dvdsInMachine.peekBuffer();
+	}
+	
+	public ArrayList<String> getDVDListString() {
+		ArrayList<DVD> list = this.dvdsInMachine.peekBuffer();
+		ArrayList<String> stringList = new ArrayList<String>();
+		int number = 1;
+		for(DVD dvd : list) {
+			stringList.add("#"+number++ +" DVDId:" + dvd.id + ", " + "time of entering: " + getDVDTimeOfEnteringBelt(dvd.id) + " overtime: " + getDVDOvertime(dvd.id) + " created :" + dvd.timeOfEnteringPipeLine);
+		}
+		
+		return stringList;
 	}
 
 	public int getDVDTimeOfEnteringBelt(int dvdID) {

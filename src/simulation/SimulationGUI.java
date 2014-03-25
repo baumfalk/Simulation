@@ -25,6 +25,7 @@ import machines.MachineStage2;
 import machines.MachineStage3;
 import machines.MachineStage4;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 
 public class SimulationGUI {
 
@@ -48,7 +49,9 @@ public class SimulationGUI {
 	private JLabel lblTime;
 	private JButton btnPause;
 	private JTextArea txtHours;
-	
+	private JTextField txtGoto;
+	protected static ListWindow cbListWindow2;
+	protected static ListWindow cbListWindow1;
 	/**
 	 * Launch the application.
 	 */
@@ -60,10 +63,23 @@ public class SimulationGUI {
 					SimulationGUI window = new SimulationGUI();
 					window.frmDvdFactorySimulation.setVisible(true);
 					
-					statisticsWindow = new ListWindow("Statistics");
-					statisticsWindow.setVisible(true);
-					eventListWindow = new ListWindow("Event List");
+					int xPos = window.frmDvdFactorySimulation.getX() + window.frmDvdFactorySimulation.getWidth();
+					int yPos = window.frmDvdFactorySimulation.getY();
+					
+					cbListWindow1 = new ListWindow("Conveyor Belt 1",xPos,yPos);
+					cbListWindow1.setVisible(true);
+					yPos += + cbListWindow1.getHeight();
+					cbListWindow2 = new ListWindow("Conveyor Belt 2",xPos,yPos);
+					cbListWindow2.setVisible(true);
+					
+					yPos +=  cbListWindow2.getHeight();
+					eventListWindow = new ListWindow("Event List",xPos,yPos);
 					eventListWindow.setVisible(true);
+					xPos = window.frmDvdFactorySimulation.getX();
+					yPos = window.frmDvdFactorySimulation.getY() + window.frmDvdFactorySimulation.getHeight();
+					
+					statisticsWindow = new ListWindow("Statistics",xPos,yPos);
+					statisticsWindow.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -105,9 +121,12 @@ public class SimulationGUI {
 		}
 		eventListWindow.newList(simulation.getEventListString());
 		statisticsWindow.newList(simulation.statistics.getStatisticList());
+		cbListWindow1.newList(simulation.getConveyorBelt(1).getDVDListString());
+		cbListWindow2.newList(simulation.getConveyorBelt(2).getDVDListString());
 		lblTime.setText("Time: " + simulation.getCurrentTime());
 		
-		
+		cbListWindow1.repaint();
+		cbListWindow2.repaint();
 		eventListWindow.repaint();
 		statisticsWindow.repaint();
 		
@@ -134,7 +153,7 @@ public class SimulationGUI {
 	private void initWindow() {
 		frmDvdFactorySimulation = new JFrame();
 		frmDvdFactorySimulation.setTitle("DVD Factory Simulation");
-		frmDvdFactorySimulation.setBounds(100, 100, 1063, 653);
+		frmDvdFactorySimulation.setBounds(100, 50, 1075, 653);
 		frmDvdFactorySimulation.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frmDvdFactorySimulation.getContentPane().setLayout(null);
 	}
@@ -271,6 +290,30 @@ public class SimulationGUI {
 		txtHours.setBounds(853, 10, 60, 14);
 		frmDvdFactorySimulation.getContentPane().add(txtHours);
 	
+		txtGoto = new JTextField("10");
+		txtGoto.setBounds(975, 45, 51, 14);
+		frmDvdFactorySimulation.getContentPane().add(txtGoto);
+		txtGoto.setColumns(10);
+		
+		JButton btnNewButton = new JButton("Goto");
+		btnNewButton.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				if(simulation == null) {
+					int numberOfHours = Integer.parseInt(txtHours.getText());
+					simulation = new Simulation(numberOfHours*60*60, 20, 20);
+					updateGUI();
+				} 
+				int gotoTime = Integer.parseInt(txtGoto.getText());
+				while(simulation.getCurrentTime() < gotoTime) {
+					simulation.nextStep();
+				}
+				updateGUI();
+			}
+		});
+		
+		btnNewButton.setBounds(975, 70, 76, 23);
+		frmDvdFactorySimulation.getContentPane().add(btnNewButton);
 	}
 	
 	private void initStage1() {

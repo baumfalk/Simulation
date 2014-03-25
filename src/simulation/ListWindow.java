@@ -28,7 +28,7 @@ public class ListWindow extends JFrame {
 			@Override
 			public void run() {
 				try {
-					ListWindow frame = new ListWindow("Sample");
+					ListWindow frame = new ListWindow("Sample", 100,100);
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -40,10 +40,10 @@ public class ListWindow extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public ListWindow(String name) {
+	public ListWindow(String name, int x, int y) {
 		setTitle("DVD Factory Simulation - " + name);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 400, 483);
+		setBounds(x, y, 400, 314);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -54,7 +54,7 @@ public class ListWindow extends JFrame {
 		contentPane.add(lblEventList);
 		listModel = new DefaultListModel();
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(20, 36, 362, 399);
+		scrollPane.setBounds(20, 36, 354, 238);
 		JList list = new JList();
 		list.setModel(listModel);
 		
