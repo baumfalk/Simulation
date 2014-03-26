@@ -180,8 +180,6 @@ public class Simulation {
 			}
 		}
 		eventQueue.add(event);
-		System.out.println("Added event " + event.getClass().getSimpleName() + " to the event queue.");
-		System.out.println("Added on " + event.getTimeOfScheduling() + " for time " + event.getTimeOfOccurrence());
 	}
 
 	private void createBuffers()  {
@@ -266,9 +264,9 @@ public class Simulation {
 		}
 		Event event = eventQueue.remove();
 		currentTime = event.getTimeOfOccurrence();
-		System.out.println("The current time is " + currentTime);
-		System.out.println("The event that will be processed is " + event.getClass().getSimpleName());
-		System.out.println("It was scheduled at " + event.getTimeOfScheduling() + " by " + event.getScheduler());
+		//System.out.println("The current time is " + currentTime);
+		//System.out.println("The event that will be processed is " + event.getClass().getSimpleName());
+		//System.out.println("It was scheduled at " + event.getTimeOfScheduling() + " by " + event.getScheduler());
 		
 		if(event.getTimeOfOccurrence() < currentTime) {
 			try {
@@ -282,8 +280,8 @@ public class Simulation {
 		currentTime = event.getTimeOfOccurrence();
 		
 		event.execute(this);
-		System.out.println("Executed the event");
-		System.out.println();
+		//System.out.println("Executed the event");
+		//System.out.println();
 	}
 
 
@@ -460,7 +458,6 @@ public class Simulation {
 
 
 	public void scheduleCBFinishedEvent(int machineNumber, int processingTime, int dvdID, String scheduledBy) {
-		
 		// add if needed
 		if(conveyorBeltFinishedCounter.get(machineNumber-1).get(dvdID) == null) {
 			conveyorBeltFinishedCounter.get(machineNumber-1).put(dvdID,0);
@@ -505,8 +502,15 @@ public class Simulation {
 			throw new Exception();
 		} catch (Exception e) {
 			e.printStackTrace();
+			System.out.println(getCurrentTime());
 			System.exit(1);
 		}
+	}
+
+
+	public int getStage1FinishedEventCount(int machineNumber) {
+		// TODO Auto-generated method stub
+		return stage1FinishedCounter[machineNumber-1];
 	}
 
 

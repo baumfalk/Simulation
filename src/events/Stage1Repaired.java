@@ -63,6 +63,7 @@ public class Stage1Repaired extends MachineXEvent {
 		 *  	b) Feed this DVD to the machine
 		 *  	c) Generate a processing time for the machine and give it to the machine
 		 *  	d) Schedule a new Stage1Finished event
+		 *  3. Generate a new Breakdown event
 		 */
 		machineStageOne.setRunning();
 		if(machineStageOne.machineIsEmpty()) {
@@ -71,6 +72,7 @@ public class Stage1Repaired extends MachineXEvent {
 			int processingTime = machineStageOne.generateProcessingTime();
 			sim.scheduleStage1FinishedEvent(machineNumber, processingTime, scheduledBy());
 		}
+		sim.scheduleStage1BreakdownEvent(machineNumber, machineStageOne.generateBreakDownTime(), scheduledBy());
 	}
 
 	private void executeBrokenCase(Simulation sim) {
@@ -91,6 +93,7 @@ public class Stage1Repaired extends MachineXEvent {
 		 *  	c) Set the state to BrokenAndRepaired
 		 *  3. We must generate a new Stage1Bbrakdown event
 		 */
+		sim.sanityCheck(sim.getStage1FinishedEventCount(machineNumber) == 1);
 		if(machineStageOne.machineIsEmpty()) {
 			setRunningAndScheduleFinishedEvent(sim);
 		} else {

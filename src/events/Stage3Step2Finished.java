@@ -64,7 +64,6 @@ public class Stage3Step2Finished extends MachineXEvent {
 		for(int i =0; i < machineStageThree.batchSize; i++) {
 			if(machineStageThree.machineStuckOnDVD()) {
 				delay += machineStageThree.generateRepairTime();
-				System.out.println("\tStage 3 step 2 crashed on a dvd!");
 			}
 		}
 		return delay;

@@ -33,7 +33,7 @@ public class MachineStage2 extends Machine {
 
 	@Override
 	public int generateProcessingTime() {
-		return (int) Math.abs(Math.round(dist.sample())); // wrap around
+		return 1+ (int) Math.abs(Math.round(dist.sample())) ; // wrap around
 	}
 
 	public boolean breakDVD()

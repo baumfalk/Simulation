@@ -33,7 +33,7 @@ public class MachineStage1 extends Machine {
 	@Override
 	public int generateProcessingTime() {
 		// TODO Randomize
-		return (int) Math.round(dist.sample());
+		return 1+(int) Math.round(dist.sample());// at least 1
 	}
 	
 	public int generateBreakDownTime()
@@ -70,7 +70,6 @@ public class MachineStage1 extends Machine {
 		// TODO Auto-generated method stub
 		if(state == StateStage1.Broken) {
 			state = StateStage1.BrokenAndDVD;
-			System.out.println("\t Set the state to BrokenAndDVDBeforeRepair" );
 		}
 		else {
 			try {

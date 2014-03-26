@@ -50,7 +50,7 @@ public class MachineStage4 extends Machine {
 
 	@Override
 	public int generateProcessingTime() {
-		return (int) Math.round(dist.sample());
+		return 1+(int) Math.round(dist.sample());
 	}
 
 	public StateStage4 getState() {

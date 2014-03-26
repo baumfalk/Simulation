@@ -27,7 +27,7 @@ public class ConveyorBelt extends Machine {
 	
 	@Override
 	public int generateProcessingTime() {
-		return 1;//5*60; //TODO: fix this
+		return 5*60;
 	}
 
 	public StateConveyorBelt getState() {
