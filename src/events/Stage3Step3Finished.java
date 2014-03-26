@@ -84,34 +84,34 @@ public class Stage3Step3Finished extends MachineXEvent {
 		 * 					- else if the time the dvd was put on the belt + processing time > current time
 		 * 						* update the overtime for this DVD on the overtime we calculated by step 1.h.ii .
 		 * 				
-		 * 		l) Else if the farthest left buffer is full
-		 * 			i) Do the the same thing as with j, but then for the farthest buffer.
+		 * 		l) Else if the furthest left buffer is full
+		 * 			i) Do the the same thing as with j, but then for the furthest buffer.
 		 * 		m) If both buffers are empty
 		 * 			i) Set the machine on Idle
 		 * 			ii) Update the idle time for this machine
-		 * 	2. Else if the farthest machine of stage 4 is Idle (i.e. the crate is empty)
-		 * 		a) Do the same as with step 1, but then for the farthest machine
+		 * 	2. Else if the furthest machine of stage 4 is Idle (i.e. the crate is empty)
+		 * 		a) Do the same as with step 1, but then for the furthest machine
 		 * 	3. Else if no machine of stage 4 is Idle
 		 * 		a) Set this machine to Blocked
 		 * 		b) Set the blocked time for the machine
 		 */
 		
 		int nearestNumber = machineNumber;
-		int farthestNumber = 3 - machineNumber;
+		int furthestNumber = 3 - machineNumber;
 		MachineStage4 nearestMachineStageFour = sim.getMachineStage4(nearestNumber);
-		MachineStage4 farthestMachineStageFour = sim.getMachineStage4(farthestNumber);
+		MachineStage4 furthestMachineStageFour = sim.getMachineStage4(furthestNumber);
 	
 		
 		if(nearestMachineStageFour.getState() == StateStage4.Idle) {
 			scheduleStage4Event(sim, nearestMachineStageFour);
 			
-			handleFullLeftBuffer(sim, nearestNumber, farthestNumber);
+			handleFullLeftBuffer(sim, nearestNumber, furthestNumber);
 			
 
-		} else if(farthestMachineStageFour.getState() == StateStage4.Idle) {
-			scheduleStage4Event(sim, farthestMachineStageFour);
+		} else if(furthestMachineStageFour.getState() == StateStage4.Idle) {
+			scheduleStage4Event(sim, furthestMachineStageFour);
 			
-			handleFullLeftBuffer(sim, nearestNumber, farthestNumber);
+			handleFullLeftBuffer(sim, nearestNumber, furthestNumber);
 		} else {
 			machineStageThree.setBlocked();
 			machineStageThree.setTimeBlockedStarted(timeOfOccurrence);
@@ -119,11 +119,11 @@ public class Stage3Step3Finished extends MachineXEvent {
 	}
 
 	private void handleFullLeftBuffer(Simulation sim, int nearestNumber,
-			int farthestNumber) {
+			int furthestNumber) {
 		if(machineStageThree.leftBuffer(nearestNumber).isFull()) {
 			scheduleStageThreeStepOneEvent(sim, nearestNumber);
-		} else if(machineStageThree.leftBuffer(farthestNumber).isFull()) {
-			scheduleStageThreeStepOneEvent(sim, farthestNumber);
+		} else if(machineStageThree.leftBuffer(furthestNumber).isFull()) {
+			scheduleStageThreeStepOneEvent(sim, furthestNumber);
 		} else {
 			machineStageThree.setIdle();
 			machineStageThree.setTimeIdleStarted(timeOfOccurrence);
@@ -160,10 +160,12 @@ public class Stage3Step3Finished extends MachineXEvent {
 			int overtime = timeOfOccurrence - conveyorBelt.getBlockedTime();
 			
 			for(DVD dvd : conveyorBelt.getDVDsOnBelt()) {
-				int dvdOffBeltTime = conveyorBelt.getDVDTimeOfEnteringBelt(dvd.id) + conveyorBelt.generateProcessingTime();
+				int dvdOfBeltTime = conveyorBelt.getDVDTimeOfEnteringBelt(dvd.id) + conveyorBelt.generateProcessingTime();
 				int timeProcessed = conveyorBelt.getBlockedTime() - conveyorBelt.getDVDTimeOfEnteringBelt(dvd.id);
-				int timeLeft =  conveyorBelt.generateProcessingTime() - timeProcessed;
-				if(dvdOffBeltTime <= timeOfOccurrence) {
+				int timeLeft =  conveyorBelt.getDVDOvertime(dvd.id) + conveyorBelt.generateProcessingTime() - timeProcessed;
+				sim.sanityCheck(timeLeft >= 0);
+				sim.sanityCheck((timeLeft-conveyorBelt.getDVDOvertime(dvd.id)) >= 0);
+				if(dvdOfBeltTime <= timeOfOccurrence) {
 					sim.scheduleCBFinishedEvent(conveyorBelt.machineNumber, timeLeft, dvd.id, scheduledBy());
 				} else {
 					int newOvertime = conveyorBelt.getDVDOvertime(dvd.id) + overtime; 

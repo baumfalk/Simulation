@@ -48,8 +48,9 @@ public class MachineStage1 extends Machine {
 
 
 	public void setBroken() {
-		if(state == StateStage1.Running || state == StateStage1.Blocked ||  state == StateStage1.BrokenAndRepaired)
+		if(state == StateStage1.Running || state == StateStage1.Blocked ||  state == StateStage1.BrokenAndRepaired) {
 			state = StateStage1.Broken;
+		}
 		else {
 			try {
 				throw new InvalidStateException();
@@ -67,7 +68,6 @@ public class MachineStage1 extends Machine {
 	}
 
 	public void setBrokenAndDVDBeforeRepair() {
-		// TODO Auto-generated method stub
 		if(state == StateStage1.Broken) {
 			state = StateStage1.BrokenAndDVD;
 		}
@@ -84,8 +84,10 @@ public class MachineStage1 extends Machine {
 	}
 
 	public void setRunning() {
-		if(state == StateStage1.Blocked || state == StateStage1.BrokenAndRepaired || state == StateStage1.BrokenAndDVD || state == StateStage1.Broken)
+		if(state == StateStage1.Blocked || state == StateStage1.BrokenAndRepaired || state == StateStage1.BrokenAndDVD || state == StateStage1.Broken) {
 			state = StateStage1.Running;
+		}
+			
 		else {
 			try {
 				throw new InvalidStateException();
@@ -99,8 +101,9 @@ public class MachineStage1 extends Machine {
 	}
 
 	public void setBlocked() {
-		if(state == StateStage1.Running)
+		if(state == StateStage1.Running) {
 			state = StateStage1.Blocked;
+		}
 		else {
 			try {
 				throw new InvalidStateException();
@@ -113,9 +116,9 @@ public class MachineStage1 extends Machine {
 	}
 
 	public void setBrokenAndRepaired() {
-		// TODO Auto-generated method stub
-		if(state == StateStage1.Broken)
+		if(state == StateStage1.Broken) {
 			state = StateStage1.BrokenAndRepaired;
+		}
 		else {
 			try {
 				throw new InvalidStateException();

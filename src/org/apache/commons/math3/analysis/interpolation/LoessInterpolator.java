@@ -277,7 +277,7 @@ public class LoessInterpolator
                 final int iright = bandwidthInterval[1];
 
                 // Compute the point of the bandwidth interval that is
-                // farthest from x
+                // furthest from x
                 final int edge;
                 if (xval[i] - xval[ileft] > xval[iright] - xval[i]) {
                     edge = ileft;

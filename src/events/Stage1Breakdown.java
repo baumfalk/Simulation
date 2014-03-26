@@ -28,15 +28,12 @@ public class Stage1Breakdown extends MachineXEvent {
 		
 		switch(machineStageOne.getState()) {
 		case Blocked:
-			executeRunningOrBlockedCase(sim);
-			break;
 		case Running:
-			sim.sanityCheck(sim.getStage1FinishedEventCount(machineNumber) == 1);
+		case BrokenAndRepaired:
 			executeRunningOrBlockedCase(sim);
 			break;
 		case Broken:
 		case BrokenAndDVD:
-		case BrokenAndRepaired:
 			/*
 			 * Cannot happen, since this means that broken was scheduled before it was repaired
 			 */

@@ -63,6 +63,8 @@ public class Stage1Repaired extends MachineXEvent {
 		 *  	b) Feed this DVD to the machine
 		 *  	c) Generate a processing time for the machine and give it to the machine
 		 *  	d) Schedule a new Stage1Finished event
+		 *  3. If the machine is not empty
+		 *  	a) Schedule an event in processing time left time.
 		 *  3. Generate a new Breakdown event
 		 */
 		machineStageOne.setRunning();
@@ -71,6 +73,8 @@ public class Stage1Repaired extends MachineXEvent {
 			machineStageOne.addDVD(newDVD);
 			int processingTime = machineStageOne.generateProcessingTime();
 			sim.scheduleStage1FinishedEvent(machineNumber, processingTime, scheduledBy());
+		} else {
+			sim.scheduleStage1FinishedEvent(machineNumber, machineStageOne.getProcessingTime(), scheduledBy());
 		}
 		sim.scheduleStage1BreakdownEvent(machineNumber, machineStageOne.generateBreakDownTime(), scheduledBy());
 	}
@@ -93,7 +97,7 @@ public class Stage1Repaired extends MachineXEvent {
 		 *  	c) Set the state to BrokenAndRepaired
 		 *  3. We must generate a new Stage1Bbrakdown event
 		 */
-		sim.sanityCheck(sim.getStage1FinishedEventCount(machineNumber) == 1);
+		
 		if(machineStageOne.machineIsEmpty()) {
 			setRunningAndScheduleFinishedEvent(sim);
 		} else {

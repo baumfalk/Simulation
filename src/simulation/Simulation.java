@@ -14,6 +14,7 @@ import misc.Statistics;
 import buffer.DVDBuffer;
 import events.CBFinished;
 import events.Event;
+import events.MachineXEvent;
 import events.SimulationFinished;
 import events.Stage1Breakdown;
 import events.Stage1Finished;
@@ -29,7 +30,7 @@ import exceptions.InvalidTimeError;
 public class Simulation {
 	
 	private int currentTime;
-	
+	private int prevTime = 0;
 	public int getCurrentTime() {
 		return currentTime;
 	}
@@ -61,9 +62,9 @@ public class Simulation {
 	private int[] stage3Step2FinishedCounter;
 	private int[] stage3Step3FinishedCounter;
 	private int[] stage4FinishedCounter;
+	public static int largestGapInTime = 0;
 
 	public static int DVDCount = 0;
-	
 	public static void main(String [] args) {
 		if (args.length < 3) {
 			System.out.println("Not enough arguments!");
@@ -263,11 +264,17 @@ public class Simulation {
 			return;
 		}
 		Event event = eventQueue.remove();
+		prevTime = currentTime;
 		currentTime = event.getTimeOfOccurrence();
-		//System.out.println("The current time is " + currentTime);
-		//System.out.println("The event that will be processed is " + event.getClass().getSimpleName());
-		//System.out.println("It was scheduled at " + event.getTimeOfScheduling() + " by " + event.getScheduler());
-		
+		if(currentTime - prevTime > largestGapInTime) {
+			largestGapInTime = currentTime - prevTime;
+			System.out.println("New largest gap:" +largestGapInTime + ", got at " + currentTime);
+		}
+		if(event instanceof CBFinished || event instanceof Stage3Step3Finished) {
+			System.out.println("The current time is " + currentTime);
+			System.out.println("The event that will be processed is " + event.getClass().getSimpleName());
+			System.out.println("It was scheduled at " + event.getTimeOfScheduling() + " by " + event.getScheduler());
+		}
 		if(event.getTimeOfOccurrence() < currentTime) {
 			try {
 				throw new InvalidTimeError();
@@ -280,6 +287,9 @@ public class Simulation {
 		currentTime = event.getTimeOfOccurrence();
 		
 		event.execute(this);
+		if(event instanceof CBFinished || event instanceof Stage3Step3Finished) {
+			System.out.println();
+		}
 		//System.out.println("Executed the event");
 		//System.out.println();
 	}
@@ -502,7 +512,7 @@ public class Simulation {
 			throw new Exception();
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.out.println(getCurrentTime());
+			System.out.println(getCurrentTime() + " - " + largestGapInTime);
 			System.exit(1);
 		}
 	}

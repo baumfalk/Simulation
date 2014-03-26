@@ -51,8 +51,8 @@ public class KMeansPlusPlusClusterer<T extends Clusterable<T>> {
         /** Split the cluster with largest number of points. */
         LARGEST_POINTS_NUMBER,
 
-        /** Create a cluster around the point farthest from its centroid. */
-        FARTHEST_POINT,
+        /** Create a cluster around the point furthest from its centroid. */
+        furthest_POINT,
 
         /** Generate an error. */
         ERROR
@@ -192,8 +192,8 @@ public class KMeansPlusPlusClusterer<T extends Clusterable<T>> {
                         case LARGEST_POINTS_NUMBER :
                             newCenter = getPointFromLargestNumberCluster(clusters);
                             break;
-                        case FARTHEST_POINT :
-                            newCenter = getFarthestPoint(clusters);
+                        case furthest_POINT :
+                            newCenter = getfurthestPoint(clusters);
                             break;
                         default :
                             throw new ConvergenceException(LocalizedFormats.EMPTY_CLUSTER_IN_K_MEANS);
@@ -452,20 +452,20 @@ public class KMeansPlusPlusClusterer<T extends Clusterable<T>> {
     }
 
     /**
-     * Get the point farthest to its cluster center
+     * Get the point furthest to its cluster center
      *
      * @param clusters the {@link Cluster}s to search
-     * @return point farthest to its cluster center
+     * @return point furthest to its cluster center
      * @throws ConvergenceException if clusters are all empty
      */
-    private T getFarthestPoint(final Collection<Cluster<T>> clusters) throws ConvergenceException {
+    private T getfurthestPoint(final Collection<Cluster<T>> clusters) throws ConvergenceException {
 
         double maxDistance = Double.NEGATIVE_INFINITY;
         Cluster<T> selectedCluster = null;
         int selectedPoint = -1;
         for (final Cluster<T> cluster : clusters) {
 
-            // get the farthest point
+            // get the furthest point
             final T center = cluster.getCenter();
             final List<T> points = cluster.getPoints();
             for (int i = 0; i < points.size(); ++i) {

@@ -16,13 +16,14 @@ public class ConveyorBelt extends Machine {
 	
 	private HashMap<Integer, Integer> dvdOvertimeLeft;
 	private HashMap<Integer, Integer> dvdTimeOfEntering;
-
+	private HashMap<Integer, Integer> dvdTimeLeft;
 	
 	public ConveyorBelt(int conveyorBeltNumber, DVDBuffer rightBuffer) {
 		super(conveyorBeltNumber, null, new ArrayList<DVDBuffer>(Arrays.asList(rightBuffer)),-1); // infinity
 		state = StateConveyorBelt.Idle;
-		dvdTimeOfEntering = new HashMap<Integer,Integer>();;
+		dvdTimeOfEntering = new HashMap<Integer,Integer>();
 		dvdOvertimeLeft = new HashMap<Integer,Integer>();
+		dvdTimeLeft = new HashMap<Integer, Integer>();
 	}
 	
 	@Override
@@ -50,8 +51,14 @@ public class ConveyorBelt extends Machine {
 	}
 
 	public void setBlocked() {
-		if(state == StateConveyorBelt.Running)
+		if(state == StateConveyorBelt.Running) {
 			state = StateConveyorBelt.Blocked;
+			System.out.println("Machine " + machineNumber + " BLOCKED");
+			ArrayList<String> list =  getDVDListString();
+			for(String s : list) {
+				System.out.println("\t " + s );
+			}
+		}
 		else {
 			try {
 				throw new InvalidStateException();

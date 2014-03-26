@@ -9,7 +9,6 @@ import exceptions.InvalidStateException;
 
 public class Stage4Finished extends MachineXEvent {
 
-	private DVD dvd;
 	private MachineStage4 machineStageFour;
 	public Stage4Finished(int t, int tos, int m,String scheduledBy) {
 		super(t, tos, m, scheduledBy);
@@ -58,8 +57,8 @@ public class Stage4Finished extends MachineXEvent {
 			 *  		i) Set the machine from stage 3 to Running
 			 *  		ii) Update the statistics for blocked time for this machine
 			 *  		iii) Schedule new Stage3Step3Finished event due in 0 seconds.
-			 *  	d) If the farthest machine from stage 3 is Blocked
-			 *  		i) do the same as in c), but then for the farthest machine.
+			 *  	d) If the furthest machine from stage 3 is Blocked
+			 *  		i) do the same as in c), but then for the furthest machine.
 			 */
 			DVD dvdFromMachine = machineStageFour.removeDVD();
 			int throughputTime = timeOfOccurrence - dvdFromMachine.timeOfEnteringPipeLine;
@@ -78,9 +77,9 @@ public class Stage4Finished extends MachineXEvent {
 				machineStageFour.setTimeIdleStarted(timeOfOccurrence);
 				
 				MachineStage3 nearestMachineStageThree = sim.getMachineStage3(machineNumber);
-				MachineStage3 farthestMachineStageThree = sim.getMachineStage3(3-machineNumber);
+				MachineStage3 furthestMachineStageThree = sim.getMachineStage3(3-machineNumber);
 				scheduleNewStageThreeStep3Event(sim, nearestMachineStageThree);
-				scheduleNewStageThreeStep3Event(sim, farthestMachineStageThree);
+				scheduleNewStageThreeStep3Event(sim, furthestMachineStageThree);
 			}
 			break;
 		}

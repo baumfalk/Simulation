@@ -11,6 +11,7 @@ public class SimulationFinished extends Event{
 	@Override
 	public void execute(Simulation sim) {
 		sim.simulationFinished = true;
+		System.out.println(sim.largestGapInTime);
 		System.out.println(sim.statistics);
 	}
 
