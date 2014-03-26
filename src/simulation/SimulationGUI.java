@@ -216,7 +216,7 @@ public class SimulationGUI {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				int numberOfHours = Integer.parseInt(txtHours.getText());
-				simulation = new Simulation(numberOfHours*60*60, 20, 20);
+				simulation = new Simulation(numberOfHours*60*60, 200, 10);
 				updateGUI();
 				timer.start();
 				btnPause.setText("Pause");

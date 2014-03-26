@@ -46,9 +46,21 @@ public abstract class Event implements Comparable<Event> {
 				output = 1;
 			}
 			else  {
+				// always resolve conflicts deterministically, so never 0.
+				// This is becaus else the priority queue might schedule events that occur on the same time randomly
 				output = this.getClass().getSimpleName().compareTo(event.getClass().getSimpleName());
-				if(this instanceof MachineXEvent && event instanceof MachineXEvent && output == 0)
-					output = ( ((MachineXEvent) this).getTimeOfScheduling() < ((MachineXEvent) event).getTimeOfScheduling()) ? -1 : 1;
+				// the same events
+				if(output == 0) {
+					boolean thisEarlierThanEvent = (this.getTimeOfOccurrence() <event.getTimeOfOccurrence());
+					output = (thisEarlierThanEvent) ? -1 : 1;
+					// should always be true
+					if(this instanceof MachineXEvent && event instanceof MachineXEvent) {
+						boolean thisSmallerMachineNumber = ((MachineXEvent)this).getMachineNumber() < ((MachineXEvent)event).getMachineNumber();
+						output = (thisSmallerMachineNumber) ? -1 : 1;
+					} else{
+						output = -1;
+					}
+				}
 			}
 		}
 		else output = 1;

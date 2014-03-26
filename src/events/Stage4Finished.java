@@ -70,7 +70,7 @@ public class Stage4Finished extends MachineXEvent {
 				DVD dvdFromBuffer = machineStageFour.leftBuffer().removeFromBuffer();
 				machineStageFour.addDVD(dvdFromBuffer);
 				int delay = machineStageFour.renewCartridgeIfNecessary();
-				int processingTime = machineStageFour.generateProcessingTime();
+				int processingTime = machineStageFour.generateProcessingTime() + delay;
 
 				sim.scheduleStage4Finished(machineNumber, processingTime, scheduledBy());
 			} else {

@@ -15,7 +15,7 @@ public abstract class MachineXEvent extends Event {
 	
 	public String toString() {
 		String s= super.toString();
-		s = " Machine: " + machineNumber + " " + s;
+		s = s + " Machine: " + machineNumber;
 		return s;
 	}
 	

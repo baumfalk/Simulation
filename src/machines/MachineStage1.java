@@ -33,7 +33,7 @@ public class MachineStage1 extends Machine {
 	@Override
 	public int generateProcessingTime() {
 		// TODO Randomize
-		return 1;//(int) Math.round(dist.sample());
+		return (int) Math.round(dist.sample());
 	}
 	
 	public int generateBreakDownTime()
@@ -60,7 +60,6 @@ public class MachineStage1 extends Machine {
 			}
 		}
 	}
-
 
 	public StateStage1 getState() {
 

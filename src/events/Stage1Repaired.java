@@ -58,14 +58,14 @@ public class Stage1Repaired extends MachineXEvent {
 		 * and while the machine was broken. We must do the following:
 		 * 
 		 * 	1. Set the state to running
-		 *  2. If the buffer is not full
+		 *  2. If the machine is empty
 		 *  	a) Create a new DVD
 		 *  	b) Feed this DVD to the machine
 		 *  	c) Generate a processing time for the machine and give it to the machine
 		 *  	d) Schedule a new Stage1Finished event
 		 */
 		machineStageOne.setRunning();
-		if(!machineStageOne.rightBuffer().isFull()) {
+		if(machineStageOne.machineIsEmpty()) {
 			DVD newDVD = sim.generateNewDVD();
 			machineStageOne.addDVD(newDVD);
 			int processingTime = machineStageOne.generateProcessingTime();

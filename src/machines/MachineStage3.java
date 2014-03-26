@@ -45,7 +45,7 @@ public class MachineStage3 extends Machine {
 		for(int i = 0; i < batchSize; i++) {
 			time += distStep1.sample();
 		}
-		return 1;//(int) Math.round(time);
+		return (int) Math.round(time);
 	}
 	
 	public int generateProcessingTimeStep2() {
@@ -53,11 +53,11 @@ public class MachineStage3 extends Machine {
 		for(int i = 0; i < batchSize; i++) {
 			time += distStep2.sample();
 		}
-		return 1;//(int) Math.round(time);
+		return (int) Math.round(time);
 	}
 	
 	public int generateProcessingTimeStep3() {
-		return 1;//3 * 60;
+		return 3 * 60;
 	}
 
 	public boolean machineStuckOnDVD() {

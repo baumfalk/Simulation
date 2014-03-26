@@ -78,7 +78,8 @@ public class Stage3Step3Finished extends MachineXEvent {
 		 *  				  (note that we can use <= and not just <, since we force in our event ordering that CBFinished events
 		 *  				  that happen on the same time as Stage3Step3Finished events are always executed
 		 *  				  before the Stage3Step3Finished events)
-		 * 						* schedule a ConveyorBeltFinished event for this DVD in overtime seconds.
+		 *  					* calculate how many seconds the dvd should still be on the belt
+		 * 						* schedule a ConveyorBeltFinished event for this DVD in timeleft seconds.
 		 * 					  	  The original  ConveyorBeltFinished event already went by, so we need to reschedule
 		 * 					- else if the time the dvd was put on the belt + processing time > current time
 		 * 						* update the overtime for this DVD on the overtime we calculated by step 1.h.ii .
@@ -143,25 +144,27 @@ public class Stage3Step3Finished extends MachineXEvent {
 			MachineStage2 machineStageTwo = sim.getMachineStage2(conveyorBelt.machineNumber);
 			// sanity check: belt not empty
 			sim.sanityCheck(!conveyorBelt.machineIsEmpty());
-			sim.sanityCheck(machineStageTwo.getState() == StateStage2.Blocked );
 			conveyorBelt.setRunning();
 			
 			// Update statistics on idle time of the conveyor belt
 			int totalBlockedTimeConveyorBelt = timeOfOccurrence-conveyorBelt.getBlockedTime();
 			sim.statistics.addToStatistic("Conveyor Belt Machine "+ conveyorBelt.machineNumber + " blocked time", totalBlockedTimeConveyorBelt);
 			
-			
 			int totalBlockedTimeStage2 = timeOfOccurrence-machineStageTwo.getBlockedTime();
 			sim.statistics.addToStatistic("Stage2 Machine "+ machineStageTwo.machineNumber + " blocked time", totalBlockedTimeStage2);
 			
-			machineStageTwo.setRunning();
-			sim.scheduleStage2FinishedEvent(conveyorBelt.machineNumber, 0, scheduledBy());
+			if(machineStageTwo.getState() == StateStage2.Blocked) {
+				machineStageTwo.setRunning();
+				sim.scheduleStage2FinishedEvent(conveyorBelt.machineNumber, 0, scheduledBy());
+			}
 			int overtime = timeOfOccurrence - conveyorBelt.getBlockedTime();
 			
 			for(DVD dvd : conveyorBelt.getDVDsOnBelt()) {
-				int dvdOfBeltTime = conveyorBelt.getDVDTimeOfEnteringBelt(dvd.id) + conveyorBelt.generateProcessingTime();
-				if(dvdOfBeltTime <= timeOfOccurrence) {
-					sim.scheduleCBFinishedEvent(conveyorBelt.machineNumber, overtime, dvd.id, scheduledBy());
+				int dvdOffBeltTime = conveyorBelt.getDVDTimeOfEnteringBelt(dvd.id) + conveyorBelt.generateProcessingTime();
+				int timeProcessed = conveyorBelt.getBlockedTime() - conveyorBelt.getDVDTimeOfEnteringBelt(dvd.id);
+				int timeLeft =  conveyorBelt.generateProcessingTime() - timeProcessed;
+				if(dvdOffBeltTime <= timeOfOccurrence) {
+					sim.scheduleCBFinishedEvent(conveyorBelt.machineNumber, timeLeft, dvd.id, scheduledBy());
 				} else {
 					int newOvertime = conveyorBelt.getDVDOvertime(dvd.id) + overtime; 
 					conveyorBelt.setDVDOvertime(dvd.id, newOvertime);
